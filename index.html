@@ -5,13 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#2563EB" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="XADMIN" />
     <meta name="mobile-web-app-capable" content="yes" />
     <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" type="image/svg+xml"
+      href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>%F0%9F%91%A8%E2%80%8D%F0%9F%92%BB</text></svg>" />
+    <link rel="apple-touch-icon"
+      href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='42' fill='%232563EB'/><text x='50%25' y='54%25' font-size='120' text-anchor='middle' dominant-baseline='middle'>%F0%9F%91%A8%E2%80%8D%F0%9F%92%BB</text></svg>" />
     <title>XADMIN · XMARKET Console</title>
   </head>
   <body>
     <div id="root"></div>
     <script>
+      // Kill any old SW so the new icon + bundle take over instantly
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.getRegistrations().then((rs) => rs.forEach((r) => r.unregister()));
         if ('caches' in window) caches.keys().then((ks) => ks.forEach((k) => caches.delete(k)));

@@ -25,7 +25,13 @@ export default function Sidebar() {
   return (
     <aside className="sidebar">
       <div className="sidebar-brand">
-        <div className="sidebar-brand-icon">X</div>
+        <div className="sidebar-brand-icon" style={{
+          fontSize: 22,
+          background: 'linear-gradient(135deg,#DBEAFE,#BFDBFE)',
+          color: '#1F2430',
+        }}>
+          👨‍💻
+        </div>
         <div>
           <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: -0.3 }}>XADMIN</div>
           <div style={{ fontSize: 10, color: 'var(--text-dim)', fontWeight: 600 }}>XMARKET</div>

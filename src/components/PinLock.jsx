@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Lock, Delete } from 'lucide-react';
+import { Delete } from 'lucide-react';
 
 const PIN = '1010';
 
@@ -26,7 +26,7 @@ export default function PinLock({ onUnlock }) {
           background:'linear-gradient(135deg,#3B82F6,#2563EB)', display:'flex',
           alignItems:'center', justifyContent:'center', color:'#fff',
           boxShadow:'8px 8px 20px rgba(37,99,235,0.35), -6px -6px 16px rgba(255,255,255,0.9)' }}>
-          <Lock size={32} />
+          <span style={{ fontSize: 34, lineHeight: 1 }}>👨‍💻</span>
         </div>
         <h2 style={{ fontSize:22, fontWeight:900 }}>XADMIN</h2>
         <p style={{ fontSize:12.5, color:'var(--text-dim)', marginTop:4 }}>Enter access PIN</p>
