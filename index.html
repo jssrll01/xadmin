@@ -3,50 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-
-    <title>XADMIN · XMARKET Console</title>
-    <meta name="description" content="XMARKET admin console" />
-
-    <!-- PWA -->
-    <link rel="manifest" href="/manifest.webmanifest" />
-
-    <!-- Icon (must be a real file, served at this exact path) -->
-    <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
-    <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512.png" />
-
-    <!-- iOS -->
-    <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192.png" />
+    <meta name="theme-color" content="#2563EB" />
+    <link rel="icon" type="image/png" href="/icons/icon-192.png" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+    <link rel="manifest" href="/manifest.json" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="XADMIN" />
-
-    <!-- Android -->
-    <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="theme-color" content="#2563EB" />
+    <title>XADMIN · XMARKET Console</title>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
-
-    <script>
-      // Register SW — required for install prompt
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js', { scope: '/' })
-            .then((r) => console.log('[SW] registered', r.scope))
-            .catch((e) => console.warn('[SW] failed', e));
-        });
-      }
-
-      // Log install readiness so you can see it in the browser console
-      window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        window.__deferredPrompt = e;
-        console.log('[PWA] install prompt available');
-      });
-      window.addEventListener('appinstalled', () => {
-        console.log('[PWA] app installed');
-      });
-    </script>
   </body>
 </html>
