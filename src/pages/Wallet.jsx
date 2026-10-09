@@ -12,11 +12,12 @@ export default function Wallet() {
       searchKeys={['type', 'reason', 'note']}
       columns={[
         { key: 'id', label: 'ID', render: (r) => <code style={{ fontSize: 11 }}>{(r.id || '').slice(0, 8)}</code> },
+        { key: 'user_id', label: 'User', render: (r) => (r.user_id || '').slice(0, 8) || '—' },
         { key: 'amount', label: 'Amount', render: (r) => {
           const v = Number(r.amount || 0);
           return <b style={{ color: v >= 0 ? 'var(--success)' : 'var(--danger)' }}>{peso(v)}</b>;
         } },
-        { key: 'type', label: 'Type' },
+        { key: 'type', label: 'Type', render: (r) => r.type || '—' },
         { key: 'note', label: 'Note', render: (r) => r.note || '—' },
         { key: 'created_at', label: 'Date', render: (r) => dateTime(r.created_at) },
       ]}

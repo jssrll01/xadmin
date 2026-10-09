@@ -45,7 +45,6 @@ export const fetchReturns  = () => list(T.returns, 'created_at');
 export const fetchReports  = () => list(T.reports, 'created_at');
 export const fetchBundles  = () => list(T.bundles, 'created_at');
 export const fetchXCards   = () => list(T.xcards, 'created_at');
-export const fetchBots     = () => list(T.bots, 'created_at');
 export const fetchSellers  = () => list(T.users, 'created_at');
 export const fetchOrderItems = () => list(T.order_items);
 
@@ -100,4 +99,3 @@ export const returnCrud  = crud(T.returns);
 export const reportCrud  = crud(T.reports);
 export const bundleCrud  = crud(T.bundles);
 export const xcardCrud   = crud(T.xcards);
-export const botCrud     = crud(T.bots);

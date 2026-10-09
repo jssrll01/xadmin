@@ -16,7 +16,6 @@ import Sellers from './pages/Sellers.jsx';
 import Bundles from './pages/Bundles.jsx';
 import Xcards from './pages/Xcards.jsx';
 import Promos from './pages/Promos.jsx';
-import Bots from './pages/Bots.jsx';
 import Settings from './pages/Settings.jsx';
 
 export default function App() {
@@ -25,10 +24,14 @@ export default function App() {
   );
 
   if (!unlocked) {
-    return <PinLock onUnlock={() => {
-      sessionStorage.setItem('xadmin_unlocked', '1');
-      setUnlocked(true);
-    }} />;
+    return (
+      <PinLock
+        onUnlock={() => {
+          sessionStorage.setItem('xadmin_unlocked', '1');
+          setUnlocked(true);
+        }}
+      />
+    );
   }
 
   return (
@@ -47,7 +50,6 @@ export default function App() {
           <Route path="/xcards"   element={<Xcards />} />
           <Route path="/promos"   element={<Promos />} />
           <Route path="/bundles"  element={<Bundles />} />
-          <Route path="/bots"     element={<Bots />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="*"         element={<Navigate to="/" replace />} />
         </Routes>

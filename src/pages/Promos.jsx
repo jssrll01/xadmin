@@ -16,7 +16,9 @@ export default function Promos() {
         { key: 'discount_value', label: 'Value', render: (r) =>
           (r.discount_value ?? 0) + (r.discount_type === 'percent' ? '%' : ' ₱') },
         { key: 'min_spend', label: 'Min spend', render: (r) => '₱' + Number(r.min_spend || 0) },
-        { key: 'used_count', label: 'Used' },
+        { key: 'max_uses', label: 'Max uses', render: (r) => r.max_uses ?? '∞' },
+        { key: 'used_count', label: 'Used', render: (r) => r.used_count ?? 0 },
+        { key: 'per_user_limit', label: 'Per user', render: (r) => r.per_user_limit ?? 1 },
         { key: 'active', label: 'Active', render: (r) => r.active ? '✅' : '❌' },
       ]}
       formFields={[

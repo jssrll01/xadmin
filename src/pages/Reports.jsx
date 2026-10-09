@@ -13,8 +13,10 @@ export default function Reports() {
       columns={[
         { key: 'id', label: 'ID', render: (r) => <code style={{ fontSize: 11 }}>{(r.id || '').slice(0, 8)}</code> },
         { key: 'category', label: 'Category', render: (r) => <b>{r.category}</b> },
-        { key: 'gmail', label: 'Gmail' },
-        { key: 'concern', label: 'Concern', render: (r) => <span style={{ fontSize: 12 }}>{r.concern}</span> },
+        { key: 'gmail', label: 'Gmail', render: (r) => r.gmail || '—' },
+        { key: 'phone', label: 'Phone', render: (r) => r.phone || '—' },
+        { key: 'concern', label: 'Concern', wrap: true, render: (r) => <span style={{ fontSize: 12 }}>{r.concern}</span> },
+        { key: 'related_id', label: 'Related', render: (r) => r.related_id || '—' },
         { key: 'created_at', label: 'Created', render: (r) => dateTime(r.created_at) },
       ]}
       formFields={[

@@ -12,7 +12,13 @@ export default function Returns() {
       searchKeys={['status']}
       columns={[
         { key: 'id', label: 'ID', render: (r) => <code style={{ fontSize: 11 }}>{(r.id || '').slice(0, 8)}</code> },
-        { key: 'status', label: 'Status' },
+        { key: 'order_id', label: 'Order', render: (r) => (r.order_id || '').slice(0, 8) || '—' },
+        { key: 'user_id', label: 'User', render: (r) => (r.user_id || '').slice(0, 8) || '—' },
+        { key: 'reason', label: 'Reason', wrap: true, render: (r) => r.reason || '—' },
+        { key: 'status', label: 'Status', render: (r) => {
+          const s = (r.status || 'pending').toLowerCase();
+          return <span className={`neu-badge badge-${s}`}>{s}</span>;
+        } },
         { key: 'created_at', label: 'Requested', render: (r) => dateTime(r.created_at) },
       ]}
       formFields={[

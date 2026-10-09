@@ -11,9 +11,13 @@ export default function Sellers() {
       searchKeys={['email', 'username', 'first_name', 'last_name']}
       columns={[
         { key: 'id', label: 'ID', render: (r) => <code style={{ fontSize: 11 }}>{(r.id || '').slice(0, 8)}</code> },
-        { key: 'username', label: 'Username' },
-        { key: 'email', label: 'Email' },
-        { key: 'phone', label: 'Phone' },
+        { key: 'username', label: 'Username', render: (r) => r.username || '—' },
+        { key: 'email', label: 'Email', render: (r) => r.email || '—' },
+        { key: 'phone', label: 'Phone', render: (r) => r.phone || '—' },
+        { key: 'status', label: 'Status', render: (r) => {
+          const s = (r.status || 'active').toLowerCase();
+          return <span className={`neu-badge badge-${s}`}>{s}</span>;
+        } },
       ]}
       formFields={[
         { key: 'email', label: 'Email' },
@@ -23,6 +27,8 @@ export default function Sellers() {
         { key: 'phone', label: 'Phone' },
         { key: 'nearest_landmark', label: 'Landmark', required: true },
         { key: 'barangay', label: 'Barangay', required: true },
+        { key: 'status', label: 'Status', type: 'select',
+          options: ['active', 'frozen', 'banned'], default: 'active' },
       ]}
       onCreate={userCrud.create}
       onUpdate={userCrud.update}
