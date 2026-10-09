@@ -9,25 +9,39 @@ export default function Orders() {
       title="Orders"
       subtitle="Customer orders"
       fetcher={fetchOrders}
-      searchKeys={['status', 'id']}
+      searchKeys={['order_code', 'email', 'name', 'status']}
       columns={[
-        { key: 'id', label: 'Order', render: (r) => <code style={{ fontSize: 11 }}>{(r.id || '').slice(0, 8)}</code> },
-        { key: 'total', label: 'Total', render: (r) => <b>{peso(r.total || r.amount || r.total_amount || 0)}</b> },
+        { key: 'order_code', label: 'Code', render: (r) => <b>{r.order_code}</b> },
+        { key: 'name', label: 'Buyer' },
+        { key: 'email', label: 'Email' },
+        { key: 'total', label: 'Total', render: (r) => peso(r.total) },
+        { key: 'payment_method', label: 'Payment' },
         { key: 'status', label: 'Status', render: (r) => (
           <span className="neu-badge" style={{
-            background: ['completed','paid'].includes(r.status) ? '#D1FAE5'
+            background: ['completed','paid','delivered'].includes(r.status) ? '#D1FAE5'
                       : r.status === 'cancelled' ? '#FEE2E2' : '#FEF3C7',
-            color: ['completed','paid'].includes(r.status) ? '#065F46'
+            color: ['completed','paid','delivered'].includes(r.status) ? '#065F46'
                  : r.status === 'cancelled' ? '#991B1B' : '#92400E',
-          }}>{r.status || '—'}</span>
+          }}>{r.status}</span>
         ) },
         { key: 'created_at', label: 'Date', render: (r) => dateTime(r.created_at) },
       ]}
       formFields={[
-        { key: 'total', label: 'Total', type: 'number' },
+        { key: 'order_code', label: 'Order code', required: true },
+        { key: 'name', label: 'Buyer name' },
+        { key: 'email', label: 'Email' },
+        { key: 'mobile', label: 'Mobile' },
+        { key: 'address', label: 'Address' },
+        { key: 'subtotal', label: 'Subtotal', type: 'number', default: 0 },
+        { key: 'discount', label: 'Discount', type: 'number', default: 0 },
+        { key: 'total', label: 'Total', type: 'number', default: 0 },
+        { key: 'payment_method', label: 'Payment method',
+          type: 'select', options: ['cod', 'gcash', 'maya', 'bank'] },
+        { key: 'delivery_method', label: 'Delivery',
+          type: 'select', options: ['delivery', 'pickup'] },
         { key: 'status', label: 'Status', type: 'select',
-          options: ['pending', 'paid', 'completed', 'cancelled', 'refunded'] },
-        { key: 'notes', label: 'Notes', type: 'textarea' },
+          options: ['pending', 'paid', 'shipped', 'delivered', 'completed', 'cancelled'],
+          default: 'pending' },
       ]}
       onCreate={orderCrud.create}
       onUpdate={orderCrud.update}

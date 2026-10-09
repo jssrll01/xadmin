@@ -11,7 +11,7 @@ export default function Bots() {
       fetcher={fetchBots}
       searchKeys={['bot', 'text', 'from_name']}
       columns={[
-        { key: 'bot', label: 'Bot', render: (r) => <b>{r.bot || '—'}</b> },
+        { key: 'bot', label: 'Bot', render: (r) => <b>{r.bot}</b> },
         { key: 'direction', label: 'Dir' },
         { key: 'from_name', label: 'From', render: (r) => r.from_name || r.from_id || '—' },
         { key: 'text', label: 'Message', render: (r) => <span style={{ fontSize: 12 }}>{r.text || '—'}</span> },
@@ -19,7 +19,9 @@ export default function Bots() {
       ]}
       formFields={[
         { key: 'bot', label: 'Bot', required: true },
-        { key: 'direction', label: 'Direction', type: 'select', options: ['in', 'out'] },
+        { key: 'direction', label: 'Direction', type: 'select',
+          options: ['in', 'out'], default: 'in' },
+        { key: 'from_id', label: 'From ID' },
         { key: 'from_name', label: 'From name' },
         { key: 'text', label: 'Text', type: 'textarea', required: true },
       ]}

@@ -8,6 +8,11 @@ const T = {
   xcards: 'xcards', reports: 'report_tickets', bots: 'bot_messages',
 };
 
+// Primary key per table (defaults to 'id')
+const PK = {
+  promo_codes: 'code',
+};
+
 async function list(table, order) {
   try {
     let q = supabase.from(table).select('*');
@@ -18,6 +23,16 @@ async function list(table, order) {
     return { items: [], error: e };
   }
 }
+
+// Build a crud object that respects the table's real PK
+const crud = (table) => {
+  const key = PK[table] || 'id';
+  return {
+    create: async (p) => supabase.from(table).insert(p).select().single(),
+    update: async (id, p) => supabase.from(table).update(p).eq(key, id),
+    remove: async (id) => supabase.from(table).delete().eq(key, id),
+  };
+};
 
 // Fetchers
 export const fetchUsers    = () => list(T.users, 'created_at');
@@ -44,8 +59,7 @@ export async function fetchStats() {
       supabase.from(T.topups).select('*'),
       supabase.from(T.reports).select('*'),
     ]);
-    const revenue = (o.data || []).reduce((s, x) =>
-      s + Number(x.total || x.amount || x.total_amount || x.subtotal || 0), 0);
+    const revenue = (o.data || []).reduce((s, x) => s + Number(x.total || 0), 0);
     return {
       revenue,
       orders: o.count || (o.data?.length || 0),
@@ -70,18 +84,12 @@ export async function fetchRevenueSeries(days = 30) {
   }
   (data || []).forEach((o) => {
     const k = o.created_at?.slice(0, 10);
-    if (k && map[k] !== undefined) map[k] += Number(o.total || o.amount || 0);
+    if (k && map[k] !== undefined) map[k] += Number(o.total || 0);
   });
   return Object.entries(map).map(([date, revenue]) => ({ date, revenue }));
 }
 
-// CRUD per table
-const crud = (table) => ({
-  create: async (p) => supabase.from(table).insert(p).select().single(),
-  update: async (id, p) => supabase.from(table).update(p).eq('id', id),
-  remove: async (id) => supabase.from(table).delete().eq('id', id),
-});
-
+// Expose crud objects for each page
 export const productCrud = crud(T.products);
 export const orderCrud   = crud(T.orders);
 export const userCrud    = crud(T.users);
@@ -93,20 +101,3 @@ export const reportCrud  = crud(T.reports);
 export const bundleCrud  = crud(T.bundles);
 export const xcardCrud   = crud(T.xcards);
 export const botCrud     = crud(T.bots);
-
-export async function approveTopUp(id) {
-  return supabase.from(T.topups).update({ status: 'approved' }).eq('id', id);
-}
-export async function rejectTopUp(id) {
-  return supabase.from(T.topups).update({ status: 'rejected' }).eq('id', id);
-}
-export async function creditWallet(userId, amount, note = 'Admin credit') {
-  return supabase.from(T.wallet).insert({
-    user_id: userId, amount: Number(amount), type: 'credit', note,
-  });
-}
-export async function debitWallet(userId, amount, note = 'Admin debit') {
-  return supabase.from(T.wallet).insert({
-    user_id: userId, amount: -Math.abs(Number(amount)), type: 'debit', note,
-  });
-}

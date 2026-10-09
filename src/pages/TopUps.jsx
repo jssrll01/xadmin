@@ -12,8 +12,7 @@ export default function TopUps() {
       searchKeys={['status', 'method']}
       columns={[
         { key: 'id', label: 'ID', render: (r) => <code style={{ fontSize: 11 }}>{(r.id || '').slice(0, 8)}</code> },
-        { key: 'amount', label: 'Amount', render: (r) => <b>{peso(r.amount || r.requested_amount || 0)}</b> },
-        { key: 'method', label: 'Method', render: (r) => r.method || r.payment_method || '—' },
+        { key: 'amount', label: 'Amount', render: (r) => <b>{peso(r.amount)}</b> },
         { key: 'status', label: 'Status', render: (r) => (
           <span className="neu-badge" style={{
             background: r.status === 'approved' ? '#D1FAE5'
@@ -25,9 +24,10 @@ export default function TopUps() {
         { key: 'created_at', label: 'Requested', render: (r) => dateTime(r.created_at) },
       ]}
       formFields={[
+        { key: 'user_id', label: 'User ID', required: true },
         { key: 'amount', label: 'Amount', type: 'number', required: true },
-        { key: 'method', label: 'Method', type: 'select', options: ['gcash', 'maya', 'bank', 'crypto'] },
-        { key: 'status', label: 'Status', type: 'select', options: ['pending', 'approved', 'rejected'] },
+        { key: 'status', label: 'Status', type: 'select',
+          options: ['pending', 'approved', 'rejected'], default: 'pending' },
       ]}
       onCreate={topupCrud.create}
       onUpdate={topupCrud.update}

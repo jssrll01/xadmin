@@ -9,17 +9,21 @@ export default function Reports() {
       title="Reports"
       subtitle="User reports & tickets"
       fetcher={fetchReports}
-      searchKeys={['subject', 'title', 'category', 'status']}
+      searchKeys={['category', 'concern', 'gmail']}
       columns={[
         { key: 'id', label: 'ID', render: (r) => <code style={{ fontSize: 11 }}>{(r.id || '').slice(0, 8)}</code> },
-        { key: 'subject', label: 'Subject', render: (r) => r.subject || r.title || r.category || '—' },
-        { key: 'status', label: 'Status' },
+        { key: 'category', label: 'Category', render: (r) => <b>{r.category}</b> },
+        { key: 'gmail', label: 'Gmail' },
+        { key: 'concern', label: 'Concern', render: (r) => <span style={{ fontSize: 12 }}>{r.concern}</span> },
         { key: 'created_at', label: 'Created', render: (r) => dateTime(r.created_at) },
       ]}
       formFields={[
-        { key: 'subject', label: 'Subject' },
-        { key: 'status', label: 'Status', type: 'select', options: ['open', 'pending', 'resolved', 'closed'] },
-        { key: 'message', label: 'Message', type: 'textarea' },
+        { key: 'category', label: 'Category', required: true },
+        { key: 'concern', label: 'Concern', type: 'textarea', required: true },
+        { key: 'user_id', label: 'User ID' },
+        { key: 'gmail', label: 'Gmail' },
+        { key: 'phone', label: 'Phone' },
+        { key: 'related_id', label: 'Related ID' },
       ]}
       onCreate={reportCrud.create}
       onUpdate={reportCrud.update}

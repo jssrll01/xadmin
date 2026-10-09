@@ -8,18 +8,21 @@ export default function Sellers() {
       title="Sellers"
       subtitle="Seller accounts"
       fetcher={fetchSellers}
-      searchKeys={['email', 'username', 'full_name']}
+      searchKeys={['email', 'username', 'first_name', 'last_name']}
       columns={[
         { key: 'id', label: 'ID', render: (r) => <code style={{ fontSize: 11 }}>{(r.id || '').slice(0, 8)}</code> },
-        { key: 'name', label: 'Username', render: (r) => r.username || r.full_name || r.display_name || '—' },
+        { key: 'username', label: 'Username' },
         { key: 'email', label: 'Email' },
-        { key: 'role', label: 'Role', render: (r) => r.role || r.user_type || '—' },
+        { key: 'phone', label: 'Phone' },
       ]}
       formFields={[
         { key: 'email', label: 'Email' },
         { key: 'username', label: 'Username' },
-        { key: 'full_name', label: 'Full name' },
-        { key: 'role', label: 'Role', type: 'select', options: ['seller', 'admin', 'user'] },
+        { key: 'first_name', label: 'First name' },
+        { key: 'last_name', label: 'Last name' },
+        { key: 'phone', label: 'Phone' },
+        { key: 'nearest_landmark', label: 'Landmark', required: true },
+        { key: 'barangay', label: 'Barangay', required: true },
       ]}
       onCreate={userCrud.create}
       onUpdate={userCrud.update}

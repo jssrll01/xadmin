@@ -19,7 +19,7 @@ import { Plus, Edit2, Trash2, Search } from 'lucide-react';
  */
 export default function CrudPage({
   title, subtitle, fetcher, columns, formFields,
-  onCreate, onUpdate, onDelete, searchKeys = [],
+  onCreate, onUpdate, onDelete, searchKeys = [], primaryKey = 'id',
 }) {
   const { show } = useToast();
   const [items, setItems] = useState([]);
@@ -44,33 +44,34 @@ export default function CrudPage({
   useEffect(() => { load(); }, [load]);
 
   const openNew = () => {
-    const blank = {};
+    const blank = { __isNew: true };
     formFields.forEach((f) => { blank[f.key] = f.default ?? ''; });
     setEditing(blank);
   };
 
   const save = async () => {
     if (!editing) return;
-    // validate required
     for (const f of formFields) {
-      if (f.required && !editing[f.key]) {
+      if (f.required && (editing[f.key] === undefined || editing[f.key] === '')) {
         show?.(`${f.label} is required`, 'error');
         return;
       }
     }
     setSaving(true);
     try {
-      const isNew = !editing.id;
+      const pkField = primaryKey || 'id';
+      const isNew = !editing[pkField] && !editing.__isNew;
       const payload = {};
       formFields.forEach((f) => {
         let v = editing[f.key];
-        if (f.type === 'number') v = v === '' || v == null ? 0 : Number(v);
+        if (f.type === 'number') v = (v === '' || v == null) ? (f.default ?? 0) : Number(v);
         if (f.type === 'boolean') v = !!v;
+        if (v === '' && !f.required) return; // skip empty optional
         payload[f.key] = v;
       });
       const res = isNew
         ? await onCreate(payload)
-        : await onUpdate(editing.id, payload);
+        : await onUpdate(editing[pkField], payload);
       if (res?.error) throw res.error;
       show?.(isNew ? 'Created' : 'Updated', 'success');
       setEditing(null);
@@ -83,10 +84,11 @@ export default function CrudPage({
   };
 
   const remove = async (row) => {
-    const label = row.name || row.title || row.email || row.code || row.id?.slice(0, 8);
+    const pkField = primaryKey || 'id';
+    const label = row.name || row.title || row.email || row.code || String(row[pkField]).slice(0, 8);
     if (!confirm(`Delete "${label}"?`)) return;
     try {
-      const res = await onDelete(row.id);
+      const res = await onDelete(row[pkField]);
       if (res?.error) throw res.error;
       show?.('Deleted', 'success');
       load();
@@ -152,7 +154,7 @@ export default function CrudPage({
             </thead>
             <tbody>
               {filtered.map((row, i) => (
-                <tr key={row.id || i}>
+                <tr key={row[primaryKey] || i}>
                   {columns.map((c) => (
                     <td key={c.key}>
                       {c.render ? c.render(row) : String(row[c.key] ?? '—')}
