@@ -1,5 +1,32 @@
 import { supabase } from '../supabase.js';
 
+/* ============================================================
+   ON-SCREEN ERROR LOGGER — visible on every page
+   ============================================================ */
+if (typeof window !== 'undefined') {
+  window.__XADMIN_ERRORS = window.__XADMIN_ERRORS || [];
+  window.__xadminLog = function (msg) {
+    window.__XADMIN_ERRORS.push(msg);
+    console.error('[XADMIN]', msg);
+    const el = document.getElementById('__xadmin_err');
+    if (el) {
+      el.style.display = 'block';
+      el.textContent = 'API ERRORS:\n' + window.__XADMIN_ERRORS.slice(-6).join('\n');
+    }
+  };
+}
+
+async function q(name, fn) {
+  try {
+    const r = await fn();
+    if (r.error) window.__xadminLog?.(`${name}: ${r.error.message}`);
+    return r;
+  } catch (e) {
+    window.__xadminLog?.(`${name} CRASH: ${e.message}`);
+    return { items: [], error: e };
+  }
+}
+
 const T = {
   users: 'profiles', products: 'products', orders: 'orders',
   order_items: 'order_items', topups: 'xwallet_topups',
@@ -7,34 +34,6 @@ const T = {
   returns: 'return_requests', sellers: 'profiles', bundles: 'bundles',
   xcards: 'xcards', reports: 'report_tickets', bot_messages: 'bot_messages',
 };
-
-// Loud debug helper — prints to toast AND console
-async function q(name, fn) {
-  try {
-    const r = await fn();
-    if (r.error) {
-      console.error(`[API ${name}]`, r.error);
-      alert(`API ERROR [${name}]: ${r.error.message}`);
-    }
-    return r;
-  } catch (e) {
-    console.error(`[API ${name}]`, e);
-    alert(`API CRASH [${name}]: ${e.message}`);
-    return { items: [], error: e };
-  }
-}
-
-/* ============================================================
-   DIAGNOSTIC — call this from browser console or app start
-   ============================================================ */
-export async function diagnose() {
-  const results = [];
-  for (const [key, tbl] of Object.entries(T)) {
-    const { count, error } = await supabase.from(tbl).select('*', { count: 'exact', head: true });
-    results.push(`${error ? '❌' : '✅'} ${key} (${tbl}) ${error ? error.message : 'rows=' + count}`);
-  }
-  return results;
-}
 
 /* ============================================================
    DASHBOARD
