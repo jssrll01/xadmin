@@ -5,21 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#2563EB" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="apple-mobile-web-app-title" content="XADMIN" />
     <meta name="mobile-web-app-capable" content="yes" />
     <link rel="manifest" href="/manifest.webmanifest" />
-    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj48cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgcng9IjQyIiBmaWxsPSIjMjU2M0VCIi8+PHRleHQgeD0iNTAlIiB5PSI1NSUiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjEwMCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iI2ZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSI+WDwvdGV4dD48L3N2Zz4=" />
     <title>XADMIN · XMARKET Console</title>
   </head>
   <body>
     <div id="__xadmin_err" style="display:none;position:fixed;top:0;left:0;right:0;background:#ef4444;color:#fff;padding:10px;font-family:monospace;font-size:11px;z-index:99999;white-space:pre-wrap;max-height:40vh;overflow:auto"></div>
     <div id="root"></div>
     <script>
+      // Kill any existing service workers + caches on load
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js').catch(() => {});
+        navigator.serviceWorker.getRegistrations().then(regs => {
+          regs.forEach(r => r.unregister());
         });
+        if ('caches' in window) {
+          caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
+        }
       }
     </script>
     <script type="module" src="/src/main.jsx"></script>
