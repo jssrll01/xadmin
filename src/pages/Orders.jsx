@@ -24,7 +24,7 @@ export default function Orders() {
 
   const load = () => {
     setLoading(true);
-    fetchOrders({ status, search }).then(({ items }) => { setItems(items); setLoading(false); });
+    fetchOrders({ status, search }).then(({ items }) => { setItems(Array.isArray(items) ? items : []); setLoading(false); });
   };
   useEffect(load, [status]); // eslint-disable-line
 

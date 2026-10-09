@@ -17,7 +17,7 @@ export default function Xcards() {
 
   const load = () => {
     setLoading(true);
-    fetchAllXcards({ status: tab }).then(({ items }) => { setItems(items); setLoading(false); });
+    fetchAllXcards({ status: tab }).then(({ items }) => { setItems(Array.isArray(items) ? items : []); setLoading(false); });
   };
   useEffect(load, [tab]); // eslint-disable-line
 

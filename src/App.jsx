@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import PinLock from './components/PinLock.jsx';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
+import PageBoundary from './components/PageBoundary.jsx';
 import Layout from './components/Layout.jsx';
 
 import Dashboard from './pages/Dashboard.jsx';
@@ -19,6 +20,8 @@ import PromoCodes from './pages/PromoCodes.jsx';
 import Bots from './pages/Bots.jsx';
 import Settings from './pages/Settings.jsx';
 
+const wrap = (el) => <PageBoundary>{el}</PageBoundary>;
+
 export default function App() {
   const [unlocked, setUnlocked] = useState(
     () => sessionStorage.getItem('xadmin_unlocked') === '1'
@@ -26,12 +29,10 @@ export default function App() {
 
   if (!unlocked) {
     return (
-      <PinLock
-        onUnlock={() => {
-          sessionStorage.setItem('xadmin_unlocked', '1');
-          setUnlocked(true);
-        }}
-      />
+      <PinLock onUnlock={() => {
+        sessionStorage.setItem('xadmin_unlocked', '1');
+        setUnlocked(true);
+      }} />
     );
   }
 
@@ -39,22 +40,22 @@ export default function App() {
     <ErrorBoundary>
       <Layout>
         <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/products" element={<Products />} />
-          <Route path="/orders" element={<Orders />} />
-          <Route path="/users" element={<Users />} />
-          <Route path="/topups" element={<TopUps />} />
-          <Route path="/wallet" element={<Wallet />} />
-          <Route path="/reports" element={<Reports />} />
-          <Route path="/returns" element={<Returns />} />
-          <Route path="/sellers" element={<Sellers />} />
-          <Route path="/bundles" element={<Bundles />} />
-          <Route path="/xcards" element={<Xcards />} />
-          <Route path="/promo-codes" element={<PromoCodes />} />
-          <Route path="/bots" element={<Bots />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="/"            element={wrap(<Dashboard />)} />
+          <Route path="/dashboard"   element={wrap(<Dashboard />)} />
+          <Route path="/products"    element={wrap(<Products />)} />
+          <Route path="/orders"      element={wrap(<Orders />)} />
+          <Route path="/users"       element={wrap(<Users />)} />
+          <Route path="/topups"      element={wrap(<TopUps />)} />
+          <Route path="/wallet"      element={wrap(<Wallet />)} />
+          <Route path="/reports"     element={wrap(<Reports />)} />
+          <Route path="/returns"     element={wrap(<Returns />)} />
+          <Route path="/sellers"     element={wrap(<Sellers />)} />
+          <Route path="/bundles"     element={wrap(<Bundles />)} />
+          <Route path="/xcards"      element={wrap(<Xcards />)} />
+          <Route path="/promo-codes" element={wrap(<PromoCodes />)} />
+          <Route path="/bots"        element={wrap(<Bots />)} />
+          <Route path="/settings"    element={wrap(<Settings />)} />
+          <Route path="*"            element={<Navigate to="/" replace />} />
         </Routes>
       </Layout>
     </ErrorBoundary>

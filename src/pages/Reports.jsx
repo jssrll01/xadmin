@@ -31,7 +31,7 @@ export default function Reports() {
 
   const load = () => {
     setLoading(true);
-    fetchReports({ category: cat, status }).then(({ items }) => { setItems(items); setLoading(false); });
+    fetchReports({ category: cat, status }).then(({ items }) => { setItems(Array.isArray(items) ? items : []); setLoading(false); });
   };
   useEffect(load, [cat, status]); // eslint-disable-line
 

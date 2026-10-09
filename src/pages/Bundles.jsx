@@ -18,7 +18,7 @@ export default function Bundles() {
 
   const load = () => {
     setLoading(true);
-    fetchBundles().then(rows => { setItems(rows); setLoading(false); });
+    fetchBundles().then(rows => { setItems(Array.isArray(rows) ? rows : []); setLoading(false); });
   };
   useEffect(load, []);
 

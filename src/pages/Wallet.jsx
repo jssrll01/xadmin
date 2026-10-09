@@ -22,7 +22,7 @@ export default function Wallet() {
 
   const load = () => {
     setLoading(true);
-    fetchAllTxns({ type }).then(({ items }) => { setItems(items); setLoading(false); });
+    fetchAllTxns({ type }).then(({ items }) => { setItems(Array.isArray(items) ? items : []); setLoading(false); });
   };
   useEffect(load, [type]); // eslint-disable-line
 

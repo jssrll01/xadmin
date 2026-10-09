@@ -1,5 +1,8 @@
 import { supabase } from '../supabase.js';
 
+// Guarantee: every fetch returns an array, never null/undefined
+const SAFE_ARRAY = (d) => Array.isArray(d) ? d : [];
+
 /* ============================================================
    ON-SCREEN ERROR LOGGER — visible on every page
    ============================================================ */
@@ -46,15 +49,15 @@ export async function fetchStats() {
     q('stats.topups', () => supabase.from(T.topups).select('*', { count: 'exact' })),
     q('stats.reports',() => supabase.from(T.reports).select('*', { count: 'exact' })),
   ]);
-  const revenue = (o.data || []).reduce((s, x) =>
+  const revenue = SAFE_ARRAY(o.data).reduce((s, x) =>
     s + Number(x.total || x.amount || x.total_amount || x.subtotal || 0), 0);
   return {
     revenue,
     orders: o.count || 0,
     users: u.count || 0,
     products: p.count || 0,
-    pendingTopups: (t.data || []).filter(x => x.status === 'pending').length,
-    openReports: (r.data || []).filter(x => ['open','pending','new'].includes(x.status)).length,
+    pendingTopups: SAFE_ARRAY(t.data).filter(x => x.status === 'pending').length,
+    openReports: SAFE_ARRAY(r.data).filter(x => ['open','pending','new'].includes(x.status)).length,
   };
 }
 
@@ -67,7 +70,7 @@ export async function fetchRevenueSeries(days = 30) {
     const d = new Date(); d.setDate(d.getDate() - (days - 1 - i));
     map[d.toISOString().slice(0, 10)] = 0;
   }
-  (data || []).forEach(o => {
+  SAFE_ARRAY(data).forEach(o => {
     const k = o.created_at?.slice(0, 10);
     if (k && map[k] !== undefined)
       map[k] += Number(o.total || o.amount || o.total_amount || o.subtotal || 0);
@@ -82,7 +85,7 @@ export async function fetchUsers({ search = '', limit = 100 } = {}) {
   let query = supabase.from(T.users).select('*').limit(limit);
   if (search) query = query.or(`username.ilike.%${search}%,email.ilike.%${search}%`);
   const { data, error } = await q('fetchUsers', () => query);
-  return { items: data || [], error };
+  return { items: SAFE_ARRAY(data), error };
 }
 export async function updateUser(id, patch) {
   const { error } = await q('updateUser', () => supabase.from(T.users).update(patch).eq('id', id));
@@ -98,7 +101,7 @@ export async function deleteUser(id) {
    ============================================================ */
 export async function fetchProducts() {
   const { data, error } = await q('fetchProducts', () => supabase.from(T.products).select('*'));
-  return { items: data || [], error };
+  return { items: SAFE_ARRAY(data), error };
 }
 export async function createProduct(payload) {
   const { data, error } = await q('createProduct', () =>
@@ -122,7 +125,7 @@ export async function fetchOrders({ status = '' } = {}) {
   let query = supabase.from(T.orders).select('*').order('created_at', { ascending: false });
   if (status) query = query.eq('status', status);
   const { data, error } = await q('fetchOrders', () => query);
-  return { items: data || [], error };
+  return { items: SAFE_ARRAY(data), error };
 }
 export async function updateOrderStatus(id, status) {
   const { error } = await q('updateOrderStatus', () =>
@@ -132,7 +135,7 @@ export async function updateOrderStatus(id, status) {
 export async function fetchOrderItems(orderId) {
   const { data, error } = await q('fetchOrderItems', () =>
     supabase.from(T.order_items).select('*').eq('order_id', orderId));
-  return { items: data || [], error };
+  return { items: SAFE_ARRAY(data), error };
 }
 
 /* ============================================================
@@ -142,7 +145,7 @@ export async function fetchTopUps({ status = '' } = {}) {
   let query = supabase.from(T.topups).select('*');
   if (status) query = query.eq('status', status);
   const { data, error } = await q('fetchTopUps', () => query);
-  return { items: data || [], error };
+  return { items: SAFE_ARRAY(data), error };
 }
 export async function approveTopUp(id, userId, amount) {
   const { error: tErr } = await q('approveTopUp', () =>
@@ -165,7 +168,7 @@ export async function rejectTopUp(id) {
 export async function fetchAllTxns({ limit = 200 } = {}) {
   const { data, error } = await q('fetchAllTxns', () =>
     supabase.from(T.wallet_transactions).select('*').limit(limit));
-  return { items: data || [], error };
+  return { items: SAFE_ARRAY(data), error };
 }
 export async function adminCreditWallet(userId, amount, note = 'Admin credit') {
   const { error } = await q('adminCreditWallet', () =>
@@ -189,7 +192,7 @@ export async function fetchReports({ status = '' } = {}) {
   let query = supabase.from(T.reports).select('*');
   if (status) query = query.eq('status', status);
   const { data, error } = await q('fetchReports', () => query);
-  return { items: data || [], error };
+  return { items: SAFE_ARRAY(data), error };
 }
 export async function updateReport(id, patch) {
   const { error } = await q('updateReport', () =>
@@ -204,7 +207,7 @@ export async function fetchBotMessages({ bot = 'support', limit = 100 } = {}) {
   let query = supabase.from(T.bot_messages).select('*').limit(limit);
   if (bot) query = query.eq('bot', bot);
   const { data, error } = await q('fetchBotMessages', () => query);
-  return { items: (data || []).reverse(), error };
+  return { items: SAFE_ARRAY(data).reverse(), error };
 }
 export async function sendBotTest(bot, text) {
   try {
@@ -221,7 +224,7 @@ export async function sendBotTest(bot, text) {
    ============================================================ */
 export async function fetchPromoCodes() {
   const { data, error } = await q('fetchPromoCodes', () => supabase.from(T.promo_codes).select('*'));
-  return { items: data || [], error };
+  return { items: SAFE_ARRAY(data), error };
 }
 export async function createPromoCode(payload) {
   const { data, error } = await q('createPromoCode', () =>
@@ -239,7 +242,7 @@ export async function deletePromoCode(id) {
 }
 export async function fetchReturns() {
   const { data, error } = await q('fetchReturns', () => supabase.from(T.returns).select('*'));
-  return { items: data || [], error };
+  return { items: SAFE_ARRAY(data), error };
 }
 export async function updateReturn(id, patch) {
   const { error } = await q('updateReturn', () =>
@@ -248,7 +251,7 @@ export async function updateReturn(id, patch) {
 }
 export async function fetchSellers() {
   const { data, error } = await q('fetchSellers', () => supabase.from(T.sellers).select('*'));
-  return { items: data || [], error };
+  return { items: SAFE_ARRAY(data), error };
 }
 export async function updateSeller(id, patch) {
   const { error } = await q('updateSeller', () =>
@@ -257,7 +260,7 @@ export async function updateSeller(id, patch) {
 }
 export async function fetchBundles() {
   const { data, error } = await q('fetchBundles', () => supabase.from(T.bundles).select('*'));
-  return { items: data || [], error };
+  return { items: SAFE_ARRAY(data), error };
 }
 export async function createBundle(payload) {
   const { data, error } = await q('createBundle', () =>
@@ -278,7 +281,7 @@ export async function upsertBundle(payload) {
 }
 export async function fetchXCards() {
   const { data, error } = await q('fetchXCards', () => supabase.from(T.xcards).select('*'));
-  return { items: data || [], error };
+  return { items: SAFE_ARRAY(data), error };
 }
 export async function createXCard(payload) {
   const { data, error } = await q('createXCard', () =>

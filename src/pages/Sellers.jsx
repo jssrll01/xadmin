@@ -9,7 +9,7 @@ export default function Sellers() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchSellers().then(rows => { setItems(rows); setLoading(false); });
+    fetchSellers().then(rows => { setItems(Array.isArray(rows) ? rows : []); setLoading(false); });
   }, []);
 
   return (

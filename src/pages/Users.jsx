@@ -17,7 +17,7 @@ export default function Users() {
 
   const load = () => {
     setLoading(true);
-    fetchUsers({ search }).then(({ items }) => { setItems(items); setLoading(false); });
+    fetchUsers({ search }).then(({ items }) => { setItems(Array.isArray(items) ? items : []); setLoading(false); });
   };
   useEffect(load, []); // eslint-disable-line
 

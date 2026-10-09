@@ -17,7 +17,7 @@ export default function TopUps() {
     setLoading(true);
     const { items, error } = await fetchTopUps({ status: filter === 'all' ? '' : filter });
     if (error) show(error.message, 'error');
-    setItems(items);
+    setItems(Array.isArray(items) ? items : []);
     setLoading(false);
   };
   useEffect(load, [filter]);

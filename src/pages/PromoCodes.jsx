@@ -18,7 +18,7 @@ export default function PromoCodes() {
 
   const load = () => {
     setLoading(true);
-    fetchPromos().then(rows => { setItems(rows); setLoading(false); });
+    fetchPromos().then(rows => { setItems(Array.isArray(rows) ? rows : []); setLoading(false); });
   };
   useEffect(load, []);
 
