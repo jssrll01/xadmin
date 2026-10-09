@@ -10,17 +10,14 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="description" content="XMARKET admin console" />
     <link rel="manifest" href="/manifest.webmanifest" />
-    <link rel="icon" type="image/svg+xml"
-      href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>%F0%9F%91%A8%E2%80%8D%F0%9F%92%BB</text></svg>" />
-    <link rel="apple-touch-icon"
-      href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='42' fill='%232563EB'/><text x='50%25' y='54%25' font-size='120' text-anchor='middle' dominant-baseline='middle'>%F0%9F%91%A8%E2%80%8D%F0%9F%92%BB</text></svg>" />
+    <link rel="icon" type="image/png" href="/icons/icon-192.png" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
     <title>XADMIN · XMARKET Console</title>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
     <script>
-      // Register the service worker — required for real "Install app" prompt
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('/sw.js', { scope: '/' })
@@ -28,8 +25,6 @@
             .catch((err) => console.warn('SW failed:', err));
         });
       }
-
-      // Capture the install prompt so we can show our own button if needed
       window.__deferredPrompt = null;
       window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
