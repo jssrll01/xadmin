@@ -1,137 +1,87 @@
 import React, { useEffect, useState } from 'react';
-import { CheckCircle2, XCircle, ExternalLink } from 'lucide-react';
+import { Check, X } from 'lucide-react';
 import Card from '../components/Card.jsx';
 import Btn from '../components/Btn.jsx';
-import Modal from '../components/Modal.jsx';
-import Badge from '../components/Badge.jsx';
 import EmptyState from '../components/EmptyState.jsx';
 import { useToast } from '../components/Toast.jsx';
-import { fetchTopups, approveTopup, rejectTopup } from '../lib/api.js';
+import { fetchTopUps, approveTopUp, rejectTopUp } from '../lib/api.js';
 import { peso, dateTime } from '../lib/format.js';
-
-const TABS = ['awaiting_verification', 'approved', 'rejected', ''];
 
 export default function TopUps() {
   const { show } = useToast();
-  const [tab, setTab] = useState('awaiting_verification');
   const [items, setItems] = useState([]);
+  const [filter, setFilter] = useState('pending');
   const [loading, setLoading] = useState(true);
-  const [selected, setSelected] = useState(null);
-  const [note, setNote] = useState('');
 
-  const load = () => {
+  const load = async () => {
     setLoading(true);
-    fetchTopups({ status: tab }).then(({ items }) => { setItems(items); setLoading(false); });
+    const { items, error } = await fetchTopUps({ status: filter === 'all' ? '' : filter });
+    if (error) show(error.message, 'error');
+    setItems(items);
+    setLoading(false);
   };
-  useEffect(load, [tab]); // eslint-disable-line
+  useEffect(load, [filter]);
 
-  const approve = async () => {
-    const { error } = await approveTopup(selected.id, null, note || 'Approved by admin');
+  const approve = async (t) => {
+    if (!confirm(`Approve ${peso(t.amount)} top-up for ${t.users?.email || 'user'}?`)) return;
+    const { error } = await approveTopUp(t.id, t.user_id, t.amount);
     if (error) return show(error.message, 'error');
     show('Top-up approved', 'success');
-    setSelected(null);
-    setNote('');
     load();
   };
 
-  const reject = async () => {
-    const { error } = await rejectTopup(selected.id, null, note || 'Rejected by admin');
+  const reject = async (t) => {
+    if (!confirm('Reject this top-up?')) return;
+    const { error } = await rejectTopUp(t.id);
     if (error) return show(error.message, 'error');
     show('Top-up rejected', 'success');
-    setSelected(null);
-    setNote('');
     load();
   };
 
   return (
     <>
       <div className="page-head">
-        <div>
-          <h1>Top-ups</h1>
-          <p>{items.length} requests</p>
-        </div>
+        <div><h1>Top-Ups</h1><p>Wallet funding requests</p></div>
       </div>
-
       <Card style={{ marginBottom: 18 }}>
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          {TABS.map(t => (
-            <button key={t} onClick={() => setTab(t)}
-              className={'neu-pill' + (tab === t ? ' active' : '')}>
-              {t || 'All'}
+        <div style={{ display: 'flex', gap: 8 }}>
+          {['pending', 'approved', 'rejected', 'all'].map(s => (
+            <button key={s} className={'neu-pill' + (filter === s ? ' active' : '')} onClick={() => setFilter(s)}>
+              {s.charAt(0).toUpperCase() + s.slice(1)}
             </button>
           ))}
         </div>
       </Card>
 
-      {loading ? (
-        <Card>Loading…</Card>
-      ) : items.length === 0 ? (
+      {loading ? <Card>Loading…</Card> : items.length === 0 ? (
         <EmptyState title="No top-ups" message="Nothing to review here." />
       ) : (
         <table className="neu-table">
-          <thead>
-            <tr>
-              <th>Email</th>
-              <th>Amount</th>
-              <th>Total (incl. fee)</th>
-              <th>Method</th>
-              <th>Status</th>
-              <th>Date</th>
-              <th></th>
-            </tr>
-          </thead>
+          <thead><tr><th>User</th><th>Amount</th><th>Method</th><th>Status</th><th>Requested</th><th></th></tr></thead>
           <tbody>
             {items.map(t => (
-              <tr key={t.id} onClick={() => setSelected(t)} style={{ cursor: 'pointer' }}>
-                <td>{t.email || '—'}</td>
-                <td><b>{peso(t.amount || t.subtotal)}</b></td>
-                <td><b>{peso(t.total)}</b></td>
-                <td>{t.payment_method || '—'}</td>
-                <td><Badge status={t.status} /></td>
+              <tr key={t.id}>
+                <td>{t.users?.email || t.user_id?.slice(0, 8) || '—'}</td>
+                <td><b>{peso(t.amount)}</b></td>
+                <td>{t.method || '—'}</td>
+                <td><span className="neu-badge" style={{
+                  background: t.status === 'approved' ? '#D1FAE5' : t.status === 'rejected' ? '#FEE2E2' : '#FEF3C7',
+                  color: t.status === 'approved' ? '#065F46' : t.status === 'rejected' ? '#991B1B' : '#92400E',
+                }}>{t.status}</span></td>
                 <td>{dateTime(t.created_at)}</td>
-                <td style={{ textAlign: 'right' }}>→</td>
+                <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
+                  {t.status === 'pending' && (
+                    <>
+                      <Btn variant="success" onClick={() => approve(t)} style={{ padding: 8, marginRight: 6 }}><Check size={15} /></Btn>
+                      <Btn variant="danger" onClick={() => reject(t)} style={{ padding: 8 }}><X size={15} /></Btn>
+                    </>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       )}
-
-      <Modal open={!!selected} onClose={() => setSelected(null)} title="Top-up details" size="lg">
-        {selected && (
-          <>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
-              <div className="neu-card-inset"><div style={{ fontSize: 11, color: 'var(--text-dim)' }}>Email</div><div style={{ fontWeight: 700 }}>{selected.email || '—'}</div></div>
-              <div className="neu-card-inset"><div style={{ fontSize: 11, color: 'var(--text-dim)' }}>Payment</div><div style={{ fontWeight: 700 }}>{selected.payment_method || '—'}</div></div>
-              <div className="neu-card-inset"><div style={{ fontSize: 11, color: 'var(--text-dim)' }}>Amount</div><div style={{ fontWeight: 700 }}>{peso(selected.amount || selected.subtotal)}</div></div>
-              <div className="neu-card-inset"><div style={{ fontSize: 11, color: 'var(--text-dim)' }}>Fee (1%)</div><div style={{ fontWeight: 700 }}>{peso(selected.fee)}</div></div>
-              <div className="neu-card-inset"><div style={{ fontSize: 11, color: 'var(--text-dim)' }}>Total</div><div style={{ fontWeight: 900, color: 'var(--primary)' }}>{peso(selected.total)}</div></div>
-              <div className="neu-card-inset"><div style={{ fontSize: 11, color: 'var(--text-dim)' }}>Status</div><Badge status={selected.status} /></div>
-            </div>
-
-            {selected.receipt_data?.dataUrl && (
-              <div style={{ marginBottom: 16 }}>
-                <div style={{ fontSize: 12.5, fontWeight: 800, marginBottom: 8 }}>Payment receipt</div>
-                <img src={selected.receipt_data.dataUrl} alt="receipt"
-                  style={{ width: '100%', maxHeight: 400, objectFit: 'contain', borderRadius: 12, background: 'var(--surface-in)' }} />
-              </div>
-            )}
-
-            <input className="neu-input" placeholder="Admin note (optional)"
-              value={note} onChange={e => setNote(e.target.value)} style={{ marginBottom: 12 }} />
-
-            {selected.status === 'awaiting_verification' && (
-              <div style={{ display: 'flex', gap: 10 }}>
-                <Btn variant="success" onClick={approve} style={{ flex: 1 }}>
-                  <CheckCircle2 size={16} /> Approve
-                </Btn>
-                <Btn variant="danger" onClick={reject} style={{ flex: 1 }}>
-                  <XCircle size={16} /> Reject
-                </Btn>
-              </div>
-            )}
-          </>
-        )}
-      </Modal>
     </>
   );
 }

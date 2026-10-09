@@ -1,141 +1,113 @@
 import React, { useEffect, useState } from 'react';
-import { Search, Trash2, CheckCircle, Zap, Clock } from 'lucide-react';
+import { Plus, Edit2, Trash2, Search } from 'lucide-react';
 import Card from '../components/Card.jsx';
 import Btn from '../components/Btn.jsx';
 import Modal from '../components/Modal.jsx';
 import EmptyState from '../components/EmptyState.jsx';
 import { useToast } from '../components/Toast.jsx';
-import { fetchProducts, updateProduct, deleteProduct } from '../lib/api.js';
-import { peso, dateTime } from '../lib/format.js';
+import { fetchProducts, createProduct, updateProduct, deleteProduct } from '../lib/api.js';
+import { peso, dateOnly } from '../lib/format.js';
 
 export default function Products() {
   const { show } = useToast();
-  const [search, setSearch] = useState('');
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selected, setSelected] = useState(null);
+  const [search, setSearch] = useState('');
+  const [editing, setEditing] = useState(null); // null | {} | existing product
+  const [saving, setSaving] = useState(false);
 
-  const load = () => {
+  const load = async () => {
     setLoading(true);
-    fetchProducts({ search }).then(({ items }) => { setItems(items); setLoading(false); });
+    const { items, error } = await fetchProducts();
+    if (error) show(error.message, 'error');
+    setItems(items);
+    setLoading(false);
   };
-  useEffect(load, []); // eslint-disable-line
+  useEffect(load, []);
 
-  const toggleInstant = async (p) => {
-    const { error } = await updateProduct(p.id, { instant: !p.instant });
+  const save = async () => {
+    setSaving(true);
+    const payload = {
+      name: editing.name,
+      price: Number(editing.price),
+      stock: Number(editing.stock || 0),
+      category: editing.category || 'General',
+      description: editing.description || '',
+    };
+    const { error } = editing.id
+      ? await updateProduct(editing.id, payload)
+      : await createProduct(payload);
+    setSaving(false);
     if (error) return show(error.message, 'error');
-    setItems(prev => prev.map(x => x.id === p.id ? { ...x, instant: !x.instant } : x));
-    show('Updated', 'success');
+    show(editing.id ? 'Product updated' : 'Product created', 'success');
+    setEditing(null);
+    load();
   };
 
-  const togglePreorder = async (p) => {
-    const { error } = await updateProduct(p.id, { preorder: !p.preorder });
-    if (error) return show(error.message, 'error');
-    setItems(prev => prev.map(x => x.id === p.id ? { ...x, preorder: !x.preorder } : x));
-    show('Updated', 'success');
-  };
-
-  const del = async (p) => {
-    if (!confirm(`Delete product "${p.name}"?`)) return;
+  const remove = async (p) => {
+    if (!confirm(`Delete "${p.name}"?`)) return;
     const { error } = await deleteProduct(p.id);
     if (error) return show(error.message, 'error');
-    setItems(prev => prev.filter(x => x.id !== p.id));
     show('Product deleted', 'success');
-    setSelected(null);
+    load();
   };
+
+  const filtered = items.filter(p => !search || p.name?.toLowerCase().includes(search.toLowerCase()));
 
   return (
     <>
       <div className="page-head">
         <div>
           <h1>Products</h1>
-          <p>{items.length} products</p>
+          <p>{items.length} items in catalog</p>
         </div>
+        <Btn variant="primary" onClick={() => setEditing({ name: '', price: 0, stock: 0, category: 'General' })}>
+          <Plus size={16} /> New Product
+        </Btn>
       </div>
 
       <Card style={{ marginBottom: 18 }}>
-        <div style={{ display: 'flex', gap: 10 }}>
-          <input className="neu-input" placeholder="Search products…"
-            value={search} onChange={e => setSearch(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && load()} />
-          <Btn variant="primary" onClick={load}><Search size={16} /> Search</Btn>
-        </div>
+        <input className="neu-input" placeholder="Search products…" value={search} onChange={e => setSearch(e.target.value)} />
       </Card>
 
-      {loading ? (
-        <Card>Loading…</Card>
-      ) : items.length === 0 ? (
-        <EmptyState title="No products" message="No products match your search." />
+      {loading ? <Card>Loading…</Card> : filtered.length === 0 ? (
+        <EmptyState title="No products" message="Add your first product to get started." />
       ) : (
         <table className="neu-table">
           <thead>
-            <tr>
-              <th>Product</th>
-              <th>Store</th>
-              <th>Price</th>
-              <th>Flags</th>
-              <th></th>
-            </tr>
+            <tr><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Created</th><th></th></tr>
           </thead>
           <tbody>
-            {items.map(p => (
-              <tr key={p.id} onClick={() => setSelected(p)} style={{ cursor: 'pointer' }}>
-                <td>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <img src={(p.images && p.images[0]) || ''} alt=""
-                      style={{ width: 40, height: 40, borderRadius: 10, objectFit: 'cover', background: 'var(--surface-in)' }} />
-                    <div>
-                      <div style={{ fontWeight: 700 }}>{p.name}</div>
-                      <div style={{ fontSize: 11, color: 'var(--text-dim)' }}>{p.legacy_id || p.id.slice(0, 8)}</div>
-                    </div>
-                  </div>
-                </td>
-                <td>{p.store || '—'}</td>
+            {filtered.map(p => (
+              <tr key={p.id}>
+                <td><b>{p.name}</b></td>
+                <td>{p.category || '—'}</td>
                 <td><b>{peso(p.price)}</b></td>
-                <td>
-                  <div style={{ display: 'flex', gap: 6 }}>
-                    {p.instant && <span className="neu-badge" style={{ background: '#D1FAE5', color: '#065F46' }}><Zap size={10} /> Instant</span>}
-                    {p.preorder && <span className="neu-badge" style={{ background: '#FEF3C7', color: '#78350F' }}><Clock size={10} /> Pre-order</span>}
-                    {!p.instant && !p.preorder && <span className="neu-badge" style={{ background: '#E0E4EC', color: '#374151' }}>Normal</span>}
-                  </div>
+                <td>{p.stock ?? 0}</td>
+                <td>{dateOnly(p.created_at)}</td>
+                <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
+                  <Btn variant="ghost" onClick={() => setEditing(p)} style={{ padding: 8 }}><Edit2 size={15} /></Btn>
+                  <Btn variant="ghost" onClick={() => remove(p)} style={{ padding: 8, color: 'var(--danger)' }}><Trash2 size={15} /></Btn>
                 </td>
-                <td style={{ textAlign: 'right' }}>→</td>
               </tr>
             ))}
           </tbody>
         </table>
       )}
 
-      <Modal open={!!selected} onClose={() => setSelected(null)} title="Product details" size="lg">
-        {selected && (
-          <>
-            <div style={{ display: 'flex', gap: 16, marginBottom: 18 }}>
-              <img src={(selected.images && selected.images[0]) || ''} alt=""
-                style={{ width: 120, height: 120, borderRadius: 14, objectFit: 'cover', background: 'var(--surface-in)' }} />
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 17, fontWeight: 800 }}>{selected.name}</div>
-                <div style={{ fontSize: 12.5, color: 'var(--text-dim)', marginTop: 4 }}>{selected.store}</div>
-                <div style={{ fontSize: 20, fontWeight: 900, color: 'var(--primary)', marginTop: 8 }}>{peso(selected.price)}</div>
-              </div>
+      <Modal open={!!editing} onClose={() => setEditing(null)} title={editing?.id ? 'Edit Product' : 'New Product'}>
+        {editing && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <input className="neu-input" placeholder="Name" value={editing.name || ''} onChange={e => setEditing({ ...editing, name: e.target.value })} />
+            <input className="neu-input" placeholder="Category" value={editing.category || ''} onChange={e => setEditing({ ...editing, category: e.target.value })} />
+            <input className="neu-input" type="number" placeholder="Price" value={editing.price || 0} onChange={e => setEditing({ ...editing, price: e.target.value })} />
+            <input className="neu-input" type="number" placeholder="Stock" value={editing.stock || 0} onChange={e => setEditing({ ...editing, stock: e.target.value })} />
+            <textarea className="neu-input" placeholder="Description" rows={3} value={editing.description || ''} onChange={e => setEditing({ ...editing, description: e.target.value })} />
+            <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
+              <Btn variant="primary" onClick={save} disabled={saving} style={{ flex: 1 }}>{saving ? 'Saving…' : 'Save'}</Btn>
+              <Btn onClick={() => setEditing(null)} style={{ flex: 1 }}>Cancel</Btn>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
-              <div className="neu-card-inset"><div style={{ fontSize: 11, color: 'var(--text-dim)' }}>Discount</div><div style={{ fontWeight: 700 }}>{selected.discount || 0}%</div></div>
-              <div className="neu-card-inset"><div style={{ fontSize: 11, color: 'var(--text-dim)' }}>Sold</div><div style={{ fontWeight: 700 }}>{selected.sold || 0}</div></div>
-              <div className="neu-card-inset"><div style={{ fontSize: 11, color: 'var(--text-dim)' }}>Verified</div><div style={{ fontWeight: 700 }}>{selected.verified ? 'Yes' : 'No'}</div></div>
-              <div className="neu-card-inset"><div style={{ fontSize: 11, color: 'var(--text-dim)' }}>Created</div><div style={{ fontWeight: 700 }}>{dateTime(selected.created_at)}</div></div>
-            </div>
-            <div style={{ display: 'flex', gap: 10, marginBottom: 10 }}>
-              <Btn variant={selected.instant ? 'success' : 'default'} onClick={() => toggleInstant(selected)} style={{ flex: 1 }}>
-                <Zap size={14} /> {selected.instant ? 'Unset instant' : 'Mark instant'}
-              </Btn>
-              <Btn variant={selected.preorder ? 'success' : 'default'} onClick={() => togglePreorder(selected)} style={{ flex: 1 }}>
-                <Clock size={14} /> {selected.preorder ? 'Unset pre-order' : 'Mark pre-order'}
-              </Btn>
-            </div>
-            <Btn variant="danger" onClick={() => del(selected)} style={{ width: '100%' }}>
-              <Trash2 size={14} /> Delete product
-            </Btn>
-          </>
+          </div>
         )}
       </Modal>
     </>
