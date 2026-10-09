@@ -13,3 +13,27 @@ export const initials = (first, last, fallback) => {
   if (fallback) return fallback.slice(0, 2).toUpperCase();
   return '??';
 };
+
+/* ============================================================
+   TIME HELPERS
+   ============================================================ */
+export const timeAgo = (d) => {
+  if (!d) return '—';
+  const t = new Date(d).getTime();
+  const now = Date.now();
+  const s = Math.floor((now - t) / 1000);
+  if (s < 5) return 'just now';
+  if (s < 60) return `${s}s ago`;
+  const m = Math.floor(s / 60);
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h ago`;
+  const dy = Math.floor(h / 24);
+  if (dy < 7) return `${dy}d ago`;
+  const w = Math.floor(dy / 7);
+  if (w < 5) return `${w}w ago`;
+  return dateOnly(d);
+};
+
+export const fromNow = timeAgo;
+export const formatDate = dateOnly;

@@ -267,3 +267,126 @@ export async function deleteXCard(id) {
   const { error } = await supabase.from('xcards').delete().eq('id', id);
   return { error };
 }
+
+/* ============================================================
+   ORDER ITEMS (for Orders.jsx detail view)
+   ============================================================ */
+export async function fetchOrderItems(orderId) {
+  const { data, error } = await supabase
+    .from('order_items')
+    .select('*, products(name, price)')
+    .eq('order_id', orderId);
+  return { items: data || [], error };
+}
+
+/* ============================================================
+   EXTRA ALIASES (so any page import won't break the build)
+   ============================================================ */
+export const fetchXWallet = fetchTopUps;
+export const fetchBotChat = fetchBotMessages;
+
+/* Fallbacks for pages not yet fully wired */
+export async function fetchWalletTransactions(opts = {}) {
+  const { data, error } = await supabase.from('wallet_transactions').select('*').order('created_at', { ascending: false }).limit(200);
+  return { items: data || [], error };
+}
+export async function fetchSettings() {
+  const { data, error } = await supabase.from('settings').select('*');
+  return { items: data || [], error };
+}
+export async function updateSettings(id, patch) {
+  const { error } = await supabase.from('settings').update(patch).eq('id', id);
+  return { error };
+}
+export async function fetchBots() {
+  const { data, error } = await supabase.from('bots').select('*');
+  return { items: data || [], error };
+}
+export async function updateBot(id, patch) {
+  const { error } = await supabase.from('bots').update(patch).eq('id', id);
+  return { error };
+}
+export async function fetchDashboard() { return fetchStats(); }
+
+/* ============================================================
+   MISSING EXPORTS — required by Wallet / Promos / Xcards / Bundles
+   ============================================================ */
+
+/* -------- WALLET TRANSACTIONS -------- */
+export async function fetchAllTxns({ limit = 200 } = {}) {
+  const { data, error } = await supabase
+    .from('wallet_transactions')
+    .select('*, users(first_name, last_name, email)')
+    .order('created_at', { ascending: false })
+    .limit(limit);
+  return { items: data || [], error };
+}
+
+export async function adminCreditWallet(userId, amount, note = 'Admin credit') {
+  const { data: u, error: fErr } = await supabase
+    .from('users').select('xwallet_balance').eq('id', userId).single();
+  if (fErr) return { error: fErr };
+  const newBal = Number(u?.xwallet_balance || 0) + Number(amount);
+  const { error: uErr } = await supabase
+    .from('users').update({ xwallet_balance: newBal }).eq('id', userId);
+  if (uErr) return { error: uErr };
+  await supabase.from('wallet_transactions').insert({
+    user_id: userId, amount: Number(amount), type: 'credit', note,
+  });
+  return {};
+}
+
+export async function adminDebitWallet(userId, amount, note = 'Admin debit') {
+  const { data: u, error: fErr } = await supabase
+    .from('users').select('xwallet_balance').eq('id', userId).single();
+  if (fErr) return { error: fErr };
+  const newBal = Math.max(0, Number(u?.xwallet_balance || 0) - Number(amount));
+  const { error: uErr } = await supabase
+    .from('users').update({ xwallet_balance: newBal }).eq('id', userId);
+  if (uErr) return { error: uErr };
+  await supabase.from('wallet_transactions').insert({
+    user_id: userId, amount: -Math.abs(Number(amount)), type: 'debit', note,
+  });
+  return {};
+}
+
+/* -------- PROMOS (aliases) -------- */
+export const fetchPromos = fetchPromoCodes;
+export const deletePromo = deletePromoCode;
+export async function upsertPromo(payload) {
+  if (payload.id) {
+    const { data, error } = await supabase
+      .from('promo_codes').update(payload).eq('id', payload.id).select().single();
+    return { data, error };
+  }
+  return createPromoCode(payload);
+}
+
+/* -------- XCARDS (aliases) -------- */
+export const fetchAllXcards = fetchXCards;
+export async function voidXcard(id) {
+  const { error } = await supabase.from('xcards').update({ status: 'void' }).eq('id', id);
+  return { error };
+}
+
+/* -------- BUNDLES (aliases) -------- */
+export async function upsertBundle(payload) {
+  if (payload.id) {
+    const { data, error } = await supabase
+      .from('bundles').update(payload).eq('id', payload.id).select().single();
+    return { data, error };
+  }
+  return createBundle(payload);
+}
+
+/* -------- BOT TEST (alias) -------- */
+export const sendTestBotMessage = sendBotTest;
+
+/* ============================================================
+   FINAL DEFENSIVE ALIASES (prevent future build breaks)
+   ============================================================ */
+export const fetchWalletTxns = fetchAllTxns;
+export const fetchTransactions = fetchAllTxns;
+export const fetchPromoCodesList = fetchPromoCodes;
+export const fetchXCardList = fetchXCards;
+export const fetchBotLog = fetchBotMessages;
