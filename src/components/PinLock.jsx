@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { ShieldCheck, Delete, Lock } from 'lucide-react';
+import { Lock, Delete } from 'lucide-react';
 
-const PIN = '1010'; // hardcoded for now, will move to DB later
+const PIN = '1010';
 
 export default function PinLock({ onUnlock }) {
   const [digits, setDigits] = useState('');
@@ -13,54 +13,36 @@ export default function PinLock({ onUnlock }) {
     setDigits(next);
     if (next.length === 4) {
       setTimeout(() => {
-        if (next === PIN) {
-          onUnlock();
-        } else {
-          setError(true);
-          setTimeout(() => { setError(false); setDigits(''); }, 500);
-        }
-      }, 180);
+        if (next === PIN) onUnlock();
+        else { setError(true); setTimeout(() => { setError(false); setDigits(''); }, 500); }
+      }, 150);
     }
   };
-
-  const del = () => setDigits(d => d.slice(0, -1));
 
   return (
     <div className="pin-lock">
       <div className={'pin-box' + (error ? ' shake' : '')}>
-        <div style={{
-          width: 72, height: 72, borderRadius: 22, margin: '0 auto 20px',
-          background: 'linear-gradient(135deg, #3B82F6, #2563EB)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          color: '#fff',
-          boxShadow: '8px 8px 20px rgba(37,99,235,0.35), -6px -6px 16px rgba(255,255,255,0.9)',
-        }}>
+        <div style={{ width:72, height:72, borderRadius:22, margin:'0 auto 20px',
+          background:'linear-gradient(135deg,#3B82F6,#2563EB)', display:'flex',
+          alignItems:'center', justifyContent:'center', color:'#fff',
+          boxShadow:'8px 8px 20px rgba(37,99,235,0.35), -6px -6px 16px rgba(255,255,255,0.9)' }}>
           <Lock size={32} />
         </div>
-        <h2 style={{ fontSize: 22, fontWeight: 900, letterSpacing: -0.3 }}>XADMIN</h2>
-        <p style={{ fontSize: 12.5, color: 'var(--text-dim)', marginTop: 4 }}>Enter access PIN</p>
-
+        <h2 style={{ fontSize:22, fontWeight:900 }}>XADMIN</h2>
+        <p style={{ fontSize:12.5, color:'var(--text-dim)', marginTop:4 }}>Enter access PIN</p>
         <div className="pin-dots">
-          {[0,1,2,3].map(i => (
+          {[0,1,2,3].map((i) => (
             <div key={i} className={'pin-dot' + (i < digits.length ? ' filled' : '')} />
           ))}
         </div>
-
-        {error && (
-          <div style={{ fontSize: 12.5, color: 'var(--danger)', fontWeight: 700, marginBottom: 8 }}>
-            Incorrect PIN
-          </div>
-        )}
-
+        {error && <div style={{ fontSize:12.5, color:'var(--danger)', fontWeight:700, marginBottom:8 }}>Incorrect PIN</div>}
         <div className="pin-keypad">
-          {[1,2,3,4,5,6,7,8,9].map(n => (
+          {[1,2,3,4,5,6,7,8,9].map((n) => (
             <button key={n} className="pin-key" onClick={() => press(String(n))}>{n}</button>
           ))}
-          <button className="pin-key action" onClick={del}><Delete size={20} /></button>
+          <button className="pin-key action" onClick={() => setDigits(d => d.slice(0,-1))}><Delete size={20} /></button>
           <button className="pin-key" onClick={() => press('0')}>0</button>
-          <button className="pin-key action" onClick={onUnlock} style={{ opacity: 0 }}>
-            <ShieldCheck size={20} />
-          </button>
+          <button className="pin-key action" style={{ opacity: 0 }} />
         </div>
       </div>
     </div>

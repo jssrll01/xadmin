@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#2563EB" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />
@@ -10,26 +10,11 @@
     <title>XADMIN · XMARKET Console</title>
   </head>
   <body>
-    <div id="__xadmin_err" style="display:none;position:fixed;top:0;left:0;right:0;background:#ef4444;color:#fff;padding:10px;font-family:monospace;font-size:11px;z-index:99999;white-space:pre-wrap;max-height:40vh;overflow:auto"></div>
-    <script>
-      window.addEventListener('unhandledrejection', (e) => {
-        console.warn('[XADMIN] Unhandled promise:', e.reason);
-        e.preventDefault();
-      });
-      window.addEventListener('error', (e) => {
-        console.warn('[XADMIN] Runtime error:', e.message);
-      });
-    </script>
     <div id="root"></div>
     <script>
-      // Kill any existing service workers + caches on load
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(regs => {
-          regs.forEach(r => r.unregister());
-        });
-        if ('caches' in window) {
-          caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
-        }
+        navigator.serviceWorker.getRegistrations().then((rs) => rs.forEach((r) => r.unregister()));
+        if ('caches' in window) caches.keys().then((ks) => ks.forEach((k) => caches.delete(k)));
       }
     </script>
     <script type="module" src="/src/main.jsx"></script>

@@ -1,20 +1,25 @@
 import React, { useEffect, useState } from 'react';
-import { Users, Package, ShoppingBag, Wallet, TrendingUp, AlertTriangle } from 'lucide-react';
-import Stat from '../components/Stat.jsx';
-import Card from '../components/Card.jsx';
-import { fetchStats, fetchRevenueSeries } from '../lib/api.js';
+import { TrendingUp, ShoppingBag, Users, Package, Wallet, AlertTriangle } from 'lucide-react';
+import { fetchStats } from '../lib/api.js';
 import { peso, pesoShort } from '../lib/format.js';
 
 export default function Dashboard() {
   const [stats, setStats] = useState(null);
-  const [series, setSeries] = useState([]);
-
   useEffect(() => {
-    fetchStats().then(setStats);
-    fetchRevenueSeries(30).then(setSeries);
+    let alive = true;
+    fetchStats().then((s) => { if (alive) setStats(s); });
+    return () => { alive = false; };
   }, []);
 
-  const max = Math.max(1, ...series.map(s => s.revenue));
+  const s = stats || { revenue: 0, orders: 0, users: 0, products: 0, pendingTopups: 0, openReports: 0 };
+  const cards = [
+    { icon: TrendingUp, value: pesoShort(s.revenue), label: 'Revenue', color: '#10B981' },
+    { icon: ShoppingBag, value: s.orders, label: 'Orders', color: '#2563EB' },
+    { icon: Users, value: s.users, label: 'Users', color: '#7C3AED' },
+    { icon: Package, value: s.products, label: 'Products', color: '#F59E0B' },
+    { icon: Wallet, value: s.pendingTopups, label: 'Pending top-ups', color: '#059669' },
+    { icon: AlertTriangle, value: s.openReports, label: 'Open reports', color: '#EF4444' },
+  ];
 
   return (
     <>
@@ -24,41 +29,23 @@ export default function Dashboard() {
           <p>Overview of XMARKET activity</p>
         </div>
       </div>
-
       <div className="stat-grid">
-        <Stat icon={TrendingUp}     value={pesoShort(stats?.revenue || 0)} label="Revenue"        color="#10B981" />
-        <Stat icon={ShoppingBag}    value={stats?.orders || 0}              label="Orders"         color="#2563EB" />
-        <Stat icon={Users}          value={stats?.users || 0}               label="Users"          color="#7C3AED" />
-        <Stat icon={Package}        value={stats?.products || 0}            label="Products"       color="#F59E0B" />
-        <Stat icon={Wallet}         value={stats?.pendingTopups || 0}       label="Pending top-ups" color="#059669" />
-        <Stat icon={AlertTriangle}  value={stats?.openReports || 0}         label="Open reports"   color="#EF4444" />
-      </div>
-
-      <Card style={{ marginBottom: 20 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 18 }}>
-          <div>
-            <div style={{ fontSize: 15, fontWeight: 800 }}>Revenue · last 30 days</div>
-            <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 2 }}>Based on Xwallet purchases</div>
+        {cards.map(({ icon: Icon, value, label, color }) => (
+          <div className="stat" key={label}>
+            <div className="stat-icon" style={{ background: color }}>
+              <Icon size={22} />
+            </div>
+            <div>
+              <div className="stat-value">{value}</div>
+              <div className="stat-label">{label}</div>
+            </div>
           </div>
-          <div style={{ fontSize: 22, fontWeight: 900, color: 'var(--success)' }}>{peso(stats?.revenue || 0)}</div>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4, height: 140 }}>
-          {series.map((s, i) => (
-            <div key={i} title={`${s.date}: ${peso(s.revenue)}`} style={{
-              flex: 1, minWidth: 4,
-              height: `${(s.revenue / max) * 100}%`,
-              minHeight: s.revenue > 0 ? 4 : 2,
-              background: s.revenue > 0 ? 'linear-gradient(180deg, #3B82F6, #2563EB)' : 'var(--surface-in)',
-              borderRadius: 4,
-              transition: 'all 0.3s var(--ease)',
-            }} />
-          ))}
-        </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 10, fontSize: 10.5, color: 'var(--text-dim)', fontWeight: 700 }}>
-          <span>{series[0]?.date}</span>
-          <span>{series[series.length - 1]?.date}</span>
-        </div>
-      </Card>
+        ))}
+      </div>
+      <div className="neu-card">
+        <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 6 }}>Revenue (total)</div>
+        <div style={{ fontSize: 26, fontWeight: 900, color: 'var(--success)' }}>{peso(s.revenue)}</div>
+      </div>
     </>
   );
 }
