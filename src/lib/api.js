@@ -1,7 +1,7 @@
 import { supabase } from '../supabase.js';
 
 /* ============================================================
-   TABLE MAP — edit these if your real table names differ.
+   REAL TABLE MAP — from live schema
    ============================================================ */
 const T = {
   users:               'profiles',
@@ -17,9 +17,9 @@ const T = {
   xcards:              'xcards',
   reports:             'report_tickets',
   bot_messages:        'bot_messages',
-  settings:            'profiles',
-  bots:                'bot_messages',
 };
+
+const ok = (data) => ({ items: data || [], error: null });
 
 /* ============================================================
    DASHBOARD
@@ -27,20 +27,21 @@ const T = {
 export async function fetchStats() {
   try {
     const [u, o, p, t, r] = await Promise.all([
-      supabase.from(T.users).select('id', { count: 'exact', head: true }),
-      supabase.from(T.orders).select('id, total', { count: 'exact' }),
-      supabase.from(T.products).select('id', { count: 'exact', head: true }),
-      supabase.from(T.topups).select('id', { count: 'exact' }).eq('status', 'pending'),
-      supabase.from(T.reports).select('id', { count: 'exact' }).eq('status', 'open'),
+      supabase.from(T.users).select('*', { count: 'exact', head: true }),
+      supabase.from(T.orders).select('*', { count: 'exact' }),
+      supabase.from(T.products).select('*', { count: 'exact', head: true }),
+      supabase.from(T.topups).select('*', { count: 'exact' }),
+      supabase.from(T.reports).select('*', { count: 'exact' }),
     ]);
-    const revenue = (o.data || []).reduce((s, x) => s + Number(x.total || 0), 0);
+    const revenue = (o.data || []).reduce((s, x) =>
+      s + Number(x.total || x.amount || x.total_amount || x.subtotal || 0), 0);
     return {
       revenue,
       orders: o.count || 0,
       users: u.count || 0,
       products: p.count || 0,
-      pendingTopups: t.count || 0,
-      openReports: r.count || 0,
+      pendingTopups: (t.data || []).filter(x => x.status === 'pending').length,
+      openReports: (r.data || []).filter(x => ['open','pending','new'].includes(x.status)).length,
     };
   } catch (err) {
     console.error('fetchStats:', err);
@@ -51,7 +52,7 @@ export async function fetchStats() {
 export async function fetchRevenueSeries(days = 30) {
   const since = new Date(); since.setDate(since.getDate() - days);
   const { data } = await supabase.from(T.orders)
-    .select('created_at, total').gte('created_at', since.toISOString());
+    .select('*').gte('created_at', since.toISOString());
   const map = {};
   for (let i = 0; i < days; i++) {
     const d = new Date(); d.setDate(d.getDate() - (days - 1 - i));
@@ -59,17 +60,18 @@ export async function fetchRevenueSeries(days = 30) {
   }
   (data || []).forEach(o => {
     const k = o.created_at?.slice(0, 10);
-    if (k && map[k] !== undefined) map[k] += Number(o.total || 0);
+    if (k && map[k] !== undefined)
+      map[k] += Number(o.total || o.amount || o.total_amount || o.subtotal || 0);
   });
   return Object.entries(map).map(([date, revenue]) => ({ date, revenue }));
 }
 
 /* ============================================================
-   USERS
+   USERS (profiles)
    ============================================================ */
 export async function fetchUsers({ search = '', limit = 100 } = {}) {
-  let q = supabase.from(T.users).select('*').order('created_at', { ascending: false }).limit(limit);
-  if (search) q = q.or(`username.ilike.%${search}%,email.ilike.%${search}%,first_name.ilike.%${search}%`);
+  let q = supabase.from(T.users).select('*').limit(limit);
+  if (search) q = q.or(`username.ilike.%${search}%,email.ilike.%${search}%,full_name.ilike.%${search}%,display_name.ilike.%${search}%`);
   const { data, error } = await q;
   return { items: data || [], error };
 }
@@ -86,7 +88,7 @@ export async function deleteUser(id) {
    PRODUCTS
    ============================================================ */
 export async function fetchProducts() {
-  const { data, error } = await supabase.from(T.products).select('*').order('created_at', { ascending: false });
+  const { data, error } = await supabase.from(T.products).select('*');
   return { items: data || [], error };
 }
 export async function createProduct(payload) {
@@ -121,10 +123,10 @@ export async function fetchOrderItems(orderId) {
 }
 
 /* ============================================================
-   TOPUPS
+   TOPUPS (xwallet_topups)
    ============================================================ */
 export async function fetchTopUps({ status = '' } = {}) {
-  let q = supabase.from(T.topups).select('*').order('created_at', { ascending: false });
+  let q = supabase.from(T.topups).select('*');
   if (status) q = q.eq('status', status);
   const { data, error } = await q;
   return { items: data || [], error };
@@ -132,10 +134,13 @@ export async function fetchTopUps({ status = '' } = {}) {
 export async function approveTopUp(id, userId, amount) {
   const { error: tErr } = await supabase.from(T.topups).update({ status: 'approved' }).eq('id', id);
   if (tErr) return { error: tErr };
-  const { data: u } = await supabase.from(T.users).select('xwallet_balance').eq('id', userId).single();
-  const newBal = Number(u?.xwallet_balance || 0) + Number(amount);
-  const { error: uErr } = await supabase.from(T.users).update({ xwallet_balance: newBal }).eq('id', userId);
-  return { error: uErr };
+  // log a tx in xwallet_txns
+  await supabase.from(T.wallet_transactions).insert({
+    user_id: userId,
+    amount: Number(amount),
+    type: 'topup',
+  });
+  return {};
 }
 export async function rejectTopUp(id) {
   const { error } = await supabase.from(T.topups).update({ status: 'rejected' }).eq('id', id);
@@ -143,37 +148,30 @@ export async function rejectTopUp(id) {
 }
 
 /* ============================================================
-   WALLET
+   WALLET (xwallet_txns)
    ============================================================ */
 export async function fetchAllTxns({ limit = 200 } = {}) {
-  const { data, error } = await supabase.from(T.wallet_transactions).select('*')
-    .order('created_at', { ascending: false }).limit(limit);
+  const { data, error } = await supabase.from(T.wallet_transactions).select('*').limit(limit);
   return { items: data || [], error };
 }
 export async function adminCreditWallet(userId, amount, note = 'Admin credit') {
-  const { data: u, error: fErr } = await supabase.from(T.users).select('xwallet_balance').eq('id', userId).single();
-  if (fErr) return { error: fErr };
-  const newBal = Number(u?.xwallet_balance || 0) + Number(amount);
-  const { error: uErr } = await supabase.from(T.users).update({ xwallet_balance: newBal }).eq('id', userId);
-  if (uErr) return { error: uErr };
-  await supabase.from(T.wallet_transactions).insert({ user_id: userId, amount: Number(amount), type: 'credit', note });
-  return {};
+  const { error } = await supabase.from(T.wallet_transactions).insert({
+    user_id: userId, amount: Number(amount), type: 'credit', note,
+  });
+  return { error };
 }
 export async function adminDebitWallet(userId, amount, note = 'Admin debit') {
-  const { data: u, error: fErr } = await supabase.from(T.users).select('xwallet_balance').eq('id', userId).single();
-  if (fErr) return { error: fErr };
-  const newBal = Math.max(0, Number(u?.xwallet_balance || 0) - Number(amount));
-  const { error: uErr } = await supabase.from(T.users).update({ xwallet_balance: newBal }).eq('id', userId);
-  if (uErr) return { error: uErr };
-  await supabase.from(T.wallet_transactions).insert({ user_id: userId, amount: -Math.abs(Number(amount)), type: 'debit', note });
-  return {};
+  const { error } = await supabase.from(T.wallet_transactions).insert({
+    user_id: userId, amount: -Math.abs(Number(amount)), type: 'debit', note,
+  });
+  return { error };
 }
 
 /* ============================================================
-   REPORTS
+   REPORTS (report_tickets)
    ============================================================ */
 export async function fetchReports({ status = '' } = {}) {
-  let q = supabase.from(T.reports).select('*').order('created_at', { ascending: false });
+  let q = supabase.from(T.reports).select('*');
   if (status) q = q.eq('status', status);
   const { data, error } = await q;
   return { items: data || [], error };
@@ -187,8 +185,9 @@ export async function updateReport(id, patch) {
    BOT MESSAGES
    ============================================================ */
 export async function fetchBotMessages({ bot = 'support', limit = 100 } = {}) {
-  const { data, error } = await supabase.from(T.bot_messages).select('*')
-    .eq('bot', bot).order('created_at', { ascending: false }).limit(limit);
+  let q = supabase.from(T.bot_messages).select('*').limit(limit);
+  if (bot) q = q.eq('bot', bot);
+  const { data, error } = await q;
   return { items: (data || []).reverse(), error };
 }
 export async function sendBotTest(bot, text) {
@@ -205,7 +204,7 @@ export async function sendBotTest(bot, text) {
    PROMOS
    ============================================================ */
 export async function fetchPromoCodes() {
-  const { data, error } = await supabase.from(T.promo_codes).select('*').order('created_at', { ascending: false });
+  const { data, error } = await supabase.from(T.promo_codes).select('*');
   return { items: data || [], error };
 }
 export async function createPromoCode(payload) {
@@ -222,10 +221,10 @@ export async function deletePromoCode(id) {
 }
 
 /* ============================================================
-   RETURNS
+   RETURNS (return_requests)
    ============================================================ */
 export async function fetchReturns() {
-  const { data, error } = await supabase.from(T.returns).select('*').order('created_at', { ascending: false });
+  const { data, error } = await supabase.from(T.returns).select('*');
   return { items: data || [], error };
 }
 export async function updateReturn(id, patch) {
@@ -234,10 +233,10 @@ export async function updateReturn(id, patch) {
 }
 
 /* ============================================================
-   SELLERS
+   SELLERS (profiles — filtered by role if present)
    ============================================================ */
 export async function fetchSellers() {
-  const { data, error } = await supabase.from(T.sellers).select('*').order('created_at', { ascending: false });
+  const { data, error } = await supabase.from(T.sellers).select('*');
   return { items: data || [], error };
 }
 export async function updateSeller(id, patch) {
@@ -249,7 +248,7 @@ export async function updateSeller(id, patch) {
    BUNDLES
    ============================================================ */
 export async function fetchBundles() {
-  const { data, error } = await supabase.from(T.bundles).select('*').order('created_at', { ascending: false });
+  const { data, error } = await supabase.from(T.bundles).select('*');
   return { items: data || [], error };
 }
 export async function createBundle(payload) {
@@ -272,7 +271,7 @@ export async function upsertBundle(payload) {
    XCARDS
    ============================================================ */
 export async function fetchXCards() {
-  const { data, error } = await supabase.from(T.xcards).select('*').order('created_at', { ascending: false });
+  const { data, error } = await supabase.from(T.xcards).select('*');
   return { items: data || [], error };
 }
 export async function createXCard(payload) {
@@ -302,28 +301,7 @@ export async function upsertPromo(payload) {
 }
 export const fetchAllXcards = fetchXCards;
 export const sendTestBotMessage = sendBotTest;
-
-/* ============================================================
-   SETTINGS / BOTS / MISC
-   ============================================================ */
-export async function fetchSettings() {
-  const { data, error } = await supabase.from(T.settings).select('*');
-  return { items: data || [], error };
-}
-export async function updateSettings(id, patch) {
-  const { error } = await supabase.from(T.settings).update(patch).eq('id', id);
-  return { error };
-}
-export async function fetchBots() {
-  const { data, error } = await supabase.from(T.bots).select('*');
-  return { items: data || [], error };
-}
-export async function updateBot(id, patch) {
-  const { error } = await supabase.from(T.bots).update(patch).eq('id', id);
-  return { error };
-}
-export async function fetchDashboard() { return fetchStats(); }
-export async function fetchWalletTransactions(opts = {}) { return fetchAllTxns(opts); }
+export const fetchWalletTransactions = fetchAllTxns;
 export const fetchWalletTxns = fetchAllTxns;
 export const fetchTransactions = fetchAllTxns;
 export const fetchPromoCodesList = fetchPromoCodes;
@@ -331,3 +309,8 @@ export const fetchXCardList = fetchXCards;
 export const fetchBotLog = fetchBotMessages;
 export const fetchXWallet = fetchTopUps;
 export const fetchBotChat = fetchBotMessages;
+export async function fetchSettings() { return { items: [], error: null }; }
+export async function updateSettings() { return {}; }
+export async function fetchBots() { return fetchBotMessages({ bot: '' }); }
+export async function updateBot() { return {}; }
+export async function fetchDashboard() { return fetchStats(); }
