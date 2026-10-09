@@ -19,17 +19,15 @@
     <script type="module" src="/src/main.jsx"></script>
     <script>
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js', { scope: '/' })
-            .then(() => console.log('SW registered'))
-            .catch((err) => console.warn('SW failed:', err));
-        });
+        navigator.serviceWorker.register('/sw.js', { scope: '/' })
+          .then(() => console.log('SW registered'))
+          .catch((err) => console.warn('SW failed:', err));
       }
       window.__deferredPrompt = null;
       window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         window.__deferredPrompt = e;
-        console.log('PWA install prompt available');
+        console.log('beforeinstallprompt fired');
       });
     </script>
   </body>
