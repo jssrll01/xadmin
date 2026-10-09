@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { Delete } from 'lucide-react';
 
-const PIN = '1010';
+const PIN = import.meta.env.VITE_XADMIN_PIN || '1010';
+const SESSION_KEY = 'xadmin_unlocked';
+const ACTOR_KEY = 'xadmin_actor';
+const SESSION_TTL_MS = Number(import.meta.env.VITE_XADMIN_SESSION_TTL_MS || 900000); // default 15 min
 
 export default function PinLock({ onUnlock }) {
   const [digits, setDigits] = useState('');
@@ -13,7 +16,11 @@ export default function PinLock({ onUnlock }) {
     setDigits(next);
     if (next.length === 4) {
       setTimeout(() => {
-        if (next === PIN) onUnlock();
+        if (next === PIN) {
+          sessionStorage.setItem(SESSION_KEY, String(Date.now() + SESSION_TTL_MS));
+          sessionStorage.setItem(ACTOR_KEY, import.meta.env.VITE_XADMIN_ACTOR || 'admin');
+          onUnlock();
+        }
         else { setError(true); setTimeout(() => { setError(false); setDigits(''); }, 500); }
       }, 150);
     }

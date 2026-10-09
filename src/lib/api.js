@@ -168,3 +168,80 @@ export async function fetchShopsFromProducts() {
     return { items: [], error: e };
   }
 }
+
+
+/* ============================================================
+   AUDIT LOG
+   ============================================================ */
+export async function logAudit(action, table = null, recordId = null, before = null, after = null) {
+  try {
+    const actor = sessionStorage.getItem('xadmin_actor') || 'admin';
+    await supabase.rpc('log_audit', {
+      p_actor: actor,
+      p_action: action,
+      p_table: table,
+      p_record_id: recordId ? String(recordId) : null,
+      p_before: before,
+      p_after: after,
+    });
+  } catch (e) {
+    console.warn('logAudit failed:', e);
+  }
+}
+
+export async function fetchAuditLog({ limit = 200 } = {}) {
+  try {
+    const { data, error } = await supabase
+      .from('audit_log')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(limit);
+    return { items: Array.isArray(data) ? data : [], error };
+  } catch (e) {
+    return { items: [], error: e };
+  }
+}
+
+/* ============================================================
+   SETTINGS (transaction fee etc)
+   ============================================================ */
+export async function fetchSettings() {
+  try {
+    const { data, error } = await supabase.from('settings').select('*');
+    return { items: Array.isArray(data) ? data : [], error };
+  } catch (e) {
+    return { items: [], error: e };
+  }
+}
+
+export async function upsertSetting(key, value) {
+  try {
+    const { error } = await supabase
+      .from('settings')
+      .upsert({ key, value, updated_at: new Date().toISOString() }, { onConflict: 'key' });
+    return { error };
+  } catch (e) {
+    return { error: e };
+  }
+}
+
+/* ============================================================
+   PRODUCTS with stock-aware sorting/filtering
+   ============================================================ */
+export async function fetchProductsSorted() {
+  const { data, error } = await supabase.from('products').select('*');
+  if (error) return { items: [], error };
+  const items = (data || []).slice();
+  // In-stock first, sold-out last; secondary: newest first
+  items.sort((a, b) => {
+    const aStock = Number(a.stock || 0) > 0 ? 1 : 0;
+    const bStock = Number(b.stock || 0) > 0 ? 1 : 0;
+    if (aStock !== bStock) return bStock - aStock;
+    return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+  });
+  return { items, error: null };
+}
+
+export async function updateStock(id, newStock) {
+  return supabase.from('products').update({ stock: Number(newStock) }).eq('id', id);
+}

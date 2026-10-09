@@ -2,7 +2,7 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard, Users, Package, ShoppingBag, Wallet, RotateCcw,
-  AlertTriangle, Store, CreditCard, Gift, Boxes, Settings as Cog,
+  AlertTriangle, Store, CreditCard, Gift, Boxes, Settings as Cog, ScrollText,
 } from 'lucide-react';
 
 const items = [
@@ -18,6 +18,7 @@ const items = [
   ['/xcards', 'Xcards', CreditCard],
   ['/promos', 'Promos', Gift],
   ['/bundles', 'Bundles', Boxes],
+  ['/audit', 'Audit log', ScrollText],
   ['/settings', 'Settings', Cog],
 ];
 

@@ -4,6 +4,7 @@ import Modal from './Modal.jsx';
 import Btn from './Btn.jsx';
 import { useToast } from './Toast.jsx';
 import useAutoRefresh from '../lib/useAutoRefresh.js';
+import { logAudit } from '../lib/api.js';
 import { Plus, Edit2, Trash2, Search } from 'lucide-react';
 
 export default function CrudPage({
@@ -83,6 +84,14 @@ export default function CrudPage({
         ? await onCreate(payload)
         : await onUpdate(editing[primaryKey], payload);
       if (res?.error) throw res.error;
+      // AUDIT
+      await logAudit(
+        isNew ? 'create' : 'update',
+        title.toLowerCase(),
+        isNew ? res?.data?.[primaryKey] : editing[primaryKey],
+        isNew ? null : editing,
+        payload
+      );
       show?.(isNew ? 'Created' : 'Updated', 'success');
       setEditing(null);
       load();
@@ -99,6 +108,7 @@ export default function CrudPage({
     try {
       const res = await onDelete(row[primaryKey]);
       if (res?.error) throw res.error;
+      await logAudit('delete', title.toLowerCase(), row[primaryKey], row, null);
       show?.('Deleted', 'success');
       load();
     } catch (e) {

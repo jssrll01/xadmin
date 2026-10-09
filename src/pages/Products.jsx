@@ -1,6 +1,6 @@
 import React from 'react';
 import CrudPage from '../components/CrudPage.jsx';
-import { fetchProducts, productCrud } from '../lib/api.js';
+import { fetchProductsSorted as fetchProducts, productCrud } from '../lib/api.js';
 import { peso, dateOnly } from '../lib/format.js';
 
 export default function Products() {
@@ -17,7 +17,12 @@ export default function Products() {
         { key: 'price', label: 'Price', render: (r) => peso(r.price) },
         { key: 'original_price', label: 'Original', render: (r) => r.original_price ? peso(r.original_price) : '—' },
         { key: 'discount', label: 'Disc %', render: (r) => r.discount || 0 },
-        { key: 'stock', label: 'Stock', render: (r) => r.stock ?? 0 },
+        { key: 'stock', label: 'Stock', render: (r) => {
+          const n = Number(r.stock || 0);
+          if (n <= 0) return <span className="neu-badge badge-rejected">SOLD OUT</span>;
+          if (n <= 5) return <span className="neu-badge badge-pending">{n} left</span>;
+          return <span className="neu-badge badge-approved">{n}</span>;
+        } },
         { key: 'sold', label: 'Sold', render: (r) => r.sold ?? 0 },
         { key: 'variants', label: 'Variants', render: (r) =>
           Array.isArray(r.variants) && r.variants.length
