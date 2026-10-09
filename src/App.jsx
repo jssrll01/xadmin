@@ -12,7 +12,7 @@ import TopUps from './pages/TopUps.jsx';
 import Wallet from './pages/Wallet.jsx';
 import Reports from './pages/Reports.jsx';
 import Returns from './pages/Returns.jsx';
-import Sellers from './pages/Sellers.jsx';
+import Shops from './pages/Shops.jsx';
 import Bundles from './pages/Bundles.jsx';
 import Xcards from './pages/Xcards.jsx';
 import Promos from './pages/Promos.jsx';
@@ -46,7 +46,7 @@ export default function App() {
           <Route path="/wallet"   element={<Wallet />} />
           <Route path="/returns"  element={<Returns />} />
           <Route path="/reports"  element={<Reports />} />
-          <Route path="/sellers"  element={<Sellers />} />
+          <Route path="/shops"    element={<Shops />} />
           <Route path="/xcards"   element={<Xcards />} />
           <Route path="/promos"   element={<Promos />} />
           <Route path="/bundles"  element={<Bundles />} />

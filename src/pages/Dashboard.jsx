@@ -1,15 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { TrendingUp, ShoppingBag, Users, Package, Wallet, AlertTriangle } from 'lucide-react';
 import { fetchStats } from '../lib/api.js';
 import { peso, pesoShort } from '../lib/format.js';
+import useAutoRefresh from '../lib/useAutoRefresh.js';
 
 export default function Dashboard() {
   const [stats, setStats] = useState(null);
-  useEffect(() => {
-    let alive = true;
-    fetchStats().then((s) => { if (alive) setStats(s); });
-    return () => { alive = false; };
+
+  const load = useCallback(async () => {
+    const s = await fetchStats();
+    setStats(s);
   }, []);
+
+  useAutoRefresh(load, 1000);
 
   const s = stats || { revenue: 0, orders: 0, users: 0, products: 0, pendingTopups: 0, openReports: 0 };
   const cards = [
@@ -26,7 +29,7 @@ export default function Dashboard() {
       <div className="page-head">
         <div>
           <h1>Dashboard</h1>
-          <p>Overview of XMARKET activity</p>
+          <p>Overview · auto-refresh 1s</p>
         </div>
       </div>
       <div className="stat-grid">

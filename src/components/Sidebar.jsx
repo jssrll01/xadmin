@@ -14,7 +14,7 @@ const items = [
   ['/wallet', 'Wallet', Wallet],
   ['/returns', 'Returns', RotateCcw],
   ['/reports', 'Reports', AlertTriangle],
-  ['/sellers', 'Sellers', Store],
+  ['/shops', 'Shops', Store],
   ['/xcards', 'Xcards', CreditCard],
   ['/promos', 'Promos', Gift],
   ['/bundles', 'Bundles', Boxes],

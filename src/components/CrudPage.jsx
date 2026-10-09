@@ -1,8 +1,9 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import Card from './Card.jsx';
 import Modal from './Modal.jsx';
 import Btn from './Btn.jsx';
 import { useToast } from './Toast.jsx';
+import useAutoRefresh from '../lib/useAutoRefresh.js';
 import { Plus, Edit2, Trash2, Search } from 'lucide-react';
 
 export default function CrudPage({
@@ -21,19 +22,18 @@ export default function CrudPage({
   const [saving, setSaving] = useState(false);
 
   const load = useCallback(async () => {
-    setLoading(true);
     try {
       const res = await fetcher();
       setItems(Array.isArray(res?.items) ? res.items : []);
-    } catch (e) {
+    } catch {
       setItems([]);
-      show?.(String(e.message || e), 'error');
     } finally {
       setLoading(false);
     }
-  }, [fetcher, show]);
+  }, [fetcher]);
 
-  useEffect(() => { load(); }, [load]);
+  // Auto-refresh every 1 second
+  useAutoRefresh(load, 1000);
 
   const openNew = () => {
     const blank = { __isNew: true };
@@ -106,7 +106,6 @@ export default function CrudPage({
     }
   };
 
-  // Quick row update (used by extra actions like status change)
   const quickUpdate = async (id, patch) => {
     try {
       const res = await onUpdate(id, patch);
@@ -152,7 +151,7 @@ export default function CrudPage({
         </Card>
       )}
 
-      {loading ? (
+      {loading && items.length === 0 ? (
         <Card><div style={{ padding: 20, color: 'var(--text-dim)', textAlign: 'center' }}>Loading…</div></Card>
       ) : filtered.length === 0 ? (
         <Card>

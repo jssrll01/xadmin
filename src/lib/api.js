@@ -5,13 +5,11 @@ const T = {
   order_items: 'order_items', topups: 'xwallet_topups',
   wallet: 'xwallet_txns', promos: 'promo_codes',
   returns: 'return_requests', bundles: 'bundles',
-  xcards: 'xcards', reports: 'report_tickets', bots: 'bot_messages',
+  xcards: 'xcards', reports: 'report_tickets',
+  shops: 'shops',
 };
 
-// Primary key per table (defaults to 'id')
-const PK = {
-  promo_codes: 'code',
-};
+const PK = { promo_codes: 'code' };
 
 async function list(table, order) {
   try {
@@ -24,7 +22,6 @@ async function list(table, order) {
   }
 }
 
-// Build a crud object that respects the table's real PK
 const crud = (table) => {
   const key = PK[table] || 'id';
   return {
@@ -34,7 +31,6 @@ const crud = (table) => {
   };
 };
 
-// Fetchers
 export const fetchUsers    = () => list(T.users, 'created_at');
 export const fetchProducts = () => list(T.products, 'created_at');
 export const fetchOrders   = () => list(T.orders, 'created_at');
@@ -45,10 +41,9 @@ export const fetchReturns  = () => list(T.returns, 'created_at');
 export const fetchReports  = () => list(T.reports, 'created_at');
 export const fetchBundles  = () => list(T.bundles, 'created_at');
 export const fetchXCards   = () => list(T.xcards, 'created_at');
-export const fetchSellers  = () => list(T.users, 'created_at');
+export const fetchShops    = () => list(T.shops, 'created_at');
 export const fetchOrderItems = () => list(T.order_items);
 
-// Dashboard
 export async function fetchStats() {
   try {
     const [u, o, p, t, r] = await Promise.all([
@@ -64,7 +59,8 @@ export async function fetchStats() {
       orders: o.count || (o.data?.length || 0),
       users: u.count || 0,
       products: p.count || 0,
-      pendingTopups: (t.data || []).filter((x) => x.status === 'pending').length,
+      pendingTopups: (t.data || []).filter((x) =>
+        ['pending', 'processing'].includes(x.status)).length,
       openReports: (r.data || []).filter((x) =>
         ['open', 'pending', 'new'].includes(x.status)).length,
     };
@@ -88,7 +84,6 @@ export async function fetchRevenueSeries(days = 30) {
   return Object.entries(map).map(([date, revenue]) => ({ date, revenue }));
 }
 
-// Expose crud objects for each page
 export const productCrud = crud(T.products);
 export const orderCrud   = crud(T.orders);
 export const userCrud    = crud(T.users);
@@ -99,3 +94,21 @@ export const returnCrud  = crud(T.returns);
 export const reportCrud  = crud(T.reports);
 export const bundleCrud  = crud(T.bundles);
 export const xcardCrud   = crud(T.xcards);
+export const shopCrud    = crud(T.shops);
+
+// Approve topup — explicit server-side function (via trigger) still fires,
+// but we ALSO call the RPC to guarantee credit even if trigger isn't installed.
+export async function approveTopUp(id, userId, amount) {
+  // Set status -> approved. Trigger handles crediting.
+  const res = await supabase
+    .from(T.topups)
+    .update({ status: 'approved' })
+    .eq('id', id);
+  if (res.error) return res;
+
+  // Safety net: also increment balance directly
+  const { data: profile } = await supabase
+    .from(T.users).select('xwallet_balance').eq('id', userId).single();
+  const newBal = Number(profile?.xwallet_balance || 0) + Number(amount || 0);
+  return supabase.from(T.users).update({ xwallet_balance: newBal }).eq('id', userId);
+}
