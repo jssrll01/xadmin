@@ -11,13 +11,16 @@ export default function Promos() {
       searchKeys={['code']}
       columns={[
         { key: 'code', label: 'Code', render: (r) => <b>{r.code || '—'}</b> },
-        { key: 'discount', label: 'Discount', render: (r) => r.discount || r.discount_value || r.percent || '—' },
+        { key: 'discount_value', label: 'Value', render: (r) => (r.discount_value ?? r.discount ?? '—') + (r.discount_type === 'percent' ? '%' : '') },
         { key: 'active', label: 'Active', render: (r) => r.active ? '✅' : '❌' },
         { key: 'created_at', label: 'Created' },
       ]}
       formFields={[
         { key: 'code', label: 'Code', required: true },
-        { key: 'discount', label: 'Discount', type: 'number' },
+        { key: 'discount_type', label: 'Type', type: 'select',
+          options: ['fixed', 'percent'], required: true, default: 'fixed' },
+        { key: 'discount_value', label: 'Value', type: 'number', required: true },
+        { key: 'min_spend', label: 'Min spend', type: 'number' },
         { key: 'active', label: 'Active', type: 'boolean', default: true },
       ]}
       onCreate={promoCrud.create}
