@@ -8,6 +8,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="XADMIN" />
     <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="description" content="XMARKET admin console" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="icon" type="image/svg+xml"
       href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>%F0%9F%91%A8%E2%80%8D%F0%9F%92%BB</text></svg>" />
@@ -17,13 +18,24 @@
   </head>
   <body>
     <div id="root"></div>
-    <script>
-      // Kill any old SW so the new icon + bundle take over instantly
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then((rs) => rs.forEach((r) => r.unregister()));
-        if ('caches' in window) caches.keys().then((ks) => ks.forEach((k) => caches.delete(k)));
-      }
-    </script>
     <script type="module" src="/src/main.jsx"></script>
+    <script>
+      // Register the service worker — required for real "Install app" prompt
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js', { scope: '/' })
+            .then(() => console.log('SW registered'))
+            .catch((err) => console.warn('SW failed:', err));
+        });
+      }
+
+      // Capture the install prompt so we can show our own button if needed
+      window.__deferredPrompt = null;
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        window.__deferredPrompt = e;
+        console.log('PWA install prompt available');
+      });
+    </script>
   </body>
 </html>
