@@ -4,21 +4,21 @@ import { supabase } from '../supabase.js';
    TABLE MAP — edit these if your real table names differ.
    ============================================================ */
 const T = {
-  users:               'users',
+  users:               'profiles',
   products:            'products',
   orders:              'orders',
   order_items:         'order_items',
-  topups:              'topups',
-  wallet_transactions: 'wallet_transactions',
+  topups:              'xwallet_topups',
+  wallet_transactions: 'xwallet_txns',
   promo_codes:         'promo_codes',
-  returns:             'returns',
-  sellers:             'sellers',
+  returns:             'return_requests',
+  sellers:             'profiles',
   bundles:             'bundles',
   xcards:              'xcards',
-  reports:             'reports',
+  reports:             'report_tickets',
   bot_messages:        'bot_messages',
-  settings:            'settings',
-  bots:                'bots',
+  settings:            'profiles',
+  bots:                'bot_messages',
 };
 
 /* ============================================================
