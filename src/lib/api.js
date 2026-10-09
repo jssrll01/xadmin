@@ -112,3 +112,59 @@ export async function approveTopUp(id, userId, amount) {
   const newBal = Number(profile?.xwallet_balance || 0) + Number(amount || 0);
   return supabase.from(T.users).update({ xwallet_balance: newBal }).eq('id', userId);
 }
+
+
+/* ============================================================
+   SHOPS derived from products.store
+   ============================================================ */
+export async function fetchShopsFromProducts() {
+  try {
+    const { data, error } = await supabase.from('products').select('store, name, price, stock, category, seller_id');
+    if (error) throw error;
+
+    const map = new Map();
+    (data || []).forEach((p) => {
+      const key = p.store || '(No store)';
+      if (!map.has(key)) {
+        map.set(key, {
+          id: key,
+          store: key,
+          product_count: 0,
+          total_stock: 0,
+          categories: new Set(),
+          min_price: null,
+          max_price: null,
+          seller_ids: new Set(),
+        });
+      }
+      const s = map.get(key);
+      s.product_count += 1;
+      s.total_stock += Number(p.stock || 0);
+      if (p.category) s.categories.add(p.category);
+      const price = Number(p.price || 0);
+      if (s.min_price === null || price < s.min_price) s.min_price = price;
+      if (s.max_price === null || price > s.max_price) s.max_price = price;
+      if (p.seller_id) s.seller_ids.add(p.seller_id);
+    });
+
+    const items = Array.from(map.values()).map((s) => ({
+      id: s.id,
+      store: s.store,
+      product_count: s.product_count,
+      total_stock: s.total_stock,
+      categories: Array.from(s.categories).join(', '),
+      price_range:
+        s.min_price === null
+          ? '—'
+          : s.min_price === s.max_price
+          ? `₱${s.min_price}`
+          : `₱${s.min_price} – ₱${s.max_price}`,
+      seller_count: s.seller_ids.size,
+    }));
+
+    items.sort((a, b) => b.product_count - a.product_count);
+    return { items, error: null };
+  } catch (e) {
+    return { items: [], error: e };
+  }
+}
