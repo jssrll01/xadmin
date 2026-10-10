@@ -46,6 +46,7 @@ export default function Products() {
         { key: 'category', label: 'Category' },
         { key: 'store', label: 'Store' },
         { key: 'stock', label: 'Stock', type: 'number', default: 0 },
+        { key: 'sold', label: 'Sold', type: 'number', default: 0 },
         { key: 'variants', label: 'Variants', type: 'array',
           placeholder: 'One per line (e.g. Small, Medium, Large)' },
         { key: 'images', label: 'Image URLs', type: 'array',
