@@ -245,3 +245,53 @@ export async function fetchProductsSorted() {
 export async function updateStock(id, newStock) {
   return supabase.from('products').update({ stock: Number(newStock) }).eq('id', id);
 }
+
+
+/* ============================================================
+   NOTIFICATIONS CRUD
+   ============================================================ */
+export async function fetchNotifications({ limit = 200 } = {}) {
+  try {
+    const { data, error } = await supabase
+      .from('notifications')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(limit);
+    return { items: Array.isArray(data) ? data : [], error };
+  } catch (e) {
+    return { items: [], error: e };
+  }
+}
+
+export const notificationCrud = {
+  create: async (p) => supabase.from('notifications').insert(p).select().single(),
+  update: async (id, p) => supabase.from('notifications').update(p).eq('id', id),
+  remove: async (id) => supabase.from('notifications').delete().eq('id', id),
+};
+
+/* ============================================================
+   AUDIT LOG DELETE
+   ============================================================ */
+export async function deleteAuditLog(id) {
+  return supabase.from('audit_log').delete().eq('id', id);
+}
+
+export async function deleteAuditLogAll() {
+  return supabase.from('audit_log').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+}
+
+/* ============================================================
+   SOLD-OUT STATS
+   ============================================================ */
+export async function fetchSoldOutProducts() {
+  try {
+    const { data, error } = await supabase
+      .from('products')
+      .select('id, name, stock, sold, price, category, store')
+      .lte('stock', 0)
+      .order('sold', { ascending: false });
+    return { items: Array.isArray(data) ? data : [], error };
+  } catch (e) {
+    return { items: [], error: e };
+  }
+}

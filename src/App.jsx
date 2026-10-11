@@ -18,6 +18,7 @@ import Xcards from './pages/Xcards.jsx';
 import Promos from './pages/Promos.jsx';
 import Settings from './pages/Settings.jsx';
 import AuditLog from './pages/AuditLog.jsx';
+import Notifications from './pages/Notifications.jsx';
 
 const SESSION_KEY = 'xadmin_unlocked';
 const ACTOR_KEY = 'xadmin_actor';
@@ -89,6 +90,7 @@ export default function App() {
           <Route path="/xcards"    element={<Xcards />} />
           <Route path="/promos"    element={<Promos />} />
           <Route path="/bundles"   element={<Bundles />} />
+          <Route path="/notifications" element={<Notifications />} />
           <Route path="/audit"     element={<AuditLog />} />
           <Route path="/settings"  element={<Settings />} />
           <Route path="*"          element={<Navigate to="/" replace />} />
