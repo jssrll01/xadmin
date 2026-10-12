@@ -30,10 +30,10 @@ export default function PinLock({ onUnlock }) {
     <div className="pin-lock">
       <div className={'pin-box' + (error ? ' shake' : '')}>
         <div style={{ width:72, height:72, borderRadius:22, margin:'0 auto 20px',
-          background:'linear-gradient(135deg,#3B82F6,#2563EB)', display:'flex',
+          background:'linear-gradient(135deg,#3B82F6,#7C3AED)', display:'flex',
           alignItems:'center', justifyContent:'center', color:'#fff',
           boxShadow:'8px 8px 20px rgba(37,99,235,0.35), -6px -6px 16px rgba(255,255,255,0.9)' }}>
-          <span style={{ fontSize: 34, lineHeight: 1 }}>👨‍💻</span>
+          <span style={{ fontSize: 34, fontWeight: 900, color: "#fff" }}>X</span>
         </div>
         <h2 style={{ fontSize:22, fontWeight:900 }}>XADMIN</h2>
         <p style={{ fontSize:12.5, color:'var(--text-dim)', marginTop:4 }}>Enter access PIN</p>

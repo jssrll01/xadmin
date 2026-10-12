@@ -28,11 +28,17 @@ export default function Sidebar() {
     <aside className="sidebar">
       <div className="sidebar-brand">
         <div className="sidebar-brand-icon" style={{
-          fontSize: 22,
-          background: 'linear-gradient(135deg,#DBEAFE,#BFDBFE)',
-          color: '#1F2430',
+          background: 'linear-gradient(135deg,#3B82F6,#7C3AED)',
+          color: '#fff',
+          fontSize: 18,
+          fontWeight: 900,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          borderRadius: 11,
+          boxShadow: '4px 4px 10px rgba(37,99,235,0.35), -3px -3px 8px rgba(255,255,255,0.9)',
         }}>
-          👨‍💻
+          X
         </div>
         <div>
           <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: -0.3 }}>XADMIN</div>
