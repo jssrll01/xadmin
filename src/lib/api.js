@@ -295,3 +295,50 @@ export async function fetchSoldOutProducts() {
     return { items: [], error: e };
   }
 }
+
+
+/* ============================================================
+   ANALYTICS
+   ============================================================ */
+export async function fetchRevenueByPeriod(period = 'monthly', limit = 12) {
+  try {
+    const { data, error } = await supabase.rpc('revenue_by_period', {
+      p_period: period,
+      p_limit: limit,
+    });
+    if (error) throw error;
+    return { items: Array.isArray(data) ? data : [], error: null };
+  } catch (e) {
+    return { items: [], error: e };
+  }
+}
+
+export async function fetchTopSellingProducts(limit = 10) {
+  try {
+    const { data, error } = await supabase.rpc('top_selling_products', {
+      p_limit: limit,
+    });
+    if (error) throw error;
+    return { items: Array.isArray(data) ? data : [], error: null };
+  } catch (e) {
+    return { items: [], error: e };
+  }
+}
+
+export async function fetchRevenueSnapshot() {
+  try {
+    const { data, error } = await supabase.rpc('revenue_snapshot');
+    if (error) throw error;
+    const row = Array.isArray(data) ? data[0] : data;
+    return {
+      today: Number(row?.today || 0),
+      thisWeek: Number(row?.this_week || 0),
+      thisMonth: Number(row?.this_month || 0),
+      thisYear: Number(row?.this_year || 0),
+      allTime: Number(row?.all_time || 0),
+      error: null,
+    };
+  } catch (e) {
+    return { today: 0, thisWeek: 0, thisMonth: 0, thisYear: 0, allTime: 0, error: e };
+  }
+}
