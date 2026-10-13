@@ -5,7 +5,7 @@ const T = {
   order_items: 'order_items', topups: 'xwallet_topups',
   wallet: 'xwallet_txns', promos: 'promo_codes',
   returns: 'return_requests', bundles: 'bundles',
-  xcards: 'xcards', reports: 'report_tickets', receipts: 'xqoute_receipts', reviews: 'reviews',
+  xcards: 'xcards', reports: 'report_tickets', receipts: 'xquote_receipts', reviews: 'reviews',
   shops: 'shops',
 };
 
