@@ -18,6 +18,42 @@ const PERIODS = [
   { id: 'yearly', label: 'Yearly' },
 ];
 
+
+/* ─── Pad a sparse series so every bucket in the window is present ─── */
+function padSeries(items, period, count) {
+  const now = new Date();
+  const bucketKey = (d) => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    if (period === 'daily')   return `${y}-${m}-${day}`;
+    if (period === 'weekly') {
+      // ISO week — approximate: use the Monday of the week
+      const dow = d.getDay() === 0 ? 7 : d.getDay();
+      const mon = new Date(d); mon.setDate(d.getDate() - (dow - 1));
+      return `${mon.getFullYear()}-W${String(Math.ceil((((mon - new Date(mon.getFullYear(), 0, 1)) / 86400000) + 1) / 7)).padStart(2, '0')}`;
+    }
+    if (period === 'yearly')  return String(y);
+    return `${y}-${m}`; // monthly
+  };
+
+  const buckets = [];
+  const cur = new Date(now);
+  for (let i = count - 1; i >= 0; i--) {
+    const d = new Date(cur);
+    if (period === 'daily')   d.setDate(cur.getDate() - i);
+    if (period === 'weekly')  d.setDate(cur.getDate() - i * 7);
+    if (period === 'monthly') d.setMonth(cur.getMonth() - i, 1);
+    if (period === 'yearly')  d.setFullYear(cur.getFullYear() - i, 0, 1);
+    buckets.push(bucketKey(d));
+  }
+
+  const map = {};
+  items.forEach(it => { map[it.bucket] = it; });
+
+  return buckets.map(b => map[b] || { bucket: b, revenue: 0, order_count: 0 });
+}
+
 export default function Analytics() {
   const [period, setPeriod] = useState('monthly');
   const [series, setSeries] = useState([]);
@@ -34,8 +70,13 @@ export default function Analytics() {
         fetchRevenueSnapshot(),
         fetchTopSellingProducts(15),
       ]);
-      // reverse so oldest is left-most on the chart
-      setSeries((seriesRes.items || []).slice().reverse());
+      // pad to full window so missing buckets render as zero-bars
+      const bucketCount = period === 'daily' ? 30
+        : period === 'weekly' ? 26
+        : period === 'yearly' ? 5
+        : 24;
+      const padded = padSeries(seriesRes.items || [], period, bucketCount);
+      setSeries(padded);
       setSnapshot(snapRes);
       setTopProducts(topRes.items || []);
       const [r, v] = await Promise.all([fetchReceiptsStats(), fetchReviewsStats()]);
