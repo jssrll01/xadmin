@@ -5,9 +5,11 @@ import {
   fetchRevenueByPeriod,
   fetchTopSellingProducts,
   fetchRevenueSnapshot,
+  fetchReceiptsStats,
+  fetchReviewsStats,
 } from '../lib/api.js';
 import useAutoRefresh from '../lib/useAutoRefresh.js';
-import { TrendingUp, ShoppingBag, Calendar, Award } from 'lucide-react';
+import { TrendingUp, ShoppingBag, Calendar, Award, FileText, Star } from 'lucide-react';
 
 const PERIODS = [
   { id: 'daily', label: 'Daily' },
@@ -21,6 +23,8 @@ export default function Analytics() {
   const [series, setSeries] = useState([]);
   const [snapshot, setSnapshot] = useState(null);
   const [topProducts, setTopProducts] = useState([]);
+  const [receiptStats, setReceiptStats] = useState({ total: 0, paid: 0, unpaid: 0, pending: 0, overdue: 0, revenue: 0 });
+  const [reviewStats, setReviewStats] = useState({ total: 0, avg: 0, fiveStar: 0, replied: 0 });
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
@@ -34,6 +38,9 @@ export default function Analytics() {
       setSeries((seriesRes.items || []).slice().reverse());
       setSnapshot(snapRes);
       setTopProducts(topRes.items || []);
+      const [r, v] = await Promise.all([fetchReceiptsStats(), fetchReviewsStats()]);
+      setReceiptStats(r);
+      setReviewStats(v);
     } finally {
       setLoading(false);
     }
@@ -221,7 +228,35 @@ export default function Analytics() {
           </div>
         )}
       </Card>
-    </>
+    
+      {/* ─── QUOTATIONS ANALYTICS ─── */}
+      <div style={{ marginTop: 24 }}>
+        <h2 style={{ fontSize: 18, fontWeight: 800, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <FileText size={18} color="#0EA5E9" /> Quotations
+        </h2>
+        <div className="stat-grid">
+          <div className="stat"><div className="stat-icon" style={{ background: '#0EA5E9' }}><FileText size={22} /></div><div><div className="stat-value">{receiptStats.total}</div><div className="stat-label">Total receipts</div></div></div>
+          <div className="stat"><div className="stat-icon" style={{ background: '#10B981' }}><Award size={22} /></div><div><div className="stat-value">{receiptStats.paid}</div><div className="stat-label">Paid</div></div></div>
+          <div className="stat"><div className="stat-icon" style={{ background: '#F59E0B' }}><Calendar size={22} /></div><div><div className="stat-value">{receiptStats.unpaid}</div><div className="stat-label">Unpaid</div></div></div>
+          <div className="stat"><div className="stat-icon" style={{ background: '#3B82F6' }}><Calendar size={22} /></div><div><div className="stat-value">{receiptStats.pending}</div><div className="stat-label">Pending</div></div></div>
+          <div className="stat"><div className="stat-icon" style={{ background: '#EF4444' }}><Calendar size={22} /></div><div><div className="stat-value">{receiptStats.overdue}</div><div className="stat-label">Overdue</div></div></div>
+          <div className="stat"><div className="stat-icon" style={{ background: '#10B981' }}><TrendingUp size={22} /></div><div><div className="stat-value">{pesoShort(receiptStats.revenue)}</div><div className="stat-label">Paid revenue</div></div></div>
+        </div>
+      </div>
+
+      {/* ─── REVIEWS ANALYTICS ─── */}
+      <div style={{ marginTop: 24 }}>
+        <h2 style={{ fontSize: 18, fontWeight: 800, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Star size={18} color="#EAB308" /> Reviews
+        </h2>
+        <div className="stat-grid">
+          <div className="stat"><div className="stat-icon" style={{ background: '#EAB308' }}><Star size={22} /></div><div><div className="stat-value">{reviewStats.total}</div><div className="stat-label">Total reviews</div></div></div>
+          <div className="stat"><div className="stat-icon" style={{ background: '#F59E0B' }}><Star size={22} /></div><div><div className="stat-value">{reviewStats.avg}</div><div className="stat-label">Avg rating</div></div></div>
+          <div className="stat"><div className="stat-icon" style={{ background: '#10B981' }}><Award size={22} /></div><div><div className="stat-value">{reviewStats.fiveStar}</div><div className="stat-label">5-star</div></div></div>
+          <div className="stat"><div className="stat-icon" style={{ background: '#3B82F6' }}><TrendingUp size={22} /></div><div><div className="stat-value">{reviewStats.replied}</div><div className="stat-label">Replied</div></div></div>
+        </div>
+      </div>
+</>
   );
 }
 

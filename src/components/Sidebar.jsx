@@ -2,7 +2,7 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard, Users, Package, ShoppingBag, Wallet, RotateCcw,
-  AlertTriangle, Store, CreditCard, Gift, Boxes, Settings as Cog, ScrollText, Bell, BarChart3,
+  AlertTriangle, Store, CreditCard, Gift, Boxes, Settings as Cog, ScrollText, Bell, BarChart3, FileText, Star,
 } from 'lucide-react';
 
 const items = [
@@ -13,6 +13,8 @@ const items = [
   ['/topups', 'Top-ups', Wallet],
   ['/wallet', 'Wallet', Wallet],
   ['/returns', 'Returns', RotateCcw],
+  ['/quotations', 'Quotations', FileText],
+  ['/reviews', 'Reviews', Star],
   ['/reports', 'Reports', AlertTriangle],
   ['/shops', 'Shops', Store],
   ['/xcards', 'Xcards', CreditCard],

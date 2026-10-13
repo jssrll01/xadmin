@@ -12,6 +12,8 @@ import TopUps from './pages/TopUps.jsx';
 import Wallet from './pages/Wallet.jsx';
 import Reports from './pages/Reports.jsx';
 import Returns from './pages/Returns.jsx';
+import Quotations from './pages/Quotations.jsx';
+import Reviews from './pages/Reviews.jsx';
 import Shops from './pages/Shops.jsx';
 import Bundles from './pages/Bundles.jsx';
 import Xcards from './pages/Xcards.jsx';
@@ -92,6 +94,8 @@ export default function App() {
           <Route path="/promos"    element={<Promos />} />
           <Route path="/bundles"   element={<Bundles />} />
           <Route path="/notifications" element={<Notifications />} />
+          <Route path="/quotations" element={<Quotations />} />
+          <Route path="/reviews"    element={<Reviews />} />
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/audit"     element={<AuditLog />} />
           <Route path="/settings"  element={<Settings />} />

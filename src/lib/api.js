@@ -5,7 +5,7 @@ const T = {
   order_items: 'order_items', topups: 'xwallet_topups',
   wallet: 'xwallet_txns', promos: 'promo_codes',
   returns: 'return_requests', bundles: 'bundles',
-  xcards: 'xcards', reports: 'report_tickets',
+  xcards: 'xcards', reports: 'report_tickets', receipts: 'xqoute_receipts', reviews: 'reviews',
   shops: 'shops',
 };
 
@@ -92,6 +92,47 @@ export const walletCrud  = crud(T.wallet);
 export const promoCrud   = crud(T.promos);
 export const returnCrud  = crud(T.returns);
 export const reportCrud  = crud(T.reports);
+export const receiptCrud = crud(T.receipts);
+export const reviewCrud  = crud(T.reviews);
+
+export const fetchReceipts = () => list(T.receipts, 'created_at');
+export const fetchReviews  = () => list(T.reviews, 'created_at');
+
+export async function fetchReceiptsStats() {
+  try {
+    const { data } = await supabase.from(T.receipts).select('*');
+    const arr = data || [];
+    const paid = arr.filter(r => (r.status || '').toLowerCase() === 'paid');
+    return {
+      total: arr.length,
+      paid: paid.length,
+      unpaid: arr.filter(r => (r.status || '').toLowerCase() === 'unpaid').length,
+      pending: arr.filter(r => (r.status || '').toLowerCase() === 'pending').length,
+      overdue: arr.filter(r => (r.status || '').toLowerCase() === 'overdue').length,
+      revenue: paid.reduce((s, r) => s + Number(r.total || 0), 0),
+    };
+  } catch {
+    return { total: 0, paid: 0, unpaid: 0, pending: 0, overdue: 0, revenue: 0 };
+  }
+}
+
+export async function fetchReviewsStats() {
+  try {
+    const { data } = await supabase.from(T.reviews).select('*');
+    const arr = data || [];
+    const rated = arr.filter(r => typeof r.rating === 'number');
+    const avg = rated.length ? (rated.reduce((s, r) => s + r.rating, 0) / rated.length) : 0;
+    return {
+      total: arr.length,
+      avg: Number(avg.toFixed(2)),
+      fiveStar: arr.filter(r => r.rating === 5).length,
+      replied: arr.filter(r => r.seller_reply).length,
+    };
+  } catch {
+    return { total: 0, avg: 0, fiveStar: 0, replied: 0 };
+  }
+}
+
 export const bundleCrud  = crud(T.bundles);
 export const xcardCrud   = crud(T.xcards);
 export const shopCrud    = crud(T.shops);

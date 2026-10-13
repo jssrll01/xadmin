@@ -1,12 +1,14 @@
 import React, { useState, useCallback } from 'react';
-import { TrendingUp, ShoppingBag, Users, Package, Wallet, AlertTriangle } from 'lucide-react';
-import { fetchStats, fetchSoldOutProducts } from '../lib/api.js';
+import { TrendingUp, ShoppingBag, Users, Package, Wallet, AlertTriangle, FileText, Star } from 'lucide-react';
+import { fetchStats, fetchSoldOutProducts, fetchReceiptsStats, fetchReviewsStats } from '../lib/api.js';
 import { peso, pesoShort } from '../lib/format.js';
 import useAutoRefresh from '../lib/useAutoRefresh.js';
 
 export default function Dashboard() {
   const [stats, setStats] = useState(null);
   const [soldOutItems, setSoldOutItems] = useState([]);
+  const [receiptStats, setReceiptStats] = useState({ total: 0, paid: 0, revenue: 0 });
+  const [reviewStats, setReviewStats] = useState({ total: 0, avg: 0 });
 
   const load = useCallback(async () => {
     const s = await fetchStats();
@@ -14,6 +16,11 @@ export default function Dashboard() {
   }, []);
 
   useAutoRefresh(load, 1000);
+  useAutoRefresh(async () => {
+    const [r, v] = await Promise.all([fetchReceiptsStats(), fetchReviewsStats()]);
+    setReceiptStats(r || { total: 0, paid: 0, revenue: 0 });
+    setReviewStats(v || { total: 0, avg: 0 });
+  }, 5000);
   useAutoRefresh(async () => {
     const { items } = await fetchSoldOutProducts();
     setSoldOutItems(Array.isArray(items) ? items : []);
@@ -28,6 +35,8 @@ export default function Dashboard() {
     { icon: Wallet, value: s.pendingTopups, label: 'Pending top-ups', color: '#059669' },
     { icon: AlertTriangle, value: s.openReports, label: 'Open reports', color: '#EF4444' },
     { icon: TrendingUp, value: soldOutItems.length, label: 'Sold out', color: '#DC2626' },
+    { icon: FileText, value: receiptStats.total, label: 'Quotations', color: '#0EA5E9' },
+    { icon: Star, value: reviewStats.total, label: 'Reviews', color: '#EAB308' },
   ];
 
   return (
