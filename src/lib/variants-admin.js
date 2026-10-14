@@ -23,10 +23,12 @@ export function priceRange(product) {
 
 export function totalStock(product) {
   if (!product) return 0;
-  const hasConfig = product.variant_config && Object.keys(product.variant_config).length > 0;
-  if (!hasConfig) return Infinity;
+  const cfg = product.variant_config;
+  const dims = (cfg && typeof cfg === 'object') ? Object.keys(cfg) : [];
+  const hasRealVariants = dims.some(d => Array.isArray(cfg[d]) && cfg[d].length > 0);
+  if (!hasRealVariants) return Infinity;
   const map = product.variant_stock;
-  if (!map || typeof map !== 'object') return 0;
+  if (!map || typeof map !== 'object' || Object.keys(map).length === 0) return Infinity;
   let sum = 0;
   for (const k of Object.keys(map)) {
     const v = Number(map[k]) || 0;
