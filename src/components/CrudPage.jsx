@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import Card from './Card.jsx';
 import Modal from './Modal.jsx';
+import VariantEditor from './VariantEditor.jsx';
 import Btn from './Btn.jsx';
 import { useToast } from './Toast.jsx';
 import useAutoRefresh from '../lib/useAutoRefresh.js';
@@ -39,7 +40,8 @@ export default function CrudPage({
   const openNew = () => {
     const blank = { __isNew: true };
     formFields.forEach((f) => {
-      if (f.type === 'array') blank[f.key] = '';
+      if (f.type === 'variant-editor') blank[f.key] = { variant_config: {}, variant_prices: {}, variant_stock: {} };
+      else if (f.type === 'array') blank[f.key] = '';
       else if (f.type === 'boolean') blank[f.key] = !!f.default;
       else blank[f.key] = f.default ?? '';
     });
@@ -49,7 +51,13 @@ export default function CrudPage({
   const openEdit = (row) => {
     const copy = { ...row };
     formFields.forEach((f) => {
-      if (f.type === 'array') {
+      if (f.type === 'variant-editor') {
+        copy[f.key] = {
+          variant_config: row.variant_config || {},
+          variant_prices: row.variant_prices || {},
+          variant_stock: row.variant_stock || {},
+        };
+      } else if (f.type === 'array') {
         copy[f.key] = Array.isArray(row[f.key]) ? row[f.key].join('\n') : (row[f.key] || '');
       }
     });
@@ -72,6 +80,16 @@ export default function CrudPage({
         let v = editing[f.key];
         if (f.type === 'number') v = (v === '' || v == null) ? (f.default ?? 0) : Number(v);
         else if (f.type === 'boolean') v = !!v;
+        else if (f.type === 'variant-editor') {
+          // Emit three top-level columns instead of one
+          const obj = editing[f.key];
+          if (obj && typeof obj === 'object') {
+            payload.variant_config = obj.variant_config || {};
+            payload.variant_prices = obj.variant_prices || {};
+            payload.variant_stock = obj.variant_stock || {};
+          }
+          return;
+        }
         else if (f.type === 'array') {
           v = typeof v === 'string'
             ? v.split('\n').map(s => s.trim()).filter(Boolean)
@@ -230,6 +248,11 @@ export default function CrudPage({
                   <textarea className="neu-input" rows={3}
                     value={editing[f.key] ?? ''}
                     onChange={(e) => setEditing({ ...editing, [f.key]: e.target.value })} />
+                ) : f.type === 'variant-editor' ? (
+                  <VariantEditor
+                    value={editing[f.key]}
+                    onChange={(next) => setEditing({ ...editing, [f.key]: next })}
+                  />
                 ) : f.type === 'array' ? (
                   <textarea className="neu-input" rows={3}
                     placeholder={f.placeholder || 'One per line'}
