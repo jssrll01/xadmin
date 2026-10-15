@@ -15,6 +15,7 @@ import Returns from './pages/Returns.jsx';
 import Quotations from './pages/Quotations.jsx';
 import Reviews from './pages/Reviews.jsx';
 import Shops from './pages/Shops.jsx';
+import Stores from './pages/Stores.jsx';
 import Bundles from './pages/Bundles.jsx';
 import Xcards from './pages/Xcards.jsx';
 import Promos from './pages/Promos.jsx';
@@ -90,6 +91,7 @@ export default function App() {
           <Route path="/returns"   element={<Returns />} />
           <Route path="/reports"   element={<Reports />} />
           <Route path="/shops"     element={<Shops />} />
+          <Route path="/stores"    element={<Stores />} />
           <Route path="/xcards"    element={<Xcards />} />
           <Route path="/promos"    element={<Promos />} />
           <Route path="/bundles"   element={<Bundles />} />

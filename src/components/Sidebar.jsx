@@ -17,6 +17,7 @@ const items = [
   ['/reviews', 'Reviews', Star],
   ['/reports', 'Reports', AlertTriangle],
   ['/shops', 'Shops', Store],
+  ['/stores', 'Stores', Store],
   ['/xcards', 'Xcards', CreditCard],
   ['/promos', 'Promos', Gift],
   ['/bundles', 'Bundles', Boxes],
