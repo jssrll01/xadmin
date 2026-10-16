@@ -31,6 +31,7 @@ export default function PlayTime() {
   const [edit, setEdit] = useState(null);
   const [adj, setAdj] = useState(null);
   const [busy, setBusy] = useState(false);
+  const [sel, setSel] = useState([]);
 
   const load = useCallback(async () => {
     try {
@@ -47,7 +48,7 @@ export default function PlayTime() {
   }, [tab, search]);
   useAutoRefresh(load, 8000);
 
-  const switchTab = (k) => { setTab(k); setRows([]); setLoading(true); setSearch(''); };
+  const switchTab = (k) => { setTab(k); setRows([]); setLoading(true); setSearch(''); setSel([]); };
 
   const saveSetting = async () => {
     let value;
@@ -84,6 +85,16 @@ export default function PlayTime() {
     catch (e) { show?.(String(e.message || e), 'error'); }
   };
 
+  const delMany = async () => {
+    if (!sel.length) return;
+    if (!confirm(`Delete ${sel.length} transaction${sel.length === 1 ? '' : 's'}? This does not change any balance.`)) return;
+    try {
+      const n = await rpc('admin_pt_txn_delete_many', { p_ids: sel });
+      await audit('delete', 'playtime_transaction', null, { ids: sel }, null);
+      show?.(`Deleted ${n}`, 'success'); setSel([]); load();
+    } catch (e) { show?.(String(e.message || e), 'error'); }
+  };
+
   const trashBtn = (onClick) => (
     <button className="neu-btn" style={{ padding: 7, color: 'var(--danger)', borderColor: '#FCA5A5' }} onClick={onClick} title="Delete"><Trash2 size={14} /></button>
   );
@@ -98,6 +109,10 @@ export default function PlayTime() {
       <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
         {TABS.map(([k, l]) => <Btn key={k} variant={tab === k ? 'primary' : undefined} onClick={() => switchTab(k)}>{l}</Btn>)}
       </div>
+
+      {tab === 'txns' && sel.length > 0 && (
+        <div style={{ marginBottom: 12 }}><Btn onClick={delMany}>Delete selected ({sel.length})</Btn></div>
+      )}
 
       {(tab === 'players' || tab === 'txns') && (
         <Card style={{ marginBottom: 12, padding: 10 }}>
@@ -130,7 +145,7 @@ export default function PlayTime() {
           <table className="neu-table">
             <thead>
               {tab === 'players' && <tr><th>Player</th><th>Loyalty Points</th><th>XWallet</th><th style={{ textAlign: 'right', width: 1 }}>Actions</th></tr>}
-              {tab === 'txns' && <tr><th>When</th><th>Player</th><th>Game</th><th>Spent</th><th>Earned</th><th>XWallet</th><th>Balance</th><th style={{ textAlign: 'right', width: 1 }}>Actions</th></tr>}
+              {tab === 'txns' && <tr><th style={{ width: 1 }}><input type="checkbox" checked={rows.length > 0 && sel.length === rows.length} onChange={e => setSel(e.target.checked ? rows.map(x => x.id) : [])} /></th><th>When</th><th>Player</th><th>Game</th><th>Spent</th><th>Earned</th><th>XWallet</th><th>Balance</th><th style={{ textAlign: 'right', width: 1 }}>Actions</th></tr>}
               {tab === 'log' && <tr><th>When</th><th>Player</th><th>Event</th><th>Detail</th><th style={{ textAlign: 'right', width: 1 }}>Actions</th></tr>}
             </thead>
             <tbody>
@@ -143,7 +158,7 @@ export default function PlayTime() {
               ))}
               {tab === 'txns' && rows.map(r => (
                 <tr key={r.id}>
-                  <td>{when(r.created_at)}</td><td className="cell-wrap">{r.email || '—'}</td><td>{r.action || r.game}</td>
+                  <td><input type="checkbox" checked={sel.includes(r.id)} onChange={e => setSel(e.target.checked ? [...sel, r.id] : sel.filter(x => x !== r.id))} /></td><td>{when(r.created_at)}</td><td className="cell-wrap">{r.email || '—'}</td><td>{r.action || r.game}</td>
                   <td>{r.spent}</td><td>{r.earned}</td><td>{Number(r.wallet_credit) > 0 ? '₱' + Number(r.wallet_credit) : '—'}</td>
                   <td>{r.prev_balance} → {r.new_balance}</td>
                   <td style={{ textAlign: 'right' }}>{trashBtn(() => delRow('admin_pt_txn_delete', r, 'transaction'))}</td>
