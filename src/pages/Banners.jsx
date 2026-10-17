@@ -8,7 +8,7 @@ import { supabase } from '../supabase.js';
 import { logAudit } from '../lib/api.js';
 import { Plus, Edit2, Trash2, ArrowUp, ArrowDown } from 'lucide-react';
 
-const CODE = import.meta.env.VITE_XADMIN_PIN || '1010';
+const CODE = import.meta.env.VITE_XADMIN_PIN;
 const BLANK = { title: '', subtitle: '', image_url: '', cta_text: '', cta_link: '', sort_order: 0, active: true, starts_at: '', ends_at: '' };
 const lab = { fontSize: 11, fontWeight: 700, color: 'var(--text-dim)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: 0.4 };
 const day = (d) => (d ? String(d).slice(0, 10) : '');

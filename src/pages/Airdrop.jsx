@@ -5,7 +5,7 @@ import { useToast } from '../components/Toast.jsx';
 import useAutoRefresh from '../lib/useAutoRefresh.js';
 import { supabase } from '../supabase.js';
 
-const CODE = import.meta.env.VITE_XADMIN_PIN || '1010';
+const CODE = import.meta.env.VITE_XADMIN_PIN;
 const TABS = [['tiers', 'Tiers'], ['draws', 'Draws'], ['bets', 'Bets']];
 const when = (d) => (d ? new Date(d).toLocaleString() : '');
 const th = { textAlign: 'left', fontSize: 11, padding: '6px 8px', color: 'var(--text-dim)', textTransform: 'uppercase' };

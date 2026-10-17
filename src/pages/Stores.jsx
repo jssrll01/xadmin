@@ -1,3 +1,4 @@
+import { adminDb, adminRows } from '../lib/api';
 import React, { useState, useCallback } from 'react';
 import Card from '../components/Card.jsx';
 import Modal from '../components/Modal.jsx';
@@ -8,7 +9,7 @@ import { supabase } from '../supabase.js';
 import { logAudit } from '../lib/api.js';
 import { Plus, Edit2, Trash2 } from 'lucide-react';
 
-const CODE = import.meta.env.VITE_XADMIN_PIN || '1010';
+const CODE = import.meta.env.VITE_XADMIN_PIN;
 const BLANK = { name: '', description: '', logo_url: '', banner_url: '', location: '', contact_phone: '', contact_email: '', verified: false };
 const VBLANK = { code: '', title: '', discount_type: 'fixed', discount_value: '', min_spend: '', expires_at: '', active: true };
 const lab = { fontSize: 11, fontWeight: 700, color: 'var(--text-dim)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: 0.4 };
@@ -24,14 +25,11 @@ export default function Stores() {
 
   const load = useCallback(async () => {
     try {
-      const { data } = await supabase.from('stores').select('*').order('created_at', { ascending: false });
-      const list = data || [];
+      const list = adminRows(await adminDb('select', 'stores', { order_col: 'created_at', lim: 5000 }));
+      const allProducts = adminRows(await adminDb('select', 'products', { lim: 5000 }));
       const withCounts = await Promise.all(list.map(async (s) => {
-        const [f, p] = await Promise.all([
-          supabase.rpc('store_follower_count', { store_name: s.name }),
-          supabase.from('products').select('id', { count: 'exact', head: true }).eq('store', s.name),
-        ]);
-        return { ...s, followers: Number(f.data) || 0, product_count: p.count || 0 };
+        const f = await supabase.rpc('store_follower_count', { store_name: s.name });
+        return { ...s, followers: Number(f.data) || 0, product_count: allProducts.filter((p) => p.store === s.name).length };
       }));
       setRows(withCounts);
     } catch { setRows([]); } finally { setLoading(false); }
@@ -39,8 +37,7 @@ export default function Stores() {
   useAutoRefresh(load, 8000);
 
   const loadVouchers = async (storeId) => {
-    const { data } = await supabase.from('store_vouchers').select('*').eq('store_id', storeId).order('created_at', { ascending: false });
-    setVouchers(data || []);
+    setVouchers(adminRows(await adminDb('select', 'store_vouchers', { match_col: 'store_id', match_val: String(storeId), order_col: 'created_at', lim: 5000 })));
   };
 
   const openNew = () => { setEditing({ ...BLANK, __isNew: true }); setVouchers([]); setVform(VBLANK); };

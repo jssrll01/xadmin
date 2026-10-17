@@ -11,7 +11,7 @@ const T = {
 
 const PK = { promo_codes: 'code' };
 
-const CODE = import.meta.env.VITE_XADMIN_PIN || '1010';
+const CODE = import.meta.env.VITE_XADMIN_PIN;
 async function db(action, tbl, extra = {}) {
   const { data, error } = await supabase.rpc('admin_db', { code: CODE, action, tbl, ...extra });
   return { data, error };
@@ -146,8 +146,9 @@ export async function approveTopUp(id) {
    ============================================================ */
 export async function fetchShopsFromProducts() {
   try {
-    const { data, error } = await supabase.from('products').select('store, name, price, stock, category, seller_id');
-    if (error) throw error;
+    const r = await db('select', 'products', { lim: 5000 });
+    const data = rows(r);
+    if (r.error) throw r.error;
 
     const map = new Map();
     (data || []).forEach((p) => {
@@ -337,3 +338,5 @@ export async function fetchRevenueSnapshot() {
     return { today: 0, thisWeek: 0, thisMonth: 0, thisYear: 0, allTime: 0, error: e };
   }
 }
+
+export { db as adminDb, rows as adminRows };

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Delete } from 'lucide-react';
 
-const PIN = import.meta.env.VITE_XADMIN_PIN || '1010';
+const PIN = import.meta.env.VITE_XADMIN_PIN;
 const SESSION_KEY = 'xadmin_unlocked';
 const ACTOR_KEY = 'xadmin_actor';
 const SESSION_TTL_MS = Number(import.meta.env.VITE_XADMIN_SESSION_TTL_MS || 900000); // default 15 min

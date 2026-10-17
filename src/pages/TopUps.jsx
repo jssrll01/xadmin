@@ -10,7 +10,7 @@ export default function TopUps() {
   const { show } = useToast();
 
   const decide = async (row, status) => {
-    const { data, error } = await supabase.rpc('admin_topup_set', { code: import.meta.env.VITE_XADMIN_PIN || '1010', p_id: row.id, p_status: status });
+    const { data, error } = await supabase.rpc('admin_topup_set', { code: import.meta.env.VITE_XADMIN_PIN, p_id: row.id, p_status: status });
     if (error) return show?.(error.message, 'error');
     show?.(status === 'approved' ? 'Approved · wallet credited' : 'Rejected', 'success');
   };

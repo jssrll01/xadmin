@@ -5,7 +5,7 @@ import { peso, dateOnly, initials } from '../lib/format.js';
 
 import { supabase } from '../supabase.js';
 
-const CODE = import.meta.env.VITE_XADMIN_PIN || '1010';
+const CODE = import.meta.env.VITE_XADMIN_PIN;
 async function adminCall(fn, args) {
   const { error } = await supabase.rpc(fn, { code: CODE, ...args });
   if (error) { alert(error.message); return false; }

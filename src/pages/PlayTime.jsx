@@ -1,3 +1,4 @@
+import { adminDb, adminRows } from '../lib/api';
 import React, { useState, useCallback } from 'react';
 import Card from '../components/Card.jsx';
 import Modal from '../components/Modal.jsx';
@@ -8,7 +9,7 @@ import { supabase } from '../supabase.js';
 import { logAudit } from '../lib/api.js';
 import { Plus, Edit2, Trash2 } from 'lucide-react';
 
-const CODE = import.meta.env.VITE_XADMIN_PIN || '1010';
+const CODE = import.meta.env.VITE_XADMIN_PIN;
 const CORE = ['limits', 'spin', 'boxes', 'exchange', 'mini'];
 const TABS = [['settings', 'Settings'], ['players', 'Players'], ['txns', 'Transactions'], ['log', 'Alerts']];
 const lab = { fontSize: 11, fontWeight: 700, color: 'var(--text-dim)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: 0.4 };
@@ -37,9 +38,9 @@ export default function PlayTime() {
     try {
       let list = [];
       if (tab === 'settings') {
-        const { data, error } = await supabase.from('playtime_config').select('*').order('key');
-        if (error) throw error;
-        list = data || [];
+        const r = await adminDb('select', 'playtime_config', { lim: 1000 });
+        if (r.error) throw r.error;
+        list = adminRows(r).sort((a, b) => String(a.key).localeCompare(String(b.key)));
       } else if (tab === 'players') list = await rpc('admin_pt_players', { p_search: search });
       else if (tab === 'txns') list = await rpc('admin_pt_txns', { p_limit: 150, p_search: search });
       else list = await rpc('admin_pt_log', { p_limit: 150 });

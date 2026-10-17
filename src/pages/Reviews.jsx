@@ -1,3 +1,4 @@
+import { adminDb, adminRows } from '../lib/api';
 import React, { useEffect, useState } from 'react';
 import { Star, Search, Trash2, Edit3, Save, X, PlusCircle, MessageCircle } from 'lucide-react';
 import { supabase } from '../supabase.js';
@@ -37,8 +38,8 @@ export default function Reviews() {
     const productIds = [...new Set(list.map(r => r.product_id).filter(Boolean))];
     const userIds    = [...new Set(list.map(r => r.user_id).filter(Boolean))];
     const [pRes, uRes] = await Promise.all([
-      productIds.length ? supabase.from('products').select('id, name').in('id', productIds) : { data: [] },
-      userIds.length ? supabase.from('profiles').select('id, username, first_name, last_name, email').in('id', userIds) : { data: [] },
+      productIds.length ? adminDb('select', 'products', { lim: 5000 }).then((r) => ({ data: adminRows(r).filter((p) => productIds.includes(p.id)) })) : { data: [] },
+      userIds.length ? adminDb('select', 'profiles', { lim: 5000 }).then((r) => ({ data: adminRows(r).filter((u) => userIds.includes(u.id)) })) : { data: [] },
     ]);
     setProducts(Object.fromEntries((pRes.data || []).map(p => [p.id, p])));
     setBuyers(Object.fromEntries((uRes.data || []).map(u => [u.id, u])));
