@@ -242,21 +242,27 @@ export async function upsertSetting(key, value) {
 /* ============================================================
    PRODUCTS with stock-aware sorting/filtering
    ============================================================ */
+const totalStock = (p) => Object.values(p.variant_stock || {}).reduce((a, v) => a + Number(v || 0), 0);
+
 export async function fetchProductsSorted() {
   const r = await db('select', 'products', { lim: 5000 });
   if (r.error) return { items: [], error: r.error };
-  const items = rows(r).slice();
+  const items = rows(r).map((p) => ({ ...p, stock: totalStock(p) }));
   items.sort((a, b) => {
-    const aStock = Number(a.stock || 0) > 0 ? 1 : 0;
-    const bStock = Number(b.stock || 0) > 0 ? 1 : 0;
-    if (aStock !== bStock) return bStock - aStock;
+    const aIn = a.stock > 0 ? 1 : 0, bIn = b.stock > 0 ? 1 : 0;
+    if (aIn !== bIn) return bIn - aIn;
     return new Date(b.created_at || 0) - new Date(a.created_at || 0);
   });
   return { items, error: null };
 }
 
-export async function updateStock(id, newStock) {
-  return db('update', 'products', { payload: { stock: Number(newStock) }, match_col: 'id', match_val: String(id) });
+export async function updateStock(id, newStock, key) {
+  const r = await db('select', 'products', { match_col: 'id', match_val: String(id), lim: 1 });
+  const p = rows(r)[0];
+  if (!p) return { error: { message: 'Product not found' } };
+  const vs = { ...(p.variant_stock || {}) };
+  if (key) vs[key] = Number(newStock); else Object.keys(vs).forEach((k) => { vs[k] = Number(newStock); });
+  return db('update', 'products', { payload: { variant_stock: vs }, match_col: 'id', match_val: String(id) });
 }
 
 
@@ -288,7 +294,8 @@ export async function deleteAuditLogAll() {
    ============================================================ */
 export async function fetchSoldOutProducts() {
   const r = await db('select', 'products', { lim: 5000 });
-  const items = rows(r).filter((p) => Number(p.stock || 0) <= 0).sort((a, b) => Number(b.sold || 0) - Number(a.sold || 0));
+  const items = rows(r).map((p) => ({ ...p, stock: totalStock(p) }))
+    .filter((p) => p.stock <= 0).sort((a, b) => Number(b.sold || 0) - Number(a.sold || 0));
   return { items, error: r.error };
 }
 
