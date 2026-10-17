@@ -19,6 +19,7 @@ const items = [
   ['/shops', 'Shops', Store],
   ['/stores', 'Stores', Store],
   ['/play-time', 'Play Time', Gamepad2],
+  ['/airdrop', 'Airdrop 88', Gamepad2],
   ['/banners', 'Banner', ImageIcon],
   ['/xcards', 'Xcards', CreditCard],
   ['/promos', 'Promos', Gift],
