@@ -11,12 +11,17 @@ const T = {
 
 const PK = { promo_codes: 'code' };
 
+const CODE = import.meta.env.VITE_XADMIN_PIN || '1010';
+async function db(action, tbl, extra = {}) {
+  const { data, error } = await supabase.rpc('admin_db', { code: CODE, action, tbl, ...extra });
+  return { data, error };
+}
+const rows = (r) => (Array.isArray(r.data) ? r.data : []);
+
 async function list(table, order) {
   try {
-    let q = supabase.from(table).select('*');
-    if (order) q = q.order(order, { ascending: false });
-    const { data, error } = await q;
-    return { items: Array.isArray(data) ? data : [], error };
+    const r = await db('select', table, { order_col: order || null, lim: 5000 });
+    return { items: rows(r), error: r.error };
   } catch (e) {
     return { items: [], error: e };
   }
@@ -25,9 +30,9 @@ async function list(table, order) {
 const crud = (table) => {
   const key = PK[table] || 'id';
   return {
-    create: async (p) => supabase.from(table).insert(p).select().single(),
-    update: async (id, p) => supabase.from(table).update(p).eq(key, id),
-    remove: async (id) => supabase.from(table).delete().eq(key, id),
+    create: async (p) => db('insert', table, { payload: p }),
+    update: async (id, p) => db('update', table, { payload: p, match_col: key, match_val: String(id) }),
+    remove: async (id) => db('delete', table, { match_col: key, match_val: String(id) }),
   };
 };
 
@@ -47,22 +52,16 @@ export const fetchOrderItems = () => list(T.order_items);
 export async function fetchStats() {
   try {
     const [u, o, p, t, r] = await Promise.all([
-      supabase.from(T.users).select('*', { count: 'exact', head: true }),
-      supabase.from(T.orders).select('*'),
-      supabase.from(T.products).select('*', { count: 'exact', head: true }),
-      supabase.from(T.topups).select('*'),
-      supabase.from(T.reports).select('*'),
+      db('select', T.users, { lim: 5000 }), db('select', T.orders, { lim: 5000 }),
+      db('select', T.products, { lim: 5000 }), db('select', T.topups, { lim: 5000 }),
+      db('select', T.reports, { lim: 5000 }),
     ]);
-    const revenue = (o.data || []).reduce((s, x) => s + Number(x.total || 0), 0);
+    const orders = rows(o);
+    const revenue = orders.reduce((s, x) => s + Number(x.total || 0), 0);
     return {
-      revenue,
-      orders: o.count || (o.data?.length || 0),
-      users: u.count || 0,
-      products: p.count || 0,
-      pendingTopups: (t.data || []).filter((x) =>
-        ['pending', 'processing'].includes(x.status)).length,
-      openReports: (r.data || []).filter((x) =>
-        ['open', 'pending', 'new'].includes(x.status)).length,
+      revenue, orders: orders.length, users: rows(u).length, products: rows(p).length,
+      pendingTopups: rows(t).filter((x) => ['pending', 'processing'].includes(x.status)).length,
+      openReports: rows(r).filter((x) => ['open', 'pending', 'new'].includes(x.status)).length,
     };
   } catch {
     return { revenue: 0, orders: 0, users: 0, products: 0, pendingTopups: 0, openReports: 0 };
@@ -71,13 +70,13 @@ export async function fetchStats() {
 
 export async function fetchRevenueSeries(days = 30) {
   const since = new Date(); since.setDate(since.getDate() - days);
-  const { data } = await supabase.from(T.orders).select('*').gte('created_at', since.toISOString());
+  const data = rows(await db('select', T.orders, { lim: 5000 })).filter((o) => o.created_at && new Date(o.created_at) >= since);
   const map = {};
   for (let i = 0; i < days; i++) {
     const d = new Date(); d.setDate(d.getDate() - (days - 1 - i));
     map[d.toISOString().slice(0, 10)] = 0;
   }
-  (data || []).forEach((o) => {
+  data.forEach((o) => {
     const k = o.created_at?.slice(0, 10);
     if (k && map[k] !== undefined) map[k] += Number(o.total || 0);
   });
@@ -100,8 +99,7 @@ export const fetchReviews  = () => list(T.reviews, 'created_at');
 
 export async function fetchReceiptsStats() {
   try {
-    const { data } = await supabase.from(T.receipts).select('*');
-    const arr = data || [];
+    const arr = rows(await db('select', T.receipts, { lim: 5000 }));
     const paid = arr.filter(r => (r.status || '').toLowerCase() === 'paid');
     return {
       total: arr.length,
@@ -118,8 +116,7 @@ export async function fetchReceiptsStats() {
 
 export async function fetchReviewsStats() {
   try {
-    const { data } = await supabase.from(T.reviews).select('*');
-    const arr = data || [];
+    const arr = rows(await db('select', T.reviews, { lim: 5000 }));
     const rated = arr.filter(r => typeof r.rating === 'number');
     const avg = rated.length ? (rated.reduce((s, r) => s + r.rating, 0) / rated.length) : 0;
     return {
@@ -139,19 +136,8 @@ export const shopCrud    = crud(T.shops);
 
 // Approve topup — explicit server-side function (via trigger) still fires,
 // but we ALSO call the RPC to guarantee credit even if trigger isn't installed.
-export async function approveTopUp(id, userId, amount) {
-  // Set status -> approved. Trigger handles crediting.
-  const res = await supabase
-    .from(T.topups)
-    .update({ status: 'approved' })
-    .eq('id', id);
-  if (res.error) return res;
-
-  // Safety net: also increment balance directly
-  const { data: profile } = await supabase
-    .from(T.users).select('xwallet_balance').eq('id', userId).single();
-  const newBal = Number(profile?.xwallet_balance || 0) + Number(amount || 0);
-  return supabase.from(T.users).update({ xwallet_balance: newBal }).eq('id', userId);
+export async function approveTopUp(id) {
+  return supabase.rpc('admin_topup_set', { code: CODE, p_id: id, p_status: 'approved' });
 }
 
 
@@ -231,49 +217,34 @@ export async function logAudit(action, table = null, recordId = null, before = n
 }
 
 export async function fetchAuditLog({ limit = 200 } = {}) {
-  try {
-    const { data, error } = await supabase
-      .from('audit_log')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(limit);
-    return { items: Array.isArray(data) ? data : [], error };
-  } catch (e) {
-    return { items: [], error: e };
-  }
+  const r = await db('select', 'audit_log', { order_col: 'created_at', lim: limit });
+  return { items: rows(r), error: r.error };
 }
 
 /* ============================================================
    SETTINGS (transaction fee etc)
    ============================================================ */
 export async function fetchSettings() {
-  try {
-    const { data, error } = await supabase.from('settings').select('*');
-    return { items: Array.isArray(data) ? data : [], error };
-  } catch (e) {
-    return { items: [], error: e };
-  }
+  const r = await db('select', 'settings', { lim: 1000 });
+  return { items: rows(r), error: r.error };
 }
 
 export async function upsertSetting(key, value) {
-  try {
-    const { error } = await supabase
-      .from('settings')
-      .upsert({ key, value, updated_at: new Date().toISOString() }, { onConflict: 'key' });
-    return { error };
-  } catch (e) {
-    return { error: e };
-  }
+  const now = new Date().toISOString();
+  const cur = rows(await db('select', 'settings', { match_col: 'key', match_val: String(key), lim: 1 }));
+  const r = cur.length
+    ? await db('update', 'settings', { payload: { value, updated_at: now }, match_col: 'key', match_val: String(key) })
+    : await db('insert', 'settings', { payload: { key, value, updated_at: now } });
+  return { error: r.error };
 }
 
 /* ============================================================
    PRODUCTS with stock-aware sorting/filtering
    ============================================================ */
 export async function fetchProductsSorted() {
-  const { data, error } = await supabase.from('products').select('*');
-  if (error) return { items: [], error };
-  const items = (data || []).slice();
-  // In-stock first, sold-out last; secondary: newest first
+  const r = await db('select', 'products', { lim: 5000 });
+  if (r.error) return { items: [], error: r.error };
+  const items = rows(r).slice();
   items.sort((a, b) => {
     const aStock = Number(a.stock || 0) > 0 ? 1 : 0;
     const bStock = Number(b.stock || 0) > 0 ? 1 : 0;
@@ -284,7 +255,7 @@ export async function fetchProductsSorted() {
 }
 
 export async function updateStock(id, newStock) {
-  return supabase.from('products').update({ stock: Number(newStock) }).eq('id', id);
+  return db('update', 'products', { payload: { stock: Number(newStock) }, match_col: 'id', match_val: String(id) });
 }
 
 
@@ -292,49 +263,32 @@ export async function updateStock(id, newStock) {
    NOTIFICATIONS CRUD
    ============================================================ */
 export async function fetchNotifications({ limit = 200 } = {}) {
-  try {
-    const { data, error } = await supabase
-      .from('notifications')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(limit);
-    return { items: Array.isArray(data) ? data : [], error };
-  } catch (e) {
-    return { items: [], error: e };
-  }
+  const r = await db('select', 'notifications', { order_col: 'created_at', lim: limit });
+  return { items: rows(r), error: r.error };
 }
 
-export const notificationCrud = {
-  create: async (p) => supabase.from('notifications').insert(p).select().single(),
-  update: async (id, p) => supabase.from('notifications').update(p).eq('id', id),
-  remove: async (id) => supabase.from('notifications').delete().eq('id', id),
-};
+export const notificationCrud = crud('notifications');
 
 /* ============================================================
    AUDIT LOG DELETE
    ============================================================ */
 export async function deleteAuditLog(id) {
-  return supabase.from('audit_log').delete().eq('id', id);
+  return db('delete', 'audit_log', { match_col: 'id', match_val: String(id) });
 }
 
 export async function deleteAuditLogAll() {
-  return supabase.from('audit_log').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+  const items = rows(await db('select', 'audit_log', { lim: 5000 }));
+  for (const it of items) await db('delete', 'audit_log', { match_col: 'id', match_val: String(it.id) });
+  return { error: null };
 }
 
 /* ============================================================
    SOLD-OUT STATS
    ============================================================ */
 export async function fetchSoldOutProducts() {
-  try {
-    const { data, error } = await supabase
-      .from('products')
-      .select('id, name, stock, sold, price, category, store')
-      .lte('stock', 0)
-      .order('sold', { ascending: false });
-    return { items: Array.isArray(data) ? data : [], error };
-  } catch (e) {
-    return { items: [], error: e };
-  }
+  const r = await db('select', 'products', { lim: 5000 });
+  const items = rows(r).filter((p) => Number(p.stock || 0) <= 0).sort((a, b) => Number(b.sold || 0) - Number(a.sold || 0));
+  return { items, error: r.error };
 }
 
 
