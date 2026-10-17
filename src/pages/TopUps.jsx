@@ -1,6 +1,7 @@
 import React from 'react';
 import CrudPage from '../components/CrudPage.jsx';
-import { fetchTopUps, topupCrud, approveTopUp } from '../lib/api.js';
+import { fetchTopUps, topupCrud } from '../lib/api.js';
+import { supabase } from '../supabase.js';
 import { peso, dateTime } from '../lib/format.js';
 import { Check, X } from 'lucide-react';
 import { useToast } from '../components/Toast.jsx';
@@ -8,11 +9,12 @@ import { useToast } from '../components/Toast.jsx';
 export default function TopUps() {
   const { show } = useToast();
 
-  const handleApprove = async (row, update) => {
-    const res = await approveTopUp(row.id, row.user_id, row.amount);
-    if (res?.error) return show?.(res.error.message, 'error');
-    show?.('Approved · wallet credited', 'success');
+  const decide = async (row, status) => {
+    const { data, error } = await supabase.rpc('admin_topup_set', { code: import.meta.env.VITE_XADMIN_PIN || '1010', p_id: row.id, p_status: status });
+    if (error) return show?.(error.message, 'error');
+    show?.(status === 'approved' ? 'Approved · wallet credited' : 'Rejected', 'success');
   };
+  const handleApprove = (row) => decide(row, 'approved');
 
   return (
     <CrudPage
@@ -51,7 +53,7 @@ export default function TopUps() {
                 <Check size={14} />
               </button>
               <button className="neu-btn" style={{ padding: 7, color: 'var(--danger)', borderColor: '#FCA5A5' }}
-                onClick={() => update(row.id, { status: 'rejected' })} title="Reject">
+                onClick={() => decide(row, 'rejected')} title="Reject">
                 <X size={14} />
               </button>
             </>

@@ -3,6 +3,27 @@ import CrudPage from '../components/CrudPage.jsx';
 import { fetchUsers, userCrud } from '../lib/api.js';
 import { peso, dateOnly, initials } from '../lib/format.js';
 
+import { supabase } from '../supabase.js';
+
+const CODE = import.meta.env.VITE_XADMIN_PIN || '1010';
+async function adminCall(fn, args) {
+  const { error } = await supabase.rpc(fn, { code: CODE, ...args });
+  if (error) { alert(error.message); return false; }
+  return true;
+}
+const adjustWallet = async (row) => {
+  const v = prompt('Add (+) or remove (-) wallet amount for ' + (row.email || row.id));
+  const amt = Number(v);
+  if (!v || !amt) return;
+  const note = prompt('Note (optional)') || 'Admin adjustment';
+  if (await adminCall('admin_wallet_adjust', { p_uid: row.id, p_amt: amt, p_type: 'adjustment', p_note: note })) alert('Wallet updated');
+};
+const setPoints = async (row) => {
+  const v = prompt('Set loyalty points for ' + (row.email || row.id), String(row.loyalty_points || 0));
+  if (v === null || v === '' || isNaN(Number(v))) return;
+  if (await adminCall('admin_user_set', { p_uid: row.id, p_points: Math.floor(Number(v)) })) alert('Points updated');
+};
+
 const STATUS_OPTS = ['active', 'frozen', 'banned'];
 
 export default function Users() {
@@ -54,27 +75,25 @@ export default function Users() {
         { key: 'province', label: 'Province' },
         { key: 'city', label: 'City' },
         { key: 'delivery_address', label: 'Address', type: 'textarea' },
-        { key: 'loyalty_tier', label: 'Tier', type: 'select',
-          options: ['Bronze', 'Silver', 'Gold', 'Platinum'], default: 'Bronze' },
-        { key: 'xwallet_balance', label: 'Wallet balance', type: 'number', default: 0 },
-        { key: 'loyalty_points', label: 'Loyalty points', type: 'number', default: 0 },
-        { key: 'status', label: 'Status', type: 'select',
-          options: STATUS_OPTS, default: 'active' },
       ]}
       onCreate={userCrud.create}
       onUpdate={userCrud.update}
       onDelete={userCrud.remove}
-      extraRowActions={(row, { update }) => (
-        <select
-          className="neu-input-sm"
-          value={(row.status || 'active').toLowerCase()}
-          onChange={(e) => update(row.id, { status: e.target.value })}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <option value="active">Active</option>
-          <option value="frozen">Frozen</option>
-          <option value="banned">Banned</option>
-        </select>
+      extraRowActions={(row) => (
+        <>
+          <select
+            className="neu-input-sm"
+            value={(row.status || 'active').toLowerCase()}
+            onChange={(e) => adminCall('admin_user_set', { p_uid: row.id, p_status: e.target.value })}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <option value="active">Active</option>
+            <option value="frozen">Frozen</option>
+            <option value="banned">Banned</option>
+          </select>
+          <button className="neu-btn" style={{ padding: 7 }} title="Adjust wallet" onClick={() => adjustWallet(row)}>₱</button>
+          <button className="neu-btn" style={{ padding: 7 }} title="Set points" onClick={() => setPoints(row)}>P</button>
+        </>
       )}
     />
   );
