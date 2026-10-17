@@ -28,6 +28,7 @@ import Analytics from './pages/Analytics.jsx';
 import Notifications from './pages/Notifications.jsx';
 import Supplier from './pages/Supplier.jsx';
 import Notify from './pages/Notify.jsx';
+import AirdropMod from './pages/AirdropMod.jsx';
 
 const SESSION_KEY = 'xadmin_unlocked';
 const ACTOR_KEY = 'xadmin_actor';
@@ -106,6 +107,7 @@ export default function App() {
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/supplier" element={<Supplier />} />
           <Route path="/notify" element={<Notify />} />
+          <Route path="/airdrop-mod" element={<AirdropMod />} />
           <Route path="/quotations" element={<Quotations />} />
           <Route path="/reviews"    element={<Reviews />} />
           <Route path="/analytics" element={<Analytics />} />

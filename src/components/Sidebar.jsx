@@ -27,6 +27,7 @@ const items = [
   ['/notifications', 'Notifications', Bell],
   ['/supplier', 'Supplier', Boxes],
   ['/notify', 'Notify', Bell],
+  ['/airdrop-mod', 'Airdrop Mod', Gamepad2],
   ['/analytics', 'Analytics', BarChart3],
   ['/audit', 'Audit log', ScrollText],
   ['/settings', 'Settings', Cog],
