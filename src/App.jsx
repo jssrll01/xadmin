@@ -26,6 +26,8 @@ import Settings from './pages/Settings.jsx';
 import AuditLog from './pages/AuditLog.jsx';
 import Analytics from './pages/Analytics.jsx';
 import Notifications from './pages/Notifications.jsx';
+import Supplier from './pages/Supplier.jsx';
+import Notify from './pages/Notify.jsx';
 
 const SESSION_KEY = 'xadmin_unlocked';
 const ACTOR_KEY = 'xadmin_actor';
@@ -102,6 +104,8 @@ export default function App() {
           <Route path="/promos"    element={<Promos />} />
           <Route path="/bundles"   element={<Bundles />} />
           <Route path="/notifications" element={<Notifications />} />
+          <Route path="/supplier" element={<Supplier />} />
+          <Route path="/notify" element={<Notify />} />
           <Route path="/quotations" element={<Quotations />} />
           <Route path="/reviews"    element={<Reviews />} />
           <Route path="/analytics" element={<Analytics />} />

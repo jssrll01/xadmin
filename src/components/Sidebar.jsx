@@ -25,6 +25,8 @@ const items = [
   ['/promos', 'Promos', Gift],
   ['/bundles', 'Bundles', Boxes],
   ['/notifications', 'Notifications', Bell],
+  ['/supplier', 'Supplier', Boxes],
+  ['/notify', 'Notify', Bell],
   ['/analytics', 'Analytics', BarChart3],
   ['/audit', 'Audit log', ScrollText],
   ['/settings', 'Settings', Cog],
