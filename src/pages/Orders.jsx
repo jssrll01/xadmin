@@ -46,7 +46,7 @@ export default function Orders() {
         { key: 'payment_method', label: 'Payment method', type: 'select',
           options: ['cod', 'gcash', 'maya', 'bank'] },
         { key: 'delivery_method', label: 'Delivery', type: 'select',
-          options: ['delivery', 'pickup'] },
+          options: ['doortodoor', 'delivery'] },
         { key: 'status', label: 'Status', type: 'select',
           options: ['pending', 'paid', 'shipped', 'delivered', 'completed', 'cancelled'],
           default: 'pending' },

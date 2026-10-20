@@ -12,7 +12,7 @@ function statusColor(s) {
   return '#F59E0B';
 }
 
-const emptyDraft = { receipt_no: '', customer_name: '', customer_email: '', customer_address: '', currency: 'PHP', payment_method: 'gcash', delivery_method: 'pickup', status: 'unpaid', total: 0, notes: '' };
+const emptyDraft = { receipt_no: '', customer_name: '', customer_email: '', customer_address: '', currency: 'PHP', payment_method: 'gcash', delivery_method: 'doortodoor', status: 'unpaid', total: 0, notes: '' };
 
 export default function Quotations() {
   const [rows, setRows] = useState([]);
@@ -41,7 +41,7 @@ export default function Quotations() {
       customer_address: row.customer_address || '',
       currency: row.currency || 'PHP',
       payment_method: row.payment_method || 'gcash',
-      delivery_method: row.delivery_method || 'pickup',
+      delivery_method: row.delivery_method || 'doortodoor',
       status: row.status || 'unpaid',
       total: Number(row.total) || 0,
       notes: row.notes || '',
