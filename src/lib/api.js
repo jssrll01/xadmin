@@ -61,7 +61,7 @@ export async function fetchStats() {
     return {
       revenue, orders: orders.length, users: rows(u).length, products: rows(p).length,
       pendingTopups: rows(t).filter((x) => ['pending', 'processing'].includes(x.status)).length,
-      openReports: rows(r).filter((x) => ['open', 'pending', 'new'].includes(x.status)).length,
+      openReports: rows(r).filter((x) => ['submitted', 'in_progress'].includes(x.status)).length,
     };
   } catch {
     return { revenue: 0, orders: 0, users: 0, products: 0, pendingTopups: 0, openReports: 0 };
