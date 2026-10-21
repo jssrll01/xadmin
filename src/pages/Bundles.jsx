@@ -28,6 +28,7 @@ export default function Bundles() {
         { key: 'title', label: 'Title', required: true },
         { key: 'description', label: 'Description', type: 'textarea' },
         { key: 'image_url', label: 'Image URL' },
+        { key: 'product_ids', label: 'Item product IDs', type: 'array', placeholder: 'One product ID per line' },
         { key: 'bundle_price', label: 'Bundle price', type: 'number', required: true, default: 0 },
         { key: 'original_price', label: 'Original price', type: 'number' },
         { key: 'variants', label: 'Variants', type: 'array',
