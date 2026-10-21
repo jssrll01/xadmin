@@ -29,6 +29,7 @@ import AuditLog from './pages/AuditLog.jsx';
 import Notifications from './pages/Notifications.jsx';
 import Supplier from './pages/Supplier.jsx';
 import Notify from './pages/Notify.jsx';
+import UploadPhotos from './pages/UploadPhotos.jsx';
 import AirdropMod from './pages/AirdropMod.jsx';
 
 const SESSION_KEY = 'xadmin_unlocked';
@@ -108,6 +109,7 @@ export default function App() {
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/supplier" element={<Supplier />} />
           <Route path="/notify" element={<Notify />} />
+          <Route path="/upload" element={<UploadPhotos />} />
           <Route path="/airdrop-mod" element={<AirdropMod />} />
           <Route path="/quotations" element={<Quotations />} />
           <Route path="/quotations/new" element={<NewReceipt />} />

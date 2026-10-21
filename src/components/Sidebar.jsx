@@ -27,6 +27,7 @@ const items = [
   ['/notifications', 'Notifications', Bell],
   ['/supplier', 'Supplier', Boxes],
   ['/notify', 'Notify', Bell],
+  ['/upload', 'Upload photos', ImageIcon],
   ['/airdrop-mod', 'Airdrop Mod', Gamepad2],
   ['/audit', 'Audit log', ScrollText],
   ['/settings', 'Settings', Cog],
