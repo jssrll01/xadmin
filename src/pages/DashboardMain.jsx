@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { TrendingUp, TrendingDown, ShoppingBag, Users, Package, Wallet, AlertTriangle, FileText, Star, ArrowRight, Calendar, Award } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { fetchStats, fetchSoldOutProducts, fetchReceiptsStats, fetchReviewsStats, fetchRevenueByPeriod, fetchRevenueSnapshot, fetchTopSellingProducts, fetchOrders, fetchTopUps, fetchReports } from '../lib/api.js';
 import { peso, pesoShort } from '../lib/format.js';
 import useAutoRefresh from '../lib/useAutoRefresh.js';
@@ -168,13 +168,19 @@ export default function Dashboard() {
           </div>
           <div style={{ width: '100%', height: 230 }}>
             <ResponsiveContainer>
-              <BarChart data={series} margin={{ top: 5, right: 8, left: -18, bottom: 0 }}>
+              <AreaChart data={series} margin={{ top: 5, right: 8, left: -18, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="dxg" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#6366F1" stopOpacity={0.4} />
+                    <stop offset="95%" stopColor="#6366F1" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(150,160,180,.25)" />
                 <XAxis dataKey="bucket" tick={{ fontSize: 10 }} minTickGap={20} tickFormatter={(b) => String(b).slice(-5)} />
                 <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => pesoShort(v)} />
                 <Tooltip formatter={(v) => peso(v)} />
-                <Bar dataKey="revenue" fill="#6366F1" radius={[6, 6, 0, 0]} />
-              </BarChart>
+                <Area type="monotone" dataKey="revenue" stroke="#6366F1" strokeWidth={2.5} fill="url(#dxg)" dot={{ r: 3 }} />
+              </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
