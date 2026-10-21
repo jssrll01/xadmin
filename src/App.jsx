@@ -24,7 +24,6 @@ import Xcards from './pages/Xcards.jsx';
 import Promos from './pages/Promos.jsx';
 import Settings from './pages/Settings.jsx';
 import AuditLog from './pages/AuditLog.jsx';
-import Analytics from './pages/Analytics.jsx';
 import Notifications from './pages/Notifications.jsx';
 import Supplier from './pages/Supplier.jsx';
 import Notify from './pages/Notify.jsx';
@@ -110,7 +109,6 @@ export default function App() {
           <Route path="/airdrop-mod" element={<AirdropMod />} />
           <Route path="/quotations" element={<Quotations />} />
           <Route path="/reviews"    element={<Reviews />} />
-          <Route path="/analytics" element={<Analytics />} />
           <Route path="/audit"     element={<AuditLog />} />
           <Route path="/settings"  element={<Settings />} />
           <Route path="*"          element={<Navigate to="/" replace />} />

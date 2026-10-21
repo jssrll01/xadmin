@@ -54,7 +54,7 @@ function padSeries(items, period, count) {
   return buckets.map(b => map[b] || { bucket: b, revenue: 0, order_count: 0 });
 }
 
-export default function Analytics() {
+export default function AnalyticsPanel() {
   const [period, setPeriod] = useState('monthly');
   const [series, setSeries] = useState([]);
   const [snapshot, setSnapshot] = useState(null);
@@ -96,12 +96,7 @@ export default function Analytics() {
 
   return (
     <>
-      <div className="page-head">
-        <div>
-          <h1>Analytics</h1>
-          <p>Revenue, top products, growth</p>
-        </div>
-      </div>
+      <h2 style={{ fontSize: 18, fontWeight: 800, margin: "0 0 12px" }}>Analytics</h2>
 
       {/* KPI Cards */}
       <div className="stat-grid" style={{ marginBottom: 20 }}>
