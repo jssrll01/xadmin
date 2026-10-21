@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { FileText, Search, Trash2, Edit3, Save, X, PlusCircle } from 'lucide-react';
 import { fetchReceipts, receiptCrud } from '../lib/api.js';
+import { Link } from 'react-router-dom';
 
 const STATUSES = ['paid', 'unpaid', 'pending', 'overdue'];
 
@@ -100,7 +101,11 @@ export default function Quotations() {
           <h1>Quotations</h1>
           <p>Receipts issued via XQuote · {filtered.length} shown · ₱{totalShown.toLocaleString()}</p>
         </div>
-        <button className="neu-btn-primary" onClick={() => setCreating(c => !c)}
+        <Link to="/quotations/new" className="neu-btn-primary"
+          style={{ padding: '9px 14px', display: 'flex', alignItems: 'center', gap: 6, textDecoration: 'none' }}>
+          <PlusCircle size={14} /> New quotation
+        </Link>
+        <button className="neu-btn" onClick={() => setCreating(c => !c)}
           style={{ padding: '9px 14px', display: 'flex', alignItems: 'center', gap: 6 }}>
           <PlusCircle size={14} /> {creating ? 'Close' : 'New'}
         </button>
@@ -155,7 +160,7 @@ export default function Quotations() {
             <div key={row.id} className="neu-card">
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                 <div>
-                  <div style={{ fontSize: 14, fontWeight: 800 }}>{row.receipt_no}</div>
+                  <div style={{ fontSize: 14, fontWeight: 800 }}>{row.receipt_no} <Link to={'/quotations/' + row.id} style={{ fontSize: 12, marginLeft: 8 }}>View / Export</Link></div>
                   <div className="muted" style={{ fontSize: 12 }}>{new Date(row.created_at).toLocaleString()}</div>
                 </div>
                 <span className="neu-badge" style={{ background: sc + '22', color: sc }}>{(row.status || 'unpaid').toUpperCase()}</span>

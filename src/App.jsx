@@ -13,6 +13,8 @@ import Wallet from './pages/Wallet.jsx';
 import Reports from './pages/Reports.jsx';
 import Returns from './pages/Returns.jsx';
 import Quotations from './pages/Quotations.jsx';
+import NewReceipt from './pages/NewReceipt.jsx';
+import ReceiptView from './pages/ReceiptView.jsx';
 import Reviews from './pages/Reviews.jsx';
 import Shops from './pages/Shops.jsx';
 import Stores from './pages/Stores.jsx';
@@ -108,6 +110,8 @@ export default function App() {
           <Route path="/notify" element={<Notify />} />
           <Route path="/airdrop-mod" element={<AirdropMod />} />
           <Route path="/quotations" element={<Quotations />} />
+          <Route path="/quotations/new" element={<NewReceipt />} />
+          <Route path="/quotations/:id" element={<ReceiptView />} />
           <Route path="/reviews"    element={<Reviews />} />
           <Route path="/audit"     element={<AuditLog />} />
           <Route path="/settings"  element={<Settings />} />
