@@ -26,7 +26,7 @@ export default function Products() {
         { key: 'sold', label: 'Sold', render: (r) => r.sold ?? 0 },
         { key: 'variants', label: 'Variants', render: (r) =>
           Array.isArray(r.variants) && r.variants.length
-            ? <span style={{ fontSize: 12 }}>{r.variants.join(', ')}</span>
+            ? <span style={{ fontSize: 12 }}>{(() => { const t = r.variants.join(', '); return t.length > 10 ? t.slice(0, 10) + '...' : t; })()}</span>
             : '—' },
         { key: 'images', label: 'Images', render: (r) =>
           Array.isArray(r.images) && r.images.length
@@ -46,14 +46,14 @@ export default function Products() {
         { key: 'variant_editor', label: 'Variants', type: 'variant-editor' },
         { key: 'images', label: 'Image URLs', type: 'array',
           placeholder: 'One URL per line' },
-        { key: 'save_more', label: 'Show in Save More', type: 'boolean' },
-        { key: 'flash_sale', label: 'Show in Flash Sale', type: 'boolean' },
-        { key: 'show_fashion', label: 'Show in Fashion', type: 'boolean' },
-        { key: 'show_groceries', label: 'Show in Groceries & Pantry', type: 'boolean' },
-        { key: 'show_sports', label: 'Show in Sports & Outdoors', type: 'boolean' },
-        { key: 'show_books', label: 'Show in Books & Stationery', type: 'boolean' },
-        { key: 'show_payday', label: 'Show in Payday Sale', type: 'boolean' },
-        { key: 'show_preloved', label: 'Show in Pre-loved', type: 'boolean' },
+        { key: 'save_more', label: 'Save More', type: 'boolean' },
+        { key: 'flash_sale', label: 'Flash Sale', type: 'boolean' },
+        { key: 'show_fashion', label: 'Fashion', type: 'boolean' },
+        { key: 'show_groceries', label: 'Groceries & Pantry', type: 'boolean' },
+        { key: 'show_sports', label: 'Sports & Outdoors', type: 'boolean' },
+        { key: 'show_books', label: 'Books & Stationery', type: 'boolean' },
+        { key: 'show_payday', label: 'Payday Sale', type: 'boolean' },
+        { key: 'show_preloved', label: 'Pre-loved', type: 'boolean' },
         { key: 'verified', label: 'Verified', type: 'boolean' },
         { key: 'preorder', label: 'Preorder', type: 'boolean' },
         { key: 'instant', label: 'Instant', type: 'boolean' },
