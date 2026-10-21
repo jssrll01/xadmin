@@ -1,3 +1,4 @@
+import ProductPicker from './ProductPicker.jsx';
 import React, { useState, useCallback } from 'react';
 import Card from './Card.jsx';
 import Modal from './Modal.jsx';
@@ -41,6 +42,7 @@ export default function CrudPage({
     const blank = { __isNew: true };
     formFields.forEach((f) => {
       if (f.type === 'variant-editor') blank[f.key] = { variant_config: {}, variant_prices: {}, variant_stock: {} };
+      else if (f.type === 'product-picker') blank[f.key] = [];
       else if (f.type === 'array') blank[f.key] = '';
       else if (f.type === 'boolean') blank[f.key] = !!f.default;
       else blank[f.key] = f.default ?? '';
@@ -57,6 +59,8 @@ export default function CrudPage({
           variant_prices: row.variant_prices || {},
           variant_stock: row.variant_stock || {},
         };
+      } else if (f.type === 'product-picker') {
+        copy[f.key] = Array.isArray(row[f.key]) ? row[f.key] : [];
       } else if (f.type === 'array') {
         copy[f.key] = Array.isArray(row[f.key]) ? row[f.key].join('\n') : (row[f.key] || '');
       }
@@ -253,6 +257,8 @@ export default function CrudPage({
                     value={editing[f.key]}
                     onChange={(next) => setEditing({ ...editing, [f.key]: next })}
                   />
+                ) : f.type === 'product-picker' ? (
+                  <ProductPicker value={editing[f.key]} onChange={(next) => setEditing({ ...editing, [f.key]: next })} />
                 ) : f.type === 'array' ? (
                   <textarea className="neu-input" rows={3}
                     placeholder={f.placeholder || 'One per line'}
