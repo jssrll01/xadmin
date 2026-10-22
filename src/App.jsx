@@ -31,6 +31,7 @@ import Supplier from './pages/Supplier.jsx';
 import Notify from './pages/Notify.jsx';
 import UploadPhotos from './pages/UploadPhotos.jsx';
 import AirdropMod from './pages/AirdropMod.jsx';
+import Pricing from './pages/Pricing.jsx';
 
 const SESSION_KEY = 'xadmin_unlocked';
 const ACTOR_KEY = 'xadmin_actor';
@@ -116,6 +117,7 @@ export default function App() {
           <Route path="/quotations/:id" element={<ReceiptView />} />
           <Route path="/reviews"    element={<Reviews />} />
           <Route path="/audit"     element={<AuditLog />} />
+          <Route path="/pricing" element={<Pricing />} />
           <Route path="/settings"  element={<Settings />} />
           <Route path="*"          element={<Navigate to="/" replace />} />
         </Routes>

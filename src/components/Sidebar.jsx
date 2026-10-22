@@ -2,7 +2,7 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard, Users, Package, ShoppingBag, Wallet, RotateCcw,
-  AlertTriangle, Store, CreditCard, Gift, Boxes, Settings as Cog, ScrollText, Bell, BarChart3, FileText, Star, Gamepad2, Image as ImageIcon,
+  AlertTriangle, Store, CreditCard, Gift, Boxes, Settings as Cog, ScrollText, Bell, BarChart3, FileText, Star, Gamepad2, Image as ImageIcon, Percent,
 } from 'lucide-react';
 
 const items = [
@@ -30,6 +30,7 @@ const items = [
   ['/upload', 'Upload photos', ImageIcon],
   ['/airdrop-mod', 'Airdrop Mod', Gamepad2],
   ['/audit', 'Audit log', ScrollText],
+  ['/pricing', 'Pricing', Percent],
   ['/settings', 'Settings', Cog],
 ];
 
