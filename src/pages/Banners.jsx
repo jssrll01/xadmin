@@ -121,14 +121,17 @@ export default function Banners() {
             <div>
               <label style={{ fontSize: 12, fontWeight: 700, display: 'block', marginBottom: 4 }}>Banner Image (Upload or URL)</label>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 8 }}>
-                <input type="file" accept="image/*" onChange={async (e) => {
-                  const f = e.target.files?.[0];
-                  if (!f) return;
-                  try {
-                    const url = await uploadToCloudinary(f, 'xmarket_banners');
-                    setEdit({ ...edit, image_url: url });
-                  } catch (err) { alert('Upload failed: ' + err.message); }
-                }} style={{ fontSize: 12 }} />
+                <label className="neu-btn" style={{ padding: '8px 14px', fontSize: 12, cursor: 'pointer', display: 'inline-block', background: 'var(--surface)', border: '1px solid var(--border)' }}>
+                  📁 Choose Banner File...
+                  <input type="file" accept="image/*" onChange={async (e) => {
+                    const f = e.target.files?.[0];
+                    if (!f) return;
+                    try {
+                      const url = await uploadToCloudinary(f, 'xmarket_banners');
+                      setEdit({ ...edit, image_url: url });
+                    } catch (err) { alert('Upload failed: ' + err.message); }
+                  }} style={{ display: 'none' }} />
+                </label>
               </div>
               {field('', 'image_url', { placeholder: 'https://res.cloudinary.com/...' })}
             </div>
