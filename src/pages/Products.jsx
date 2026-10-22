@@ -1,3 +1,4 @@
+import { uploadToCloudinary } from '../lib/cloud.js';
 import React from 'react';
 import CrudPage from '../components/CrudPage.jsx';
 import { fetchProductsSorted as fetchProducts, productCrud } from '../lib/api.js';

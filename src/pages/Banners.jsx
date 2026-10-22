@@ -1,3 +1,4 @@
+import { uploadToCloudinary } from '../lib/cloud.js';
 import React, { useState, useCallback } from 'react';
 import Card from '../components/Card.jsx';
 import Modal from '../components/Modal.jsx';
@@ -117,7 +118,20 @@ export default function Banners() {
         {edit && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {edit.image_url && <img src={edit.image_url} alt="" style={{ width: '100%', borderRadius: 10 }} />}
-            {field('Image URL (Cloudinary) *', 'image_url', { placeholder: 'https://res.cloudinary.com/...' })}
+            <div>
+              <label style={{ fontSize: 12, fontWeight: 700, display: 'block', marginBottom: 4 }}>Banner Image (Upload or URL)</label>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 8 }}>
+                <input type="file" accept="image/*" onChange={async (e) => {
+                  const f = e.target.files?.[0];
+                  if (!f) return;
+                  try {
+                    const url = await uploadToCloudinary(f, 'xmarket_banners');
+                    setEdit({ ...edit, image_url: url });
+                  } catch (err) { alert('Upload failed: ' + err.message); }
+                }} style={{ fontSize: 12 }} />
+              </div>
+              {field('', 'image_url', { placeholder: 'https://res.cloudinary.com/...' })}
+            </div>
             {field('Title', 'title')}
             {field('Subtitle', 'subtitle')}
             {field('CTA button text', 'cta_text', { placeholder: 'Shop Now' })}
