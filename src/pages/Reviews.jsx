@@ -160,6 +160,12 @@ export default function Reviews() {
                 <div className="muted" style={{ fontSize: 11 }}>{new Date(row.created_at).toLocaleString()}</div>
               </div>
               <div style={{ fontSize: 13, marginBottom: 6 }}>{row.comment || '—'}</div>
+              {row.photo_url && String(row.photo_url).startsWith('https://res.cloudinary.com/bvw3okdf/') && (
+                <a href={row.photo_url} target="_blank" rel="noreferrer" style={{ display: 'inline-block', marginBottom: 8 }}>
+                  <img src={String(row.photo_url).replace('/image/upload/', '/image/upload/w_300,c_limit,f_auto,q_auto/')} alt="Review photo"
+                    style={{ maxWidth: 140, maxHeight: 140, borderRadius: 10, display: 'block' }} />
+                </a>
+              )}
               {row.seller_reply && (
                 <div className="neu-card" style={{ padding: 10, marginBottom: 8 }}>
                   <div className="muted" style={{ fontSize: 10, fontWeight: 800, marginBottom: 3 }}>SELLER REPLY</div>
