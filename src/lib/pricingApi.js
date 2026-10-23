@@ -35,3 +35,11 @@ export async function previewDiscount(price, cost) {
     { p_price: Number(price), p_cost: cost === '' || cost == null ? null : Number(cost) });
   return { data, error };
 }
+
+export const saveCashback = (c) => call('admin_cashback_save', {
+  p_enabled: !!c.is_enabled, p_pct: num(c.cashback_percentage),
+  p_min: num(c.min_order_amount), p_max: num(c.max_cashback_amount),
+  p_basis: c.calculation_basis, p_release: c.release_status, p_actor: actor() });
+export const saveCost = (pid, vkey, cost) => call('admin_product_cost_save', {
+  p_product_id: pid, p_variant_key: vkey, p_cost: num(cost), p_actor: actor() });
+export const readAudit = () => supabase.rpc('admin_read_audit', { p_pin: PIN, p_limit: 100 });

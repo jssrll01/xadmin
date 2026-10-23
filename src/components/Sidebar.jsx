@@ -31,6 +31,7 @@ const items = [
   ['/airdrop-mod', 'Airdrop Mod', Gamepad2],
   ['/audit', 'Audit log', ScrollText],
   ['/pricing', 'Pricing', Percent],
+  ['/cashback', 'Cashback & Costs', Percent],
   ['/settings', 'Settings', Cog],
 ];
 
