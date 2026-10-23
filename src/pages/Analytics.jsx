@@ -55,7 +55,7 @@ function padSeries(items, period, count) {
 }
 
 export default function AnalyticsPanel() {
-  const [period, setPeriod] = useState('monthly');
+  const [period, setPeriod] = useState('yearly');
   const [series, setSeries] = useState([]);
   const [snapshot, setSnapshot] = useState(null);
   const [topProducts, setTopProducts] = useState([]);

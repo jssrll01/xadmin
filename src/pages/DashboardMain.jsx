@@ -69,7 +69,7 @@ function Stat({ icon: Icon, value, label, color }) {
 }
 
 export default function Dashboard() {
-  const [period, setPeriod] = useState('monthly');
+  const [period, setPeriod] = useState('yearly');
   const [stats, setStats] = useState(null);
   const [snap, setSnap] = useState(null);
   const [series, setSeries] = useState([]);
