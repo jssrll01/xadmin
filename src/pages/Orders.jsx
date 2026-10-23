@@ -1,24 +1,39 @@
 import React from 'react';
 import CrudPage from '../components/CrudPage.jsx';
-import { fetchOrders, orderCrud } from '../lib/api.js';
+import { fetchOrders, fetchOrderItems, orderCrud } from '../lib/api.js';
 import { peso, dateTime } from '../lib/format.js';
+
+let ITEMS = {};
+async function fetchOrdersWithItems() {
+  const [o, i] = await Promise.all([fetchOrders(), fetchOrderItems()]);
+  const m = {};
+  (i.items || []).forEach((it) => { (m[it.order_id] = m[it.order_id] || []).push(it); });
+  ITEMS = m;
+  return o;
+}
 
 export default function Orders() { // XMARKET_RECEIPT_VIEW_COLUMN
   return (
     <CrudPage
       title="Orders"
       subtitle="Customer orders"
-      fetcher={fetchOrders}
+      fetcher={fetchOrdersWithItems}
       searchKeys={['order_code', 'email', 'name', 'status']}
       columns={[
         { key: 'order_code', label: 'Code', render: (r) => <b>{r.order_code}</b> },
         { key: 'name', label: 'Buyer', render: (r) => r.name || '—' },
         { key: 'email', label: 'Email', render: (r) => r.email || '—' },
         { key: 'mobile', label: 'Mobile', render: (r) => r.mobile || '—' },
+        { key: 'items', label: 'Items', render: (r) => (ITEMS[r.id] || []).length === 0 ? '—' : (
+          <div style={{ fontSize: 12, minWidth: 180 }}>
+            {(ITEMS[r.id] || []).map((it) => (
+              <div key={it.id}>{it.name}{it.variant ? ' (' + it.variant + ')' : ''} × {it.quantity} · {peso(Number(it.price) * Number(it.quantity))}</div>
+            ))}
+          </div>) },
         { key: 'subtotal', label: 'Subtotal', render: (r) => peso(r.subtotal) },
         { key: 'discount', label: 'Discount', render: (r) => peso(r.discount) },
         { key: 'shipping_fee', label: 'Shipping', render: (r) => peso(r.shipping_fee) },
-        { key: 'total', label: 'Total', render: (r) => <b>{peso(r.total)}</b> },
+        { key: 'total', label: 'Total', render: (r) => <b>{peso(Math.max(0, (Number(r.subtotal) || 0) - (Number(r.discount) || 0)) + (Number(r.shipping_fee) || 0))}</b> },
         { key: 'payment_method', label: 'Payment', render: (r) => r.payment_method || '—' },
         { key: 'delivery_method', label: 'Delivery', render: (r) => r.delivery_method || '—' },
         { key: 'status', label: 'Status', render: (r) => {
