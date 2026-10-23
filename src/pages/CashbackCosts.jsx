@@ -35,7 +35,15 @@ export default function CashbackCosts() {
   return (
     <div style={{ display: 'grid', gap: 14 }}>
       <Card>
-        <div style={{ fontWeight: 900, marginBottom: 6 }}>Cashback</div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+          <div style={{ fontWeight: 900 }}>Cashback {cb ? (cb.is_enabled ? '(ON)' : '(OFF)') : ''}</div>
+          {cb && (
+            <Btn variant={cb.is_enabled ? 'danger' : 'success'} onClick={async () => {
+              const n = { ...cb, is_enabled: !cb.is_enabled };
+              done(await P.saveCashback(n), n.is_enabled ? 'Cashback enabled' : 'Cashback disabled');
+            }}>{cb.is_enabled ? 'Disable' : 'Enable'}</Btn>
+          )}
+        </div>
         {!cb ? 'Loading...' : (<>
           <label style={L}><input type="checkbox" checked={!!cb.is_enabled}
             onChange={(e) => upd('is_enabled', e.target.checked)} /> Enabled</label>
