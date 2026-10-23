@@ -3,7 +3,7 @@ import CrudPage from '../components/CrudPage.jsx';
 import { fetchOrders, orderCrud } from '../lib/api.js';
 import { peso, dateTime } from '../lib/format.js';
 
-export default function Orders() {
+export default function Orders() { // XMARKET_RECEIPT_VIEW_COLUMN
   return (
     <CrudPage
       title="Orders"
@@ -17,6 +17,7 @@ export default function Orders() {
         { key: 'mobile', label: 'Mobile', render: (r) => r.mobile || '—' },
         { key: 'subtotal', label: 'Subtotal', render: (r) => peso(r.subtotal) },
         { key: 'discount', label: 'Discount', render: (r) => peso(r.discount) },
+        { key: 'shipping_fee', label: 'Shipping', render: (r) => peso(r.shipping_fee) },
         { key: 'total', label: 'Total', render: (r) => <b>{peso(r.total)}</b> },
         { key: 'payment_method', label: 'Payment', render: (r) => r.payment_method || '—' },
         { key: 'delivery_method', label: 'Delivery', render: (r) => r.delivery_method || '—' },
@@ -27,6 +28,7 @@ export default function Orders() {
         { key: 'province', label: 'Province', render: (r) => r.province || '—' },
         { key: 'city', label: 'City', render: (r) => r.city || '—' },
         { key: 'barangay', label: 'Barangay', render: (r) => r.barangay || '—' },
+        { key: 'receipt_url', label: 'Receipt', render: (r) => r.receipt_url ? <a href={r.receipt_url} target="_blank" rel="noreferrer"><img src={r.receipt_url} alt="receipt" style={{ width: 56, height: 56, objectFit: 'cover', borderRadius: 8 }} /></a> : '—' },
         { key: 'created_at', label: 'Date', render: (r) => dateTime(r.created_at) },
       ]}
       formFields={[
