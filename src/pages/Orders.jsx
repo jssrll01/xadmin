@@ -44,6 +44,7 @@ export default function Orders() { // XMARKET_RECEIPT_VIEW_COLUMN
         { key: 'instructions', label: 'Instructions', type: 'textarea' },
         { key: 'subtotal', label: 'Subtotal', type: 'number', default: 0 },
         { key: 'discount', label: 'Discount', type: 'number', default: 0 },
+        { key: 'shipping_fee', label: 'Shipping', type: 'number', default: 0 },
         { key: 'total', label: 'Total', type: 'number', default: 0 },
         { key: 'payment_method', label: 'Payment method', type: 'select',
           options: ['cod', 'gcash', 'maya', 'bank'] },
