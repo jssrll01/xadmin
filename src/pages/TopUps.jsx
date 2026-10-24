@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import Modal from '../components/Modal.jsx';
 import CrudPage from '../components/CrudPage.jsx';
 import { fetchTopUps, topupCrud } from '../lib/api.js';
 import { supabase } from '../supabase.js';
@@ -8,6 +9,7 @@ import { useToast } from '../components/Toast.jsx';
 
 export default function TopUps() {
   const { show } = useToast();
+  const [viewer, setViewer] = useState(null);
 
   const decide = async (row, status) => {
     const { data, error } = await supabase.rpc('admin_topup_set', { code: import.meta.env.VITE_XADMIN_PIN, p_id: row.id, p_status: status });
@@ -17,6 +19,7 @@ export default function TopUps() {
   const handleApprove = (row) => decide(row, 'approved');
 
   return (
+    <>
     <CrudPage
       title="Top-ups"
       subtitle="Wallet funding"
@@ -38,7 +41,7 @@ export default function TopUps() {
           const src = rc.url || rc.dataUrl;
           if (!src) return '—';
           const img = <img src={src} alt="receipt" style={{ width: 44, height: 44, objectFit: 'cover', borderRadius: 8, border: '1px solid var(--border)' }} />;
-          return rc.url ? <a href={rc.url} target="_blank" rel="noreferrer">{img}</a> : img;
+          return <span onClick={() => setViewer(src)} style={{ cursor: 'pointer' }}>{img}</span>;
         } },
         { key: 'created_at', label: 'Requested', render: (r) => dateTime(r.created_at) },
       ]}
@@ -68,5 +71,9 @@ export default function TopUps() {
         </>
       )}
     />
+    <Modal open={!!viewer} onClose={() => setViewer(null)} title="Receipt">
+      {viewer && <img src={viewer} alt="receipt" style={{ maxWidth: '100%', maxHeight: '80vh', borderRadius: 12 }} />}
+    </Modal>
+    </>
   );
 }
