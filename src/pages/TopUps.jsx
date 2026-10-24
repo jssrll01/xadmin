@@ -33,6 +33,13 @@ export default function TopUps() {
                     : 'badge-pending';
           return <span className={`neu-badge ${cls}`}>{s}</span>;
         } },
+        { key: 'receipt', label: 'Receipt', render: (r) => {
+          const rc = r.receipt_data || r.receipt || {};
+          const src = rc.url || rc.dataUrl;
+          if (!src) return '—';
+          const img = <img src={src} alt="receipt" style={{ width: 44, height: 44, objectFit: 'cover', borderRadius: 8, border: '1px solid var(--border)' }} />;
+          return rc.url ? <a href={rc.url} target="_blank" rel="noreferrer">{img}</a> : img;
+        } },
         { key: 'created_at', label: 'Requested', render: (r) => dateTime(r.created_at) },
       ]}
       formFields={[
