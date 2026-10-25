@@ -16,7 +16,7 @@ export function parsePrice(v) {
 export function mapCategory(v) {
   const c = clean(v).toLowerCase();
   if (!c) return null;
-  return CATEGORIES.find((x) => x.toLowerCase() === c) || ALIAS[c] || null;
+  return CATEGORIES.find((x) => x.toLowerCase() === c) || (Object.hasOwn(ALIAS, c) ? ALIAS[c] : null) || clean(v).slice(0, 60);
 }
 export function parseStock(v) {
   const s = clean(v).toLowerCase().replace(/[\s-]+/g, '_');
@@ -57,7 +57,7 @@ export function normalizeRow(raw, ctx = {}) {
   const price = parsePrice(raw.selling_price);
   if (price == null) errors.push('selling_price must be a positive PHP amount like 199 or 199.50');
   const category = mapCategory(raw.category);
-  if (!category) errors.push('category "' + clean(raw.category) + '" is not recognised');
+  if (!category) errors.push('category is required');
   const ss = parseStock(raw.stock_status);
   if (!ss) errors.push('stock_status must be in_stock or out_of_stock');
   const urls = String(raw.image_urls ?? '').split(/[\s|;,]+/).filter(Boolean);

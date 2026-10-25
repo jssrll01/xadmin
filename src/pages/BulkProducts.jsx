@@ -58,6 +58,24 @@ export default function BulkProducts() {
   }, [jobId, st, qq, cat, page]);
   useEffect(() => { loadJobs(); }, [loadJobs]);
   useEffect(() => { load(); }, [load]);
+  const fetchAll = async () => {
+    const out = [];
+    try {
+      for (let o = 0; ; o += 200) {
+        const d = await rpc('bulk_list', { p_job: jobId, p_status: st || null, p_q: qq || null, p_cat: cat || null, p_offset: o, p_limit: 200 });
+        out.push(...(d.rows || []));
+        if ((d.rows || []).length < 200) break;
+      }
+    } catch (e) { show(e.message, 'error'); }
+    return out;
+  };
+  const selectAll = async () => {
+    setBusy(true);
+    const all = await fetchAll();
+    setSel(new Set(all.map((r) => r.id)));
+    setBusy(false);
+    show('Selected ' + all.length + ' row(s)', 'success');
+  };
   const loadExisting = async () => { if (!existing.current.size) { const ex = await fetchProducts(); existing.current = new Set((ex.items || []).map((p) => String(p.name || '').trim().toLowerCase())); } };
 
   const onFile = async (e) => {
@@ -126,9 +144,10 @@ export default function BulkProducts() {
   const openJob = (id) => { try { localStorage.setItem('bulk_job', id); } catch (e) {} setJobId(id); setPage(0); setSt(''); setSel(new Set()); };
 
   const processRows = async () => {
-    const list = rows.filter((r) => (!sel.size || sel.has(r.id)) && ['imported', 'failed'].includes(r.status));
-    if (!list.length) return show('Select imported or failed rows first', 'error');
     setBusy(true);
+    const pool = sel.size ? await fetchAll() : rows;
+    const list = pool.filter((r) => (!sel.size || sel.has(r.id)) && ['imported', 'failed'].includes(r.status));
+    if (!list.length) { setBusy(false); return show('Select imported or failed rows first', 'error'); }
     for (let i = 0; i < list.length; i++) {
       const r = list[i]; setMsg('Images ' + (i + 1) + '/' + list.length);
       const n = { ...r.normalized }; const src = n.source_images || [];
@@ -149,7 +168,7 @@ export default function BulkProducts() {
     try { const d = await rpc('bulk_decide', { p_ids: [...sel], p_action: action }); show(d.count + ' row(s) ' + action + 'd', 'success'); setSel(new Set()); load(); } catch (e) { show(e.message, 'error'); }
   };
   const publish = async () => {
-    const ids = rows.filter((r) => sel.has(r.id) && r.status === 'approved').map((r) => r.id);
+    const ids = (await fetchAll()).filter((r) => sel.has(r.id) && r.status === 'approved').map((r) => r.id);
     if (!ids.length) return show('Select approved rows first', 'error');
     if (!window.confirm('Publish ' + ids.length + ' product(s) to the LIVE catalog?')) return;
     setBusy(true); let ok = 0, bad = 0;
@@ -194,6 +213,7 @@ export default function BulkProducts() {
     try { const d = await rpc('bulk_apply', { p_ids: [...sel], p_patch: patch }); show('Updated ' + d.count + ' row(s)', 'success'); load(); } catch (e) { show(e.message, 'error'); }
   };
   const tog = (id) => setSel((s) => { const x = new Set(s); x.has(id) ? x.delete(id) : x.add(id); return x; });
+  const catOpts = [...new Set([...CATEGORIES, ...rows.map((r) => (r.normalized || {}).category).filter(Boolean)])];
   const valid = preview ? preview.rows.filter((r) => !r.errors.length).length : 0;
 
   return (
@@ -241,10 +261,11 @@ export default function BulkProducts() {
           </div>
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
             <input className="neu-input" placeholder="Search name" value={qq} onChange={(e) => { setQq(e.target.value); setPage(0); }} style={{ flex: 1, minWidth: 120 }} />
-            <select className="neu-input" value={cat} onChange={(e) => { setCat(e.target.value); setPage(0); }}><option value="">All categories</option>{CATEGORIES.map((c) => <option key={c}>{c}</option>)}</select>
+            <select className="neu-input" value={cat} onChange={(e) => { setCat(e.target.value); setPage(0); }}><option value="">All categories</option>{catOpts.map((c) => <option key={c}>{c}</option>)}</select>
           </div>
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 8 }}>
-            <Btn onClick={() => setSel(sel.size ? new Set() : new Set(rows.map((r) => r.id)))}>{sel.size ? 'Clear' : 'Select page'}</Btn>
+            <Btn onClick={() => setSel(sel.size ? new Set() : new Set(rows.map((r) => r.id)))}>{sel.size ? 'Clear (' + sel.size + ')' : 'Select page'}</Btn>
+            <Btn disabled={busy} onClick={selectAll}>Select all</Btn>
             <Btn disabled={busy} onClick={processRows}>Process / retry images</Btn>
             <Btn disabled={busy} variant="success" onClick={() => decide('approve')}>Approve</Btn>
             <Btn disabled={busy} variant="danger" onClick={() => decide('reject')}>Reject</Btn>

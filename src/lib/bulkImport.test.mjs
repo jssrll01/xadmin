@@ -7,7 +7,9 @@ test('multiple images keep order', () => { const r = normalizeRow({ ...base, ima
 test('variants', () => { const r = normalizeRow({ ...base, variants: '[{"name":"Color","options":["Black","White"]}]' }); assert.deepEqual(r.normalized.variant_config, { Color: ['Black', 'White'] }); assert.equal(r.normalized.variant_prices.White, 100); });
 test('missing description is generated', () => { const r = normalizeRow(base); assert.equal(r.normalized.description_generated, true); assert.equal(r.status, 'imported'); });
 test('invalid price', () => { assert.equal(parsePrice('-5'), null); assert.equal(parsePrice('abc'), null); assert.equal(parsePrice('₱1,299.50'), 1299.5); assert.equal(normalizeRow({ ...base, selling_price: '0' }).status, 'needs_review'); });
-test('invalid category', () => { assert.equal(normalizeRow({ ...base, category: 'Spaceships' }).status, 'needs_review'); });
+test('new category is kept as typed', () => { const r = normalizeRow({ ...base, category: 'Spaceships' }); assert.equal(r.status, 'imported'); assert.equal(r.normalized.category, 'Spaceships'); });
+test('known category is matched', () => { assert.equal(normalizeRow({ ...base, category: 'fashion' }).normalized.category, 'Fashion'); });
+test('empty category flagged', () => { assert.equal(normalizeRow({ ...base, category: '' }).status, 'needs_review'); });
 test('duplicate in csv and in catalog', () => { const seen = new Map(); normalizeRow(base, { seen, rowNo: 1 }); assert.match(normalizeRow(base, { seen, rowNo: 2 }).errors.join(), /Duplicate of row 1/); assert.match(normalizeRow(base, { existing: new Set(['test item']) }).errors.join(), /already exists/); });
 test('ambiguous variants flagged', () => { const r = normalizeRow({ ...base, variants: '[{"name":"A","options":["x"]},{"name":"B","options":["y"]}]' }); assert.equal(r.status, 'needs_review'); assert.match(r.errors.join(), /Multiple variant types/); });
 test('missing stock_status stays draft', () => { assert.equal(normalizeRow({ ...base, stock_status: '' }).status, 'needs_review'); });
