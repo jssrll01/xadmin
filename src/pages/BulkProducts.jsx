@@ -32,6 +32,7 @@ export default function BulkProducts() {
   const { show } = useToast();
   const [preview, setPreview] = useState(null);
   const [pasted, setPasted] = useState('');
+  const [jsonText, setJsonText] = useState('');
   const [jobId, setJobId] = useState(() => { try { return localStorage.getItem('bulk_job') || ''; } catch (e) { return ''; } });
   const [jobs, setJobs] = useState([]);
   const [rows, setRows] = useState([]);
@@ -80,6 +81,33 @@ export default function BulkProducts() {
       });
       setPreview({ filename: f.name, rows: rs });
     } catch (err) { show('Could not read file: ' + err.message, 'error'); }
+  };
+  const onJson = async () => {
+    try {
+      const t = jsonText.replace(/[\u201C\u201D]/g, '"').replace(/[\u2018\u2019]/g, "'").trim();
+      if (!t) return show('Paste the JSON first', 'error');
+      let data = JSON.parse(t);
+      if (data && !Array.isArray(data) && Array.isArray(data.rows)) data = data.rows;
+      if (!Array.isArray(data) || !data.length) return show('JSON must be a list of products', 'error');
+      if (data.length > 2000) return show('Max 2000 rows per paste', 'error');
+      existing.current = new Set(); await loadExisting();
+      const seen = new Map();
+      const rs = data.map((r, i) => {
+        const raw = {}; HEADERS.forEach((h) => { raw[h] = ''; });
+        Object.keys(r || {}).forEach((k) => {
+          const kk = k.trim().toLowerCase(); if (!HEADERS.includes(kk)) return;
+          const v = r[k];
+          if (v == null) raw[kk] = '';
+          else if (kk === 'image_urls' && Array.isArray(v)) raw[kk] = v.join('|');
+          else if (kk === 'variants' && Array.isArray(v) && v.every((x) => typeof x !== 'object')) raw[kk] = 'Variation:' + v.join('|');
+          else if (kk === 'variants' && typeof v === 'object' && !Array.isArray(v) && Object.keys(v).length === 1 && Array.isArray(Object.values(v)[0])) raw[kk] = Object.keys(v)[0] + ':' + Object.values(v)[0].join('|');
+          else if (typeof v === 'object') raw[kk] = JSON.stringify(v);
+          else raw[kk] = String(v);
+        });
+        return { row_no: i + 1, raw, ...normalizeRow(raw, { seen, existing: existing.current, rowNo: i + 1 }) };
+      });
+      setPreview({ filename: 'pasted-json', rows: rs });
+    } catch (err) { show('Invalid JSON: ' + err.message, 'error'); }
   };
   const stage = async () => {
     setBusy(true); let id = null;
@@ -183,6 +211,12 @@ export default function BulkProducts() {
         <div style={{ fontWeight: 800, marginBottom: 6 }}>Or paste CSV text (works on mobile)</div>
         <textarea className="neu-input" rows={5} placeholder="Paste the whole CSV here, including the header row" value={pasted} onChange={(e) => setPasted(e.target.value)} style={{ width: '100%' }} />
         <div style={{ marginTop: 8 }}><Btn variant="primary" onClick={() => { if (!pasted.trim()) return show('Paste the CSV first', 'error'); onFile({ target: { files: [new File([pasted], 'pasted.csv', { type: 'text/csv' })], value: '' } }); }}>Read pasted CSV</Btn></div>
+      </Card>
+      <Card>
+        <div style={{ fontWeight: 800, marginBottom: 6 }}>Or paste JSON (works on mobile)</div>
+        <div style={{ fontSize: 12, marginBottom: 6 }}>A list of products. Keys are the same 7 column names. Only product_name, selling_price, category, image_urls and stock_status are needed. image_urls can be a list. variants can be "Size: S|M|L", a list like ["S","M"], or the JSON with prices and stock.</div>
+        <textarea className="neu-input" rows={6} placeholder='[{"product_name":"Item","selling_price":199,"category":"Fashion","image_urls":["https://..."],"variants":"Size: S|M|L","stock_status":"in_stock"}]' value={jsonText} onChange={(e) => setJsonText(e.target.value)} style={{ width: '100%' }} />
+        <div style={{ marginTop: 8 }}><Btn variant="primary" onClick={onJson}>Read pasted JSON</Btn></div>
       </Card>
       {preview && (
         <Card>
