@@ -62,13 +62,15 @@ export default function BulkProducts() {
     const f = e.target.files && e.target.files[0]; e.target.value = ''; if (!f) return;
     try {
       const text = (await f.text()).replace(/^\uFEFF/, '');
-      const wb = XLSX.read(text, { type: 'string', raw: true });
+      const first = text.split(/\r?\n/)[0] || '';
+      const delim = (first.match(/;/g) || []).length > (first.match(/,/g) || []).length ? ';' : (first.includes('\t') && !first.includes(',') ? '\t' : ',');
+      const wb = XLSX.read(text, { type: 'string', raw: true, FS: delim });
       const json = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: '', raw: true });
       if (!json.length) return show('File has no rows', 'error');
       if (json.length > 2000) return show('Max 2000 rows per file', 'error');
       const keys = Object.keys(json[0]).map((k) => k.trim().toLowerCase());
       const missing = HEADERS.filter((h) => !keys.includes(h));
-      if (missing.length) return show('Missing columns: ' + missing.join(', '), 'error');
+      if (missing.length) return show('Missing columns: ' + missing.join(', ') + '. Found: ' + keys.slice(0, 8).join(' | '), 'error');
       existing.current = new Set(); await loadExisting();
       const seen = new Map();
       const rs = json.map((r, i) => {
