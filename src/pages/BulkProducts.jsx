@@ -31,6 +31,7 @@ const L = { fontSize: 12, fontWeight: 700, margin: '6px 0 2px', display: 'block'
 export default function BulkProducts() {
   const { show } = useToast();
   const [preview, setPreview] = useState(null);
+  const [pasted, setPasted] = useState('');
   const [jobId, setJobId] = useState(() => { try { return localStorage.getItem('bulk_job') || ''; } catch (e) { return ''; } });
   const [jobs, setJobs] = useState([]);
   const [rows, setRows] = useState([]);
@@ -178,6 +179,11 @@ export default function BulkProducts() {
         </div>
       </Card>
 
+      <Card>
+        <div style={{ fontWeight: 800, marginBottom: 6 }}>Or paste CSV text (works on mobile)</div>
+        <textarea className="neu-input" rows={5} placeholder="Paste the whole CSV here, including the header row" value={pasted} onChange={(e) => setPasted(e.target.value)} style={{ width: '100%' }} />
+        <div style={{ marginTop: 8 }}><Btn variant="primary" onClick={() => { if (!pasted.trim()) return show('Paste the CSV first', 'error'); onFile({ target: { files: [new File([pasted], 'pasted.csv', { type: 'text/csv' })], value: '' } }); }}>Read pasted CSV</Btn></div>
+      </Card>
       {preview && (
         <Card>
           <div style={{ fontWeight: 800 }}>Preview: {preview.filename}</div>
