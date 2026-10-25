@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard.jsx';
 import Products from './pages/Products.jsx';
 import Orders from './pages/Orders.jsx';
 import CashbackCosts from './pages/CashbackCosts.jsx';
+import BulkProducts from './pages/BulkProducts.jsx';
 import Users from './pages/Users.jsx';
 import TopUps from './pages/TopUps.jsx';
 import Wallet from './pages/Wallet.jsx';
@@ -120,6 +121,7 @@ export default function App() {
           <Route path="/audit"     element={<AuditLog />} />
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/cashback" element={<CashbackCosts />} />
+          <Route path="/bulk-products" element={<BulkProducts />} />
           <Route path="/settings"  element={<Settings />} />
           <Route path="*"          element={<Navigate to="/" replace />} />
         </Routes>

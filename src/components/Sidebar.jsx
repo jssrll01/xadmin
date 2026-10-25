@@ -32,6 +32,7 @@ const items = [
   ['/audit', 'Audit log', ScrollText],
   ['/pricing', 'Pricing', Percent],
   ['/cashback', 'Cashback & Costs', Percent],
+  ['/bulk-products', 'Bulk Product Manager', Percent],
   ['/settings', 'Settings', Cog],
 ];
 
