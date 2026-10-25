@@ -25,6 +25,7 @@ const SAMPLE = [HEADERS.join(','),
   [q('Sample Instant Noodles 60g'), '25', q('Groceries & Pantry'), q('Quick-cook noodles.'), q('https://example.com/noodles.jpg'), q(''), 'in_stock'].join(','),
   [q('Sample Phone Case'), '199', q('Electronics'), q(''), q('https://example.com/a.jpg|https://example.com/b.jpg'), q('[{"name":"Color","options":["Black","White"]}]'), 'in_stock'].join(',')].join('\n');
 const Badge = ({ s }) => <span style={{ background: COLORS[s] || '#999', color: '#fff', borderRadius: 8, padding: '2px 8px', fontSize: 11, fontWeight: 800 }}>{s}</span>;
+const FLAG_LIST = [['save_more','Save More'],['flash_sale','Flash Sale'],['show_fashion','Fashion'],['show_groceries','Groceries & Pantry'],['show_sports','Sports & Outdoors'],['show_books','Books & Stationery'],['show_payday','Payday Sale'],['show_preloved','Pre-loved'],['verified','Verified'],['preorder','Preorder'],['instant','Instant']];
 const L = { fontSize: 12, fontWeight: 700, margin: '6px 0 2px', display: 'block' };
 
 export default function BulkProducts() {
@@ -150,6 +151,17 @@ export default function BulkProducts() {
     const n = normalizeRow(edit.raw, { existing: existing.current, rowNo: 0 });
     try { await rpc('bulk_update', { p_id: edit.id, p_raw: edit.raw, p_normalized: n.normalized, p_errors: n.errors, p_status: n.status, p_images: [] }); setEdit(null); load(); } catch (e) { show(e.message, 'error'); }
   };
+  const [ap, setAp] = useState({ store: '', sold: '', stock: '', useFlags: false, flags: {} });
+  const applyBulk = async () => {
+    if (!sel.size) return show('Select rows first', 'error');
+    const patch = {};
+    if (ap.store.trim()) patch.store = ap.store.trim();
+    if (ap.sold !== '') patch.sold = Math.max(0, parseInt(ap.sold, 10) || 0);
+    if (ap.stock !== '') patch.stock = Math.max(0, parseInt(ap.stock, 10) || 0);
+    if (ap.useFlags) patch.flags = Object.fromEntries(FLAG_LIST.map(([k]) => [k, !!ap.flags[k]]));
+    if (!Object.keys(patch).length) return show('Nothing to apply', 'error');
+    try { const d = await rpc('bulk_apply', { p_ids: [...sel], p_patch: patch }); show('Updated ' + d.count + ' row(s)', 'success'); load(); } catch (e) { show(e.message, 'error'); }
+  };
   const tog = (id) => setSel((s) => { const x = new Set(s); x.has(id) ? x.delete(id) : x.add(id); return x; });
   const valid = preview ? preview.rows.filter((r) => !r.errors.length).length : 0;
 
@@ -200,6 +212,21 @@ export default function BulkProducts() {
         </Card>
       )}
 
+      {jobId && (
+        <Card>
+          <div style={{ fontWeight: 800, marginBottom: 6 }}>Apply to selected rows ({sel.size} selected)</div>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            <input className="neu-input" placeholder="Store (blank = keep)" value={ap.store} onChange={(e) => setAp({ ...ap, store: e.target.value })} style={{ flex: 1, minWidth: 120 }} />
+            <input className="neu-input" type="number" placeholder="Sold" value={ap.sold} onChange={(e) => setAp({ ...ap, sold: e.target.value })} style={{ width: 90 }} />
+            <input className="neu-input" type="number" placeholder="Stock per option" value={ap.stock} onChange={(e) => setAp({ ...ap, stock: e.target.value })} style={{ width: 150 }} />
+          </div>
+          <label style={{ ...L, marginTop: 8 }}><input type="checkbox" checked={ap.useFlags} onChange={(e) => setAp({ ...ap, useFlags: e.target.checked })} /> Set checkboxes (checked = on, unchecked = off; replaces the current ones)</label>
+          {ap.useFlags && <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+            {FLAG_LIST.map(([k, lb]) => <label key={k} style={{ fontSize: 12 }}><input type="checkbox" checked={!!ap.flags[k]} onChange={(e) => setAp({ ...ap, flags: { ...ap.flags, [k]: e.target.checked } })} /> {lb}</label>)}
+          </div>}
+          <div style={{ marginTop: 8 }}><Btn variant="primary" disabled={busy} onClick={applyBulk}>Apply to selected</Btn></div>
+        </Card>
+      )}
       {rows.map((r) => {
         const n = r.normalized || {}; const opts = n.variant_config ? (Object.values(n.variant_config)[0] || []) : [];
         const pr = Object.values(n.variant_prices || {}).map(Number); const thumb = (n.images || [])[0];
