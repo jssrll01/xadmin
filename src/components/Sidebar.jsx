@@ -2,7 +2,7 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard, Users, Package, ShoppingBag, Wallet, RotateCcw,
-  AlertTriangle, Store, CreditCard, Gift, Boxes, Settings as Cog, ScrollText, Bell, BarChart3, FileText, Star, Gamepad2, Image as ImageIcon, Percent,
+  AlertTriangle, Store, CreditCard, Gift, Boxes, Settings as Cog, ScrollText, Bell, BarChart3, FileText, Star, Gamepad2, Image as ImageIcon, Percent, Radio,
 } from 'lucide-react';
 
 const items = [
@@ -33,6 +33,7 @@ const items = [
   ['/pricing', 'Pricing', Percent],
   ['/cashback', 'Cashback & Costs', Percent],
   ['/bulk-products', 'Bulk Product Manager', Percent],
+  ['/nfc', 'NFC Studio', Radio],
   ['/settings', 'Settings', Cog],
 ];
 
