@@ -34,6 +34,7 @@ import Notify from './pages/Notify.jsx';
 import UploadPhotos from './pages/UploadPhotos.jsx';
 import AirdropMod from './pages/AirdropMod.jsx';
 import Pricing from './pages/Pricing.jsx';
+import NfcStudio from './pages/NfcStudio.jsx';
 
 const SESSION_KEY = 'xadmin_unlocked';
 const ACTOR_KEY = 'xadmin_actor';
@@ -122,6 +123,7 @@ export default function App() {
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/cashback" element={<CashbackCosts />} />
           <Route path="/bulk-products" element={<BulkProducts />} />
+          <Route path="/nfc" element={<NfcStudio />} />
           <Route path="/settings"  element={<Settings />} />
           <Route path="*"          element={<Navigate to="/" replace />} />
         </Routes>
