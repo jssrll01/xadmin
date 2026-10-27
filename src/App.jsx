@@ -33,6 +33,7 @@ import Supplier from './pages/Supplier.jsx';
 import Notify from './pages/Notify.jsx';
 import UploadPhotos from './pages/UploadPhotos.jsx';
 import AirdropMod from './pages/AirdropMod.jsx';
+import DailyNotes from './pages/DailyNotes.jsx';
 import Pricing from './pages/Pricing.jsx';
 import NfcStudio from './pages/NfcStudio.jsx';
 
@@ -119,6 +120,7 @@ export default function App() {
           <Route path="/quotations/new" element={<NewReceipt />} />
           <Route path="/quotations/:id" element={<ReceiptView />} />
           <Route path="/reviews"    element={<Reviews />} />
+          <Route path="/daily"     element={<DailyNotes />} />
           <Route path="/audit"     element={<AuditLog />} />
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/cashback" element={<CashbackCosts />} />
