@@ -69,6 +69,8 @@ export default function Orders() { // XMARKET_RECEIPT_VIEW_COLUMN
           options: ['pending', 'paid', 'shipped', 'delivered', 'completed', 'cancelled'],
           default: 'pending' },
       ]}
+      statusKey="status"
+      statusOptions={['pending', 'paid', 'shipped', 'delivered', 'completed', 'cancelled']}
       onCreate={orderCrud.create}
       onUpdate={orderCrud.update}
       onDelete={orderCrud.remove}
