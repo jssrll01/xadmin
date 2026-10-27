@@ -53,8 +53,8 @@ const TABS = {
   },
   qrp_service_packages: {
     title: 'Service packages', name: (r) => r.name, sub: (r) => r.category_id + ' · ' + r.price,
-    blank: { category_id: '', name: '', included: '', price: '' },
-    fields: [['category_id', 'Category', 'cat'], ['name', 'Name'], ['included', "What's included", 'area'], ['price', 'Price (e.g. ₱299)']],
+    blank: { category_id: '', name: '', included: '', price: '', crossed_price: '' },
+    fields: [['category_id', 'Category', 'cat'], ['name', 'Name'], ['included', "What's included", 'area'], ['price', 'Price (e.g. ₱299)'], ['crossed_price', 'Crossed-out price (optional, e.g. ₱400)']],
     required: ['category_id', 'name', 'price'], urlKeys: [], newId: (r) => r.category_id + '-' + Date.now().toString(36),
   },
   qrp_content: {
