@@ -1,13 +1,16 @@
 import ProductPicker from './ProductPicker.jsx';
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import Card from './Card.jsx';
 import Modal from './Modal.jsx';
 import VariantEditor from './VariantEditor.jsx';
 import Btn from './Btn.jsx';
+import AnimatedNumber from './AnimatedNumber.jsx';
 import { useToast } from './Toast.jsx';
 import useAutoRefresh from '../lib/useAutoRefresh.js';
 import { logAudit } from '../lib/api.js';
-import { Plus, Edit2, Trash2, Search } from 'lucide-react';
+import { Plus, Edit2, Trash2, Search, ChevronLeft, ChevronRight } from 'lucide-react';
+
+const PAGE_SIZE = 25;
 
 export default function CrudPage({
   title, subtitle,
@@ -16,27 +19,40 @@ export default function CrudPage({
   searchKeys = [],
   primaryKey = 'id',
   extraRowActions,
+  statusKey,
+  statusOptions,
 }) {
   const { show } = useToast();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [failed, setFailed] = useState(false);
   const [search, setSearch] = useState('');
+  const [dq, setDq] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [sortKey, setSortKey] = useState('');
+  const [sortDir, setSortDir] = useState('asc');
+  const [page, setPage] = useState(1);
   const [editing, setEditing] = useState(null);
+  const [orig, setOrig] = useState(null);
   const [saving, setSaving] = useState(false);
 
   const load = useCallback(async () => {
     try {
       const res = await fetcher();
       setItems(Array.isArray(res?.items) ? res.items : []);
+      setFailed(false);
     } catch {
       setItems([]);
+      setFailed(true);
     } finally {
       setLoading(false);
     }
   }, [fetcher]);
 
-  // Auto-refresh every 1 second
   useAutoRefresh(load, 1000);
+
+  useEffect(() => { const t = setTimeout(() => { setDq(search.trim().toLowerCase()); setPage(1); }, 200); return () => clearTimeout(t); }, [search]);
+  useEffect(() => { setPage(1); }, [statusFilter, sortKey, sortDir]);
 
   const openNew = () => {
     const blank = { __isNew: true };
@@ -48,6 +64,7 @@ export default function CrudPage({
       else blank[f.key] = f.default ?? '';
     });
     setEditing(blank);
+    setOrig({ ...blank });
   };
 
   const openEdit = (row) => {
@@ -66,6 +83,25 @@ export default function CrudPage({
       }
     });
     setEditing(copy);
+    setOrig({ ...copy });
+  };
+
+  const closeModal = () => {
+    if (editing && orig) {
+      const dirty = formFields.some((f) => {
+        const a = editing[f.key], b = orig[f.key];
+        if (f.type === 'variant-editor') {
+          return JSON.stringify(a) !== JSON.stringify(b);
+        }
+        if (f.type === 'product-picker' || f.type === 'array') {
+          return JSON.stringify(a) !== JSON.stringify(b);
+        }
+        return String(a ?? '') !== String(b ?? '');
+      });
+      if (dirty && !confirm('Discard unsaved changes?')) return;
+    }
+    setEditing(null);
+    setOrig(null);
   };
 
   const save = async () => {
@@ -85,7 +121,6 @@ export default function CrudPage({
         if (f.type === 'number') v = (v === '' || v == null) ? (f.default ?? 0) : Number(v);
         else if (f.type === 'boolean') v = !!v;
         else if (f.type === 'variant-editor') {
-          // Emit three top-level columns instead of one
           const obj = editing[f.key];
           if (obj && typeof obj === 'object') {
             payload.variant_config = obj.variant_config || {};
@@ -106,16 +141,16 @@ export default function CrudPage({
         ? await onCreate(payload)
         : await onUpdate(editing[primaryKey], payload);
       if (res?.error) throw res.error;
-      // AUDIT
       await logAudit(
         isNew ? 'create' : 'update',
         title.toLowerCase(),
         isNew ? res?.data?.[primaryKey] : editing[primaryKey],
-        isNew ? null : editing,
+        isNew ? null : orig,
         payload
       );
       show?.(isNew ? 'Created' : 'Updated', 'success');
       setEditing(null);
+      setOrig(null);
       load();
     } catch (e) {
       show?.(String(e.message || e), 'error');
@@ -125,7 +160,7 @@ export default function CrudPage({
   };
 
   const remove = async (row) => {
-    const label = row.name || row.title || row.email || row.code || String(row[primaryKey]).slice(0, 8);
+    const label = row.name || row.title || row.email || row.code || row.order_code || String(row[primaryKey]).slice(0, 8);
     if (!confirm(`Delete "${label}"?`)) return;
     try {
       const res = await onDelete(row[primaryKey]);
@@ -149,42 +184,82 @@ export default function CrudPage({
     }
   };
 
-  const filtered = !search
-    ? items
-    : items.filter((it) =>
-        searchKeys.some((k) =>
-          String(it[k] ?? '').toLowerCase().includes(search.toLowerCase())
-        )
-      );
+  const filtered = useMemo(() => {
+    let out = items;
+    if (dq) {
+      out = out.filter((it) => searchKeys.some((k) => String(it[k] ?? '').toLowerCase().includes(dq)));
+    }
+    if (statusKey && statusFilter !== 'all') {
+      out = out.filter((it) => String(it[statusKey] ?? '').toLowerCase() === statusFilter);
+    }
+    if (sortKey) {
+      const sign = sortDir === 'asc' ? 1 : -1;
+      out = [...out].sort((a, b) => {
+        const av = a[sortKey], bv = b[sortKey];
+        if (av == null && bv == null) return 0;
+        if (av == null) return 1;
+        if (bv == null) return -1;
+        if (typeof av === 'number' && typeof bv === 'number') return (av - bv) * sign;
+        return String(av).localeCompare(String(bv)) * sign;
+      });
+    }
+    return out;
+  }, [items, dq, searchKeys, statusFilter, statusKey, sortKey, sortDir]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const curPage = Math.min(page, totalPages);
+  const pageRows = filtered.slice((curPage - 1) * PAGE_SIZE, curPage * PAGE_SIZE);
+
+  const toggleSort = (key) => {
+    if (sortKey === key) setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
+    else { setSortKey(key); setSortDir('asc'); }
+  };
 
   return (
     <>
       <div className="page-head">
         <div>
           <h1>{title}</h1>
-          <p>{subtitle || `${items.length} items`}</p>
+          <p>{subtitle || `${items.length} items`}{filtered.length !== items.length ? ` · ${filtered.length} shown` : ''}</p>
         </div>
         <Btn variant="primary" onClick={openNew}>
           <Plus size={16} /> New
         </Btn>
       </div>
 
-      {searchKeys.length > 0 && (
+      {(searchKeys.length > 0 || statusKey) && (
         <Card style={{ marginBottom: 12, padding: 10 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <Search size={16} style={{ color: 'var(--text-dim)', flexShrink: 0 }} />
-            <input
-              className="neu-input"
-              placeholder="Search…"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+            {searchKeys.length > 0 && (
+              <label style={{ position: 'relative', flex: '1 1 220px' }}>
+                <Search size={15} style={{ position: 'absolute', left: 11, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-dim)' }} />
+                <input className="neu-input" style={{ paddingLeft: 34 }}
+                  placeholder="Search…" value={search} onChange={(e) => setSearch(e.target.value)} />
+              </label>
+            )}
+            {statusKey && statusOptions && (
+              <select className="neu-input" style={{ flex: '0 1 170px' }}
+                value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+                <option value="all">All statuses</option>
+                {statusOptions.map((s) => <option key={s} value={s}>{s}</option>)}
+              </select>
+            )}
           </div>
         </Card>
       )}
 
       {loading && items.length === 0 ? (
-        <Card><div style={{ padding: 20, color: 'var(--text-dim)', textAlign: 'center' }}>Loading…</div></Card>
+        <div className="stat-grid">
+          {[0, 1, 2, 3].map((k) => (
+            <div className="stat" key={k}><div><div className="stat-label">&nbsp;</div><div className="stat-value"><span className="xa-skel" /></div></div></div>
+          ))}
+        </div>
+      ) : failed ? (
+        <Card>
+          <div style={{ padding: 24, textAlign: 'center', color: 'var(--danger)' }}>
+            Could not load data. <Btn onClick={() => { setLoading(true); load(); }}>Retry</Btn>
+          </div>
+        </Card>
       ) : filtered.length === 0 ? (
         <Card>
           <div style={{ padding: 30, textAlign: 'center', color: 'var(--text-dim)' }}>
@@ -192,50 +267,68 @@ export default function CrudPage({
               {items.length === 0 ? 'No data yet' : 'No matches'}
             </div>
             <div style={{ fontSize: 12 }}>
-              {items.length === 0 ? 'Tap "New" to add the first entry.' : 'Try a different search.'}
+              {items.length === 0 ? 'Tap "New" to add the first entry.' : 'Try a different search or filter.'}
             </div>
           </div>
         </Card>
       ) : (
-        <div className="table-wrap">
-          <table className="neu-table">
-            <thead>
-              <tr>
-                {columns.map((c) => <th key={c.key}>{c.label}</th>)}
-                <th style={{ textAlign: 'right', width: 1 }}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((row, i) => (
-                <tr key={row[primaryKey] ?? i}>
+        <>
+          <div className="table-wrap">
+            <table className="neu-table">
+              <thead>
+                <tr>
                   {columns.map((c) => (
-                    <td key={c.key} className={c.wrap ? 'cell-wrap' : undefined}>
-                      {c.render ? c.render(row) : String(row[c.key] ?? '—')}
-                    </td>
+                    <th key={c.key} onClick={() => toggleSort(c.key)}
+                      style={{ cursor: 'pointer', userSelect: 'none' }}
+                      title={`Sort by ${c.label}`}>
+                      {c.label}{sortKey === c.key ? (sortDir === 'asc' ? ' ▲' : ' ▼') : ''}
+                    </th>
                   ))}
-                  <td style={{ textAlign: 'right' }}>
-                    <div style={{ display: 'inline-flex', gap: 6, alignItems: 'center' }}>
-                      {extraRowActions && extraRowActions(row, { update: quickUpdate })}
-                      <button className="neu-btn" style={{ padding: 7 }}
-                        onClick={() => openEdit(row)} title="Edit">
-                        <Edit2 size={14} />
-                      </button>
-                      <button className="neu-btn" style={{ padding: 7, color: 'var(--danger)', borderColor: '#FCA5A5' }}
-                        onClick={() => remove(row)} title="Delete">
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
-                  </td>
+                  <th style={{ textAlign: 'right', width: 1 }}>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {pageRows.map((row, i) => (
+                  <tr key={row[primaryKey] ?? i}>
+                    {columns.map((c) => (
+                      <td key={c.key} className={c.wrap ? 'cell-wrap' : undefined}>
+                        {c.render ? c.render(row) : String(row[c.key] ?? '—')}
+                      </td>
+                    ))}
+                    <td style={{ textAlign: 'right' }}>
+                      <div style={{ display: 'inline-flex', gap: 6, alignItems: 'center' }}>
+                        {extraRowActions && extraRowActions(row, { update: quickUpdate })}
+                        <button className="neu-btn" style={{ padding: 7 }}
+                          onClick={() => openEdit(row)} title="Edit">
+                          <Edit2 size={14} />
+                        </button>
+                        <button className="neu-btn" style={{ padding: 7, color: 'var(--danger)', borderColor: 'var(--danger-soft)' }}
+                          onClick={() => remove(row)} title="Delete">
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {totalPages > 1 && (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 10, marginTop: 12 }}>
+              <Btn disabled={curPage <= 1} onClick={() => setPage(curPage - 1)} aria-label="Previous page"><ChevronLeft size={16} /></Btn>
+              <span style={{ fontSize: 12.5, color: 'var(--text-dim)' }}>
+                Page {curPage} of {totalPages} · <AnimatedNumber value={filtered.length} /> rows
+              </span>
+              <Btn disabled={curPage >= totalPages} onClick={() => setPage(curPage + 1)} aria-label="Next page"><ChevronRight size={16} /></Btn>
+            </div>
+          )}
+        </>
       )}
 
       <Modal
         open={!!editing}
-        onClose={() => setEditing(null)}
+        onClose={closeModal}
         title={editing?.__isNew ? `New ${title}` : `Edit ${title}`}
       >
         {editing && (
@@ -297,7 +390,7 @@ export default function CrudPage({
               <Btn variant="primary" onClick={save} disabled={saving} style={{ flex: 1 }}>
                 {saving ? 'Saving…' : 'Save'}
               </Btn>
-              <Btn onClick={() => setEditing(null)} style={{ flex: 1 }}>Cancel</Btn>
+              <Btn onClick={closeModal} style={{ flex: 1 }}>Cancel</Btn>
             </div>
           </div>
         )}
