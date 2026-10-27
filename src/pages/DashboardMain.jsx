@@ -1,10 +1,11 @@
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import React, { useState, useCallback, useEffect, useMemo, useContext, createContext } from 'react';
 import { Link } from 'react-router-dom';
 import { TrendingUp, TrendingDown, ShoppingBag, Users, Package, Wallet, AlertTriangle, FileText, Star, ArrowRight, Calendar, Award } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { fetchStats, fetchSoldOutProducts, fetchReceiptsStats, fetchReviewsStats, fetchRevenueByPeriod, fetchRevenueSnapshot, fetchTopSellingProducts, fetchOrders, fetchTopUps, fetchReports } from '../lib/api.js';
 import { peso, pesoShort } from '../lib/format.js';
 import useAutoRefresh from '../lib/useAutoRefresh.js';
+import AnimatedNumber from '../components/AnimatedNumber.jsx';
 
 const CSS = `
 .dx-hero,.dx-split{display:grid;grid-template-columns:1fr;gap:14px;margin-bottom:14px}
@@ -59,11 +60,20 @@ function padSeries(items, period, count) {
   return out.map((s) => ({ ...s, revenue: Number(s.revenue) || 0, order_count: Number(s.order_count) || 0 }));
 }
 
-function Stat({ icon: Icon, value, label, color }) {
+const StateCtx = createContext('ready');
+
+function Stat({ icon: Icon, value, num, fmt, label, color }) {
+  const state = useContext(StateCtx);
+  const numeric = num !== undefined || (value !== '' && value !== null && value !== undefined && Number.isFinite(Number(value)));
+  let shown;
+  if (state === 'loading') shown = <span className="xa-skel" role="status" aria-label="Loading" />;
+  else if (state === 'na') shown = <span title="Data unavailable">Not available</span>;
+  else if (numeric) shown = <AnimatedNumber value={num !== undefined ? num : value} format={fmt} />;
+  else shown = value;
   return (
     <div className="stat">
       <div className="stat-icon" style={{ background: color }}><Icon size={22} /></div>
-      <div><div className="stat-value">{value}</div><div className="stat-label">{label}</div></div>
+      <div><div className="stat-value">{shown}</div><div className="stat-label">{label}</div></div>
     </div>
   );
 }
@@ -80,6 +90,7 @@ export default function Dashboard() {
   const [orders, setOrders] = useState([]);
   const [topups, setTopups] = useState([]);
   const [reports, setReports] = useState([]);
+  const [failed, setFailed] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -88,13 +99,13 @@ export default function Dashboard() {
         fetchStats(), fetchRevenueSnapshot(), fetchRevenueByPeriod(period, 24), fetchTopSellingProducts(10),
         fetchReceiptsStats(), fetchReviewsStats(), fetchSoldOutProducts(), fetchOrders(), fetchTopUps(), fetchReports(),
       ]);
-      setStats(st); setSnap(sn);
+      setStats(st); setSnap(sn); setFailed(false);
       setSeries(padSeries((ser && ser.items) || [], period, count));
       setTop((tp && tp.items) || []);
       if (r1) setRc(r1); if (r2) setRv(r2);
       setSoldOut(Array.isArray(so && so.items) ? so.items : []);
       setOrders((o && o.items) || []); setTopups((t && t.items) || []); setReports((r && r.items) || []);
-    } catch (e) { /* keep old data */ }
+    } catch (e) { setFailed(true); }
   }, [period]);
   useEffect(() => { load(); }, [load]);
   useAutoRefresh(load, 15000);
@@ -110,6 +121,7 @@ export default function Dashboard() {
     return { total: a + b, ordersIn: series.reduce((n, d) => n + d.order_count, 0), trend: a > 0 ? ((b - a) / a) * 100 : b > 0 ? 100 : 0 };
   }, [series]);
   const up = trend >= 0;
+  const st = stats ? 'ready' : failed ? 'na' : 'loading';
 
   const byStatus = useMemo(() => {
     const m = {};
@@ -120,7 +132,7 @@ export default function Dashboard() {
   const recent = useMemo(() => [...orders].sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 6), [orders]);
 
   const cards = [
-    { icon: TrendingUp, value: pesoShort(s.revenue), label: 'Revenue', color: '#10B981' },
+    { icon: TrendingUp, num: s.revenue, fmt: pesoShort, label: 'Revenue', color: '#10B981' },
     { icon: ShoppingBag, value: s.orders, label: 'Orders', color: '#2563EB' },
     { icon: Users, value: s.users, label: 'Users', color: '#7C3AED' },
     { icon: Package, value: s.products, label: 'Products', color: '#F59E0B' },
@@ -131,16 +143,16 @@ export default function Dashboard() {
     { icon: Star, value: rv.total + (rv.avg ? ' · ' + rv.avg + '★' : ''), label: 'Reviews', color: '#EAB308' },
   ];
   const snaps = [
-    { icon: Calendar, value: pesoShort((snap && snap.today) || 0), label: 'Today', color: '#10B981' },
-    { icon: TrendingUp, value: pesoShort((snap && snap.thisWeek) || 0), label: 'This week', color: '#2563EB' },
-    { icon: Calendar, value: pesoShort((snap && snap.thisMonth) || 0), label: 'This month', color: '#7C3AED' },
-    { icon: TrendingUp, value: pesoShort((snap && snap.thisYear) || 0), label: 'This year', color: '#F59E0B' },
-    { icon: ShoppingBag, value: pesoShort((snap && snap.allTime) || 0), label: 'All time', color: '#059669' },
+    { icon: Calendar, num: (snap && snap.today) || 0, fmt: pesoShort, label: 'Today', color: '#10B981' },
+    { icon: TrendingUp, num: (snap && snap.thisWeek) || 0, fmt: pesoShort, label: 'This week', color: '#2563EB' },
+    { icon: Calendar, num: (snap && snap.thisMonth) || 0, fmt: pesoShort, label: 'This month', color: '#7C3AED' },
+    { icon: TrendingUp, num: (snap && snap.thisYear) || 0, fmt: pesoShort, label: 'This year', color: '#F59E0B' },
+    { icon: ShoppingBag, num: (snap && snap.allTime) || 0, fmt: pesoShort, label: 'All time', color: '#059669' },
   ];
   const links = [['/orders', 'Orders', ShoppingBag], ['/topups', 'Top-ups', Wallet], ['/reports', 'Reports', AlertTriangle], ['/products', 'Products', Package], ['/users', 'Users', Users]];
 
   return (
-    <>
+    <StateCtx.Provider value={st}>
       <style>{CSS}</style>
       <div className="page-head"><div><h1>Dashboard</h1><p>Overview &amp; analytics · live</p></div></div>
 
@@ -273,7 +285,7 @@ export default function Dashboard() {
             <Stat icon={Calendar} value={rc.unpaid} label="Unpaid" color="#F59E0B" />
             <Stat icon={Calendar} value={rc.pending} label="Pending" color="#3B82F6" />
             <Stat icon={Calendar} value={rc.overdue} label="Overdue" color="#EF4444" />
-            <Stat icon={TrendingUp} value={pesoShort(rc.revenue)} label="Paid revenue" color="#10B981" />
+            <Stat icon={TrendingUp} num={rc.revenue} fmt={pesoShort} label="Paid revenue" color="#10B981" />
           </div>
         </div>
         <div>
@@ -302,6 +314,6 @@ export default function Dashboard() {
           </div>
         </div>
       )}
-    </>
+    </StateCtx.Provider>
   );
 }

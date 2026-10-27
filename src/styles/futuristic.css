@@ -1,0 +1,42 @@
+/* Additive layer: motion + loading states. Does not change existing look. */
+@keyframes xa-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes xa-shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+@keyframes xa-bar { from { opacity: 0; transform: scaleY(.3); } to { opacity: 1; transform: none; } }
+
+/* Page and card entrance on every tab switch (new DOM nodes animate once) */
+.main > :not(.topbar):not(style) {
+  animation-name: xa-in;
+  animation-duration: .24s;
+  animation-timing-function: var(--ease, ease-out);
+  animation-fill-mode: backwards;
+}
+.main > :nth-child(3) { animation-delay: 40ms; }
+.main > :nth-child(4) { animation-delay: 80ms; }
+.main > :nth-child(5) { animation-delay: 120ms; }
+.main > :nth-child(6) { animation-delay: 160ms; }
+.main > :nth-child(7) { animation-delay: 200ms; }
+.main > :nth-child(n+8) { animation-delay: 240ms; }
+
+/* Loading skeleton for metric values */
+.xa-skel {
+  display: inline-block; width: 64px; height: 22px; border-radius: 8px; vertical-align: middle;
+  background: linear-gradient(90deg, rgba(150,160,180,.18) 25%, rgba(150,160,180,.34) 50%, rgba(150,160,180,.18) 75%);
+  background-size: 200% 100%;
+  animation: xa-shimmer 1.3s linear infinite;
+}
+
+/* Sidebar active indicator */
+.sidebar .nav-item { position: relative; }
+.sidebar .nav-item.active::before {
+  content: ''; position: absolute; left: 0; top: 22%; bottom: 22%; width: 3px; border-radius: 3px;
+  background: linear-gradient(180deg, #3B82F6, #7C3AED);
+  animation: xa-bar .25s var(--ease, ease-out);
+}
+
+/* Keyboard focus (buttons and links only, so text inputs look unchanged) */
+button:focus-visible, a:focus-visible { outline: 2px solid var(--primary, #2563EB); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .main > * { animation: none !important; }
+  .xa-skel, .sidebar .nav-item.active::before { animation: none !important; }
+}
