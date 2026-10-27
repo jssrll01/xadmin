@@ -7,6 +7,7 @@ import {
 
 const items = [
   ['/', 'Dashboard', LayoutDashboard],
+  ['/daily', 'Daily Tasks & Notes', ClipboardList],
   ['/users', 'Users', Users],
   ['/products', 'Products', Package],
   ['/orders', 'Orders', ShoppingBag],
@@ -29,7 +30,6 @@ const items = [
   ['/notify', 'Notify', Bell],
   ['/upload', 'Upload photos', ImageIcon],
   ['/airdrop-mod', 'Airdrop Mod', Gamepad2],
-  ['/daily', 'Daily Tasks & Notes', ClipboardList],
   ['/audit', 'Audit log', ScrollText],
   ['/pricing', 'Pricing', Percent],
   ['/cashback', 'Cashback & Costs', Percent],
