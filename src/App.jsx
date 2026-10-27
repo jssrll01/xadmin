@@ -36,6 +36,7 @@ import AirdropMod from './pages/AirdropMod.jsx';
 import DailyNotes from './pages/DailyNotes.jsx';
 import Pricing from './pages/Pricing.jsx';
 import NfcStudio from './pages/NfcStudio.jsx';
+import QrPortal from './pages/QrPortal.jsx';
 
 const SESSION_KEY = 'xadmin_unlocked';
 const ACTOR_KEY = 'xadmin_actor';
@@ -126,6 +127,7 @@ export default function App() {
           <Route path="/cashback" element={<CashbackCosts />} />
           <Route path="/bulk-products" element={<BulkProducts />} />
           <Route path="/nfc" element={<NfcStudio />} />
+          <Route path="/qr-portal" element={<QrPortal />} />
           <Route path="/settings"  element={<Settings />} />
           <Route path="*"          element={<Navigate to="/" replace />} />
         </Routes>
