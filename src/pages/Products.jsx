@@ -13,7 +13,7 @@ export default function Products() {
       fetcher={fetchProducts}
       searchKeys={['name', 'category', 'store']}
       columns={[
-        { key: 'name', label: 'Name', render: (r) => <b>{r.name}</b> },
+        { key: 'name', label: 'Name', render: (r) => { const n = String(r.name || ''); return <b title={n}>{n.length > 75 ? n.slice(0, 75) + '...' : n}</b>; } },
         { key: 'category', label: 'Category', render: (r) => r.category || '—' },
         { key: 'store', label: 'Store', render: (r) => r.store || '—' },
         { key: 'price', label: 'Price', render: (r) => priceRange(r).display },
