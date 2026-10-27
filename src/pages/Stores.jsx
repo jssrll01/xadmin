@@ -1,18 +1,20 @@
 import { adminDb, adminRows } from '../lib/api';
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import Card from '../components/Card.jsx';
 import Modal from '../components/Modal.jsx';
 import Btn from '../components/Btn.jsx';
+import AnimatedNumber from '../components/AnimatedNumber.jsx';
 import { useToast } from '../components/Toast.jsx';
 import useAutoRefresh from '../lib/useAutoRefresh.js';
 import { supabase } from '../supabase.js';
 import { logAudit } from '../lib/api.js';
-import { Plus, Edit2, Trash2 } from 'lucide-react';
+import { Plus, Edit2, Trash2, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const CODE = import.meta.env.VITE_XADMIN_PIN;
 const BLANK = { name: '', description: '', logo_url: '', banner_url: '', location: '', contact_phone: '', contact_email: '', verified: false };
 const VBLANK = { code: '', title: '', discount_type: 'fixed', discount_value: '', min_spend: '', expires_at: '', active: true };
 const lab = { fontSize: 11, fontWeight: 700, color: 'var(--text-dim)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: 0.4 };
+const PAGE_SIZE = 25;
 
 export default function Stores() {
   const { show } = useToast();
@@ -22,6 +24,15 @@ export default function Stores() {
   const [saving, setSaving] = useState(false);
   const [vouchers, setVouchers] = useState([]);
   const [vform, setVform] = useState(VBLANK);
+
+  const [q, setQ] = useState('');
+  const [dq, setDq] = useState('');
+  const [filter, setFilter] = useState('all');
+  const [sort, setSort] = useState('name_asc');
+  const [page, setPage] = useState(1);
+
+  useEffect(() => { const t = setTimeout(() => { setDq(q.trim().toLowerCase()); setPage(1); }, 200); return () => clearTimeout(t); }, [q]);
+  useEffect(() => { setPage(1); }, [filter, sort]);
 
   const load = useCallback(async () => {
     try {
@@ -41,9 +52,19 @@ export default function Stores() {
   };
 
   const openNew = () => { setEditing({ ...BLANK, __isNew: true }); setVouchers([]); setVform(VBLANK); };
-  const openEdit = (r) => { setEditing({ ...r }); setVform(VBLANK); loadVouchers(r.id); };
+  const openEdit = (r) => { setEditing({ ...r, __orig: { ...r } }); setVform(VBLANK); loadVouchers(r.id); };
 
   const set = (k, v) => setEditing(e => ({ ...e, [k]: v }));
+
+  const closeModal = () => {
+    if (!editing) return;
+    const o = editing.__orig;
+    const dirty = editing.__isNew
+      ? Object.keys(BLANK).some((k) => String(editing[k] ?? '') !== String(BLANK[k] ?? ''))
+      : o && Object.keys(BLANK).some((k) => String(editing[k] ?? '') !== String(o[k] ?? ''));
+    if (dirty && !confirm('Discard unsaved changes to this store?')) return;
+    setEditing(null);
+  };
 
   const save = async () => {
     if (!editing.name || !editing.name.trim()) { show?.('Store name is required', 'error'); return; }
@@ -56,9 +77,9 @@ export default function Stores() {
       };
       const { data, error } = await supabase.rpc('admin_save_store', { code: CODE, payload });
       if (error) throw error;
-      await logAudit(editing.__isNew ? 'create' : 'update', 'stores', data?.id, editing.__isNew ? null : editing, payload);
+      await logAudit(editing.__isNew ? 'create' : 'update', 'stores', data?.id, editing.__isNew ? null : editing.__orig, payload);
       show?.(editing.__isNew ? 'Store created' : 'Store updated', 'success');
-      if (editing.__isNew && data) { setEditing({ ...data }); loadVouchers(data.id); }
+      if (editing.__isNew && data) { setEditing({ ...data, __orig: { ...data } }); loadVouchers(data.id); }
       else setEditing(null);
       load();
     } catch (e) { show?.(String(e.message || e), 'error'); } finally { setSaving(false); }
@@ -95,46 +116,115 @@ export default function Stores() {
     </div>
   );
 
+  const filtered = useMemo(() => {
+    const f = rows.filter((r) => {
+      if (filter === 'verified' && !r.verified) return false;
+      if (filter === 'unverified' && r.verified) return false;
+      if (!dq) return true;
+      return (r.name || '').toLowerCase().includes(dq)
+        || (r.location || '').toLowerCase().includes(dq)
+        || (r.contact_phone || '').toLowerCase().includes(dq)
+        || (r.contact_email || '').toLowerCase().includes(dq);
+    });
+    const cmp = {
+      name_asc: (a, b) => (a.name || '').localeCompare(b.name || ''),
+      name_desc: (a, b) => (b.name || '').localeCompare(a.name || ''),
+      products_desc: (a, b) => (b.product_count || 0) - (a.product_count || 0),
+      products_asc: (a, b) => (a.product_count || 0) - (b.product_count || 0),
+      followers_desc: (a, b) => (b.followers || 0) - (a.followers || 0),
+    }[sort] || (() => 0);
+    return [...f].sort(cmp);
+  }, [rows, dq, filter, sort]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const curPage = Math.min(page, totalPages);
+  const pageRows = filtered.slice((curPage - 1) * PAGE_SIZE, curPage * PAGE_SIZE);
+
   return (
     <>
       <div className="page-head">
-        <div><h1>Stores</h1><p>{rows.length} registered stores</p></div>
+        <div><h1>Stores</h1><p>{rows.length} registered stores · {filtered.length} shown</p></div>
         <Btn variant="primary" onClick={openNew}><Plus size={16} /> New</Btn>
       </div>
 
       {loading && rows.length === 0 ? (
-        <Card><div style={{ padding: 20, textAlign: 'center', color: 'var(--text-dim)' }}>Loading…</div></Card>
+        <div className="stat-grid">
+          {[0, 1, 2, 3].map((k) => (
+            <div className="stat" key={k}><div><div className="stat-label">&nbsp;</div><div className="stat-value"><span className="xa-skel" /></div></div></div>
+          ))}
+        </div>
       ) : rows.length === 0 ? (
         <Card><div style={{ padding: 30, textAlign: 'center', color: 'var(--text-dim)' }}>No stores yet. Tap "New" to add one.</div></Card>
       ) : (
-        <div className="table-wrap">
-          <table className="neu-table">
-            <thead><tr><th>Store</th><th>Products</th><th>Followers</th><th>Location</th><th>Contact</th><th>Verified</th><th style={{ textAlign: 'right', width: 1 }}>Actions</th></tr></thead>
-            <tbody>
-              {rows.map(r => (
-                <tr key={r.id}>
-                  <td><div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    {r.logo_url ? <img src={r.logo_url} alt="" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover' }} /> : null}
-                    <b>{r.name}</b></div></td>
-                  <td>{r.product_count}</td><td>{r.followers}</td>
-                  <td className="cell-wrap">{r.location || '—'}</td>
-                  <td className="cell-wrap">{r.contact_phone || r.contact_email || '—'}</td>
-                  <td>{r.verified ? 'Yes' : 'No'}</td>
-                  <td style={{ textAlign: 'right' }}><div style={{ display: 'inline-flex', gap: 6 }}>
-                    <button className="neu-btn" style={{ padding: 7 }} onClick={() => openEdit(r)} title="Edit"><Edit2 size={14} /></button>
-                    <button className="neu-btn" style={{ padding: 7, color: 'var(--danger)', borderColor: '#FCA5A5' }} onClick={() => remove(r)} title="Delete"><Trash2 size={14} /></button>
-                  </div></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <>
+          <div className="stat-grid">
+            <div className="stat"><div><div className="stat-label">Stores</div><div className="stat-value"><AnimatedNumber value={rows.length} /></div></div></div>
+            <div className="stat"><div><div className="stat-label">Verified</div><div className="stat-value"><AnimatedNumber value={rows.filter((r) => r.verified).length} /></div></div></div>
+            <div className="stat"><div><div className="stat-label">Products</div><div className="stat-value"><AnimatedNumber value={rows.reduce((s, r) => s + (r.product_count || 0), 0)} /></div></div></div>
+            <div className="stat"><div><div className="stat-label">Followers</div><div className="stat-value"><AnimatedNumber value={rows.reduce((s, r) => s + (r.followers || 0), 0)} /></div></div></div>
+          </div>
+
+          <Card style={{ marginBottom: 12 }}>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              <label style={{ position: 'relative', flex: '1 1 220px' }}>
+                <Search size={15} style={{ position: 'absolute', left: 11, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-dim)' }} />
+                <input className="neu-input" style={{ paddingLeft: 34 }} placeholder="Search name, location, contact…" value={q} onChange={(e) => setQ(e.target.value)} />
+              </label>
+              <select className="neu-input" style={{ flex: '0 1 150px' }} value={filter} onChange={(e) => setFilter(e.target.value)}>
+                <option value="all">All</option>
+                <option value="verified">Verified</option>
+                <option value="unverified">Unverified</option>
+              </select>
+              <select className="neu-input" style={{ flex: '0 1 180px' }} value={sort} onChange={(e) => setSort(e.target.value)}>
+                <option value="name_asc">Name A→Z</option>
+                <option value="name_desc">Name Z→A</option>
+                <option value="products_desc">Most products</option>
+                <option value="products_asc">Fewest products</option>
+                <option value="followers_desc">Most followers</option>
+              </select>
+            </div>
+          </Card>
+
+          <div className="table-wrap">
+            <table className="neu-table">
+              <thead><tr><th>Store</th><th>Products</th><th>Followers</th><th>Location</th><th>Contact</th><th>Verified</th><th style={{ textAlign: 'right', width: 1 }}>Actions</th></tr></thead>
+              <tbody>
+                {pageRows.map(r => (
+                  <tr key={r.id}>
+                    <td><div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      {r.logo_url ? <img src={r.logo_url} alt="" loading="lazy" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover' }} /> : null}
+                      <b>{r.name}</b></div></td>
+                    <td>{r.product_count}</td><td>{r.followers}</td>
+                    <td className="cell-wrap">{r.location || '—'}</td>
+                    <td className="cell-wrap">{r.contact_phone || r.contact_email || '—'}</td>
+                    <td>{r.verified ? 'Yes' : 'No'}</td>
+                    <td style={{ textAlign: 'right' }}><div style={{ display: 'inline-flex', gap: 6 }}>
+                      <button className="neu-btn" style={{ padding: 7 }} onClick={() => openEdit(r)} title="Edit"><Edit2 size={14} /></button>
+                      <button className="neu-btn" style={{ padding: 7, color: 'var(--danger)', borderColor: 'var(--danger-soft)' }} onClick={() => remove(r)} title="Delete"><Trash2 size={14} /></button>
+                    </div></td>
+                  </tr>
+                ))}
+                {pageRows.length === 0 && (
+                  <tr><td colSpan={7} style={{ textAlign: 'center', color: 'var(--text-dim)', padding: 24 }}>No stores match these filters.</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {totalPages > 1 && (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 10, marginTop: 12 }}>
+              <Btn disabled={curPage <= 1} onClick={() => setPage(curPage - 1)} aria-label="Previous page"><ChevronLeft size={16} /></Btn>
+              <span style={{ fontSize: 12.5, color: 'var(--text-dim)' }}>Page {curPage} of {totalPages}</span>
+              <Btn disabled={curPage >= totalPages} onClick={() => setPage(curPage + 1)} aria-label="Next page"><ChevronRight size={16} /></Btn>
+            </div>
+          )}
+        </>
       )}
 
-      <Modal open={!!editing} onClose={() => setEditing(null)} title={editing?.__isNew ? 'New Store' : 'Edit Store'}>
+      <Modal open={!!editing} onClose={closeModal} title={editing?.__isNew ? 'New Store' : 'Edit Store'}>
         {editing && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {editing.banner_url && <img src={editing.banner_url} alt="" style={{ width: '100%', height: 90, objectFit: 'cover', borderRadius: 10 }} />}
+            {editing.banner_url && <img src={editing.banner_url} alt="" loading="lazy" style={{ width: '100%', height: 90, objectFit: 'cover', borderRadius: 10 }} />}
             {field('Store name *', 'name')}
             {field('Store profile (Cloudinary URL)', 'logo_url', { placeholder: 'https://res.cloudinary.com/...' })}
             {field('Store banner (Cloudinary URL)', 'banner_url', { placeholder: 'https://res.cloudinary.com/...' })}
@@ -149,7 +239,7 @@ export default function Stores() {
             </label>
             <div style={{ display: 'flex', gap: 10 }}>
               <Btn variant="primary" onClick={save} disabled={saving} style={{ flex: 1 }}>{saving ? 'Saving…' : 'Save store'}</Btn>
-              <Btn onClick={() => setEditing(null)} style={{ flex: 1 }}>Close</Btn>
+              <Btn onClick={closeModal} style={{ flex: 1 }}>Close</Btn>
             </div>
 
             {!editing.__isNew && editing.id && (
