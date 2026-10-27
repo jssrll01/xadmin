@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import Card from '../components/Card.jsx';
 import Btn from '../components/Btn.jsx';
+import AnimatedNumber from '../components/AnimatedNumber.jsx';
 import { useToast } from '../components/Toast.jsx';
 import * as P from '../lib/pricingApi.js';
 
@@ -108,8 +109,15 @@ export default function Pricing() {
     await run(fn, 'Deleted')(r.id);
   };
 
-  if (loading) return <Card>Loading…</Card>;
-  if (!d) return <Card>Could not load pricing settings.</Card>;
+  if (loading) return (
+    <>
+      <div className="page-head"><div><h1>Pricing</h1><p>Loading…</p></div></div>
+      <div className="stat-grid">{[0, 1, 2, 3].map((k) => (
+        <div className="stat" key={k}><div><div className="stat-label">&nbsp;</div><div className="stat-value"><span className="xa-skel" /></div></div></div>
+      ))}</div>
+    </>
+  );
+  if (!d) return <Card>Could not load pricing settings. <Btn onClick={() => { setLoading(true); load(); }}>Retry</Btn></Card>;
 
   const tiers = d.tiers || [], ship = d.shipping || [], s = d.settings || {}, cb = d.cashback;
   const reqCost = String(s.discount_requires_cost).replace(/"/g, '') === 'true';
@@ -129,10 +137,10 @@ export default function Pricing() {
       {tab === 'overview' && (
         <>
           <div className="stat-grid">
-            <div className="stat"><div className="stat-label">Discount tiers</div><div className="stat-value">{tiers.filter((t) => t.is_active).length}</div></div>
-            <div className="stat"><div className="stat-label">Shipping tiers</div><div className="stat-value">{ship.filter((t) => t.is_active).length}</div></div>
-            <div className="stat"><div className="stat-label">Profit floor</div><div className="stat-value">{peso(s.min_profit_floor)}</div></div>
-            <div className="stat"><div className="stat-label">Products with cost</div><div className="stat-value">{d.products_with_cost}/{d.products_total}</div></div>
+            <div className="stat"><div className="stat-label">Discount tiers</div><div className="stat-value"><AnimatedNumber value={tiers.filter((t) => t.is_active).length} /></div></div>
+            <div className="stat"><div className="stat-label">Shipping tiers</div><div className="stat-value"><AnimatedNumber value={ship.filter((t) => t.is_active).length} /></div></div>
+            <div className="stat"><div className="stat-label">Profit floor</div><div className="stat-value"><AnimatedNumber value={s.min_profit_floor} format={peso} /></div></div>
+            <div className="stat"><div className="stat-label">Products with cost</div><div className="stat-value"><AnimatedNumber value={d.products_with_cost} />/{d.products_total}</div></div>
           </div>
           <Card style={{ marginTop: 12 }}>
             <div style={{ fontWeight: 800, marginBottom: 8 }}>Status</div>

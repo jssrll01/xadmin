@@ -76,3 +76,22 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--primary, #2563E
 .xa-todo-item:hover { border-color: var(--tone); transform: translateY(-1px); }
 .xa-todo-item svg { margin-left: auto; color: var(--text-dim); }
 .xa-todo-n { min-width: 30px; text-align: center; padding: 3px 8px; border-radius: 999px; font-weight: 900; color: var(--tone); background: color-mix(in srgb, var(--tone) 16%, transparent); }
+
+/* ---------- Upload workspace ---------- */
+.xa-drop { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; padding: 26px 16px; margin-bottom: 14px; border: 2px dashed var(--border-strong); border-radius: var(--radius-lg); background: var(--surface); color: var(--text-dim); cursor: pointer; transition: border-color .15s, background .15s; }
+.xa-drop b { color: var(--text); font-size: 15px; }
+.xa-drop span { font-size: 12px; }
+.xa-drop:hover, .xa-drop.on, .xa-drop:focus-within { border-color: var(--primary); background: var(--primary-soft); }
+.xa-sr { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
+.xa-up-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.xa-up-row:first-child { padding-top: 0; }
+.xa-up-row:last-child { border-bottom: 0; padding-bottom: 0; }
+.xa-up-thumb { width: 56px; height: 56px; flex: none; border-radius: 10px; object-fit: cover; background: var(--surface-2); }
+.xa-up-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.xa-up-name { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.xa-up-main small { font-size: 11.5px; color: var(--text-dim); }
+.xa-up-main .xa-up-err { color: var(--danger); }
+.xa-up-main .xa-up-ok { color: var(--success); }
+.xa-up-act { display: flex; gap: 2px; flex: none; }
+.xa-prog { height: 6px; border-radius: 6px; background: var(--surface-2); overflow: hidden; }
+.xa-prog i { display: block; height: 100%; background: linear-gradient(90deg, #3B82F6, #7C3AED); transition: width .2s linear; }

@@ -144,7 +144,7 @@ export default function Reports() {
               <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, marginBottom: 12 }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                    <span className="neu-badge" style={{ background: '#EEF1F6', color: '#6366F1', textTransform: 'uppercase' }}>{r.category || 'report'}</span>
+                    <span className="neu-badge" style={{ background: 'var(--surface-2)', color: '#6366F1', textTransform: 'uppercase' }}>{r.category || 'report'}</span>
                     <span className="muted" style={{ fontSize: 11, fontWeight: 700 }}>#{(r.id || '').slice(0, 8)}</span>
                   </div>
                   <div className="muted" style={{ fontSize: 11 }}>

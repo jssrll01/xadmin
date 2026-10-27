@@ -297,7 +297,7 @@ export default function BulkProducts() {
           <Card key={r.id}>
             <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
               <input type="checkbox" checked={sel.has(r.id)} onChange={() => tog(r.id)} />
-              {thumb ? <img src={thumb} alt="" loading="lazy" style={{ width: 56, height: 56, objectFit: 'cover', borderRadius: 8 }} /> : <div style={{ width: 56, height: 56, borderRadius: 8, background: '#E5E7EB' }} />}
+              {thumb ? <img src={thumb} alt="" loading="lazy" style={{ width: 56, height: 56, objectFit: 'cover', borderRadius: 8 }} /> : <div style={{ width: 56, height: 56, borderRadius: 8, background: 'var(--surface-2)' }} />}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div><b>#{r.row_no}</b> <Badge s={r.status} /></div>
                 <div style={{ fontWeight: 700, wordBreak: 'break-word' }}>{n.name || r.raw.product_name}</div>
