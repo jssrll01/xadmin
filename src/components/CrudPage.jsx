@@ -1,4 +1,5 @@
 import ProductPicker from './ProductPicker.jsx';
+import ImageUrlsField from './ImageUrlsField.jsx';
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import Card from './Card.jsx';
 import Modal from './Modal.jsx';
@@ -352,6 +353,9 @@ export default function CrudPage({
                   />
                 ) : f.type === 'product-picker' ? (
                   <ProductPicker value={editing[f.key]} onChange={(next) => setEditing({ ...editing, [f.key]: next })} />
+                ) : f.type === 'array' && f.upload ? (
+                  <ImageUrlsField value={editing[f.key] ?? ''} placeholder={f.placeholder}
+                    onChange={(next) => setEditing({ ...editing, [f.key]: next })} />
                 ) : f.type === 'array' ? (
                   <textarea className="neu-input" rows={3}
                     placeholder={f.placeholder || 'One per line'}

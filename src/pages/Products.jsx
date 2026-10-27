@@ -46,7 +46,7 @@ export default function Products() {
         { key: 'sold', label: 'Sold', type: 'number', default: 0 },
         { key: 'variant_editor', label: 'Variants', type: 'variant-editor' },
         { key: 'images', label: 'Image URLs', type: 'array',
-          placeholder: 'One URL per line' },
+          placeholder: 'or paste image URLs, one per line', upload: true },
         { key: 'save_more', label: 'Save More', type: 'boolean' },
         { key: 'flash_sale', label: 'Flash Sale', type: 'boolean' },
         { key: 'show_fashion', label: 'Fashion', type: 'boolean' },
