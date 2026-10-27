@@ -122,6 +122,13 @@ export default function Dashboard() {
   }, [series]);
   const up = trend >= 0;
   const st = stats ? 'ready' : failed ? 'na' : 'loading';
+  const pendingOrders = orders.filter((o) => (o.status || '').toLowerCase() === 'pending').length;
+  const todo = [
+    { to: '/orders', label: 'Pending orders', n: pendingOrders, tone: '#F59E0B' },
+    { to: '/topups', label: 'Pending top-ups', n: pendingTopups.length, tone: '#059669' },
+    { to: '/reports', label: 'Open reports', n: openReports.length, tone: '#EF4444' },
+    { to: '/products', label: 'Sold-out products', n: soldOut.length, tone: '#DC2626' },
+  ].filter((t) => t.n > 0);
 
   const byStatus = useMemo(() => {
     const m = {};
@@ -155,6 +162,21 @@ export default function Dashboard() {
     <StateCtx.Provider value={st}>
       <style>{CSS}</style>
       <div className="page-head"><div><h1>Dashboard</h1><p>Overview &amp; analytics · live</p></div></div>
+      {st === 'ready' && (
+        <div className="xa-todo neu-card" role="region" aria-label="Action center">
+          <div className="xa-todo-head">Action center</div>
+          {todo.length === 0 ? <div className="dx-sub">All clear. Nothing is waiting on you.</div> : (
+            <div className="xa-todo-list">
+              {todo.map((t) => (
+                <Link key={t.to} to={t.to} className="xa-todo-item" style={{ '--tone': t.tone }}>
+                  <span className="xa-todo-n"><AnimatedNumber value={t.n} /></span>
+                  <span>{t.label}</span><ArrowRight size={14} />
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="stat-grid">{cards.map((c) => <Stat key={c.label} {...c} />)}</div>
 

@@ -40,3 +40,39 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--primary, #2563E
   .main > * { animation: none !important; }
   .xa-skel, .sidebar .nav-item.active::before { animation: none !important; }
 }
+
+/* ---------- Dark theme ---------- */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0B1220; --surface: #131C2E; --surface-2: #1A2540;
+  --text: #E6EAF2; --text-dim: #97A3B8;
+  --primary: #4B8BF5; --primary-soft: rgba(75,139,245,.18);
+  --success-soft: rgba(16,185,129,.18); --warn-soft: rgba(245,158,11,.18); --danger-soft: rgba(239,68,68,.18);
+  --border: #24304A; --border-strong: #33415F;
+  --shadow: 0 1px 2px rgba(0,0,0,.4), 0 4px 12px rgba(0,0,0,.35);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,.55);
+}
+:root[data-theme="dark"] .neu-input, :root[data-theme="dark"] .neu-input-sm,
+:root[data-theme="dark"] .pin-key, :root[data-theme="dark"] .ve-input { background: var(--surface-2); color: var(--text); }
+:root[data-theme="dark"] .pin-dot { background: var(--surface-2); }
+:root[data-theme="dark"] .neu-input::placeholder { color: #6B7A93; }
+:root[data-theme="dark"] .neu-badge, :root[data-theme="dark"] .badge-frozen { color: #93C5FD; }
+:root[data-theme="dark"] .badge-active, :root[data-theme="dark"] .badge-approved { color: #6EE7B7; }
+:root[data-theme="dark"] .badge-banned, :root[data-theme="dark"] .badge-rejected { color: #FCA5A5; }
+:root[data-theme="dark"] .badge-pending { color: #FCD34D; }
+:root[data-theme="dark"] .recharts-default-tooltip { background: var(--surface) !important; border-color: var(--border) !important; }
+:root[data-theme="dark"] .recharts-tooltip-label, :root[data-theme="dark"] .recharts-tooltip-item { color: var(--text) !important; }
+:root[data-theme="dark"] .recharts-text { fill: var(--text-dim); }
+
+/* ---------- Theme toggle ---------- */
+.xa-icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 10px; color: var(--text-dim); transition: background .15s, color .15s; }
+.xa-icon-btn:hover { background: var(--surface-2); color: var(--text); }
+
+/* ---------- Action center ---------- */
+.xa-todo { margin-bottom: 14px; }
+.xa-todo-head { font-size: 13px; font-weight: 800; margin-bottom: 10px; }
+.xa-todo-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; }
+.xa-todo-item { display: flex; align-items: center; gap: 10px; padding: 11px 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface-2); font-size: 13px; font-weight: 700; transition: transform .15s, border-color .15s; }
+.xa-todo-item:hover { border-color: var(--tone); transform: translateY(-1px); }
+.xa-todo-item svg { margin-left: auto; color: var(--text-dim); }
+.xa-todo-n { min-width: 30px; text-align: center; padding: 3px 8px; border-radius: 999px; font-weight: 900; color: var(--tone); background: color-mix(in srgb, var(--tone) 16%, transparent); }
