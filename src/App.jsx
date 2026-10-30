@@ -6,6 +6,7 @@ import Layout from './components/Layout.jsx';
 
 import Dashboard from './pages/Dashboard.jsx';
 import YuelinHome from './yuelin/YuelinHome.jsx';
+import YlGate from './yuelin/YlGate.jsx';
 import YuelinTable from './yuelin/YuelinTable.jsx';
 import { useAdminContext } from './context/AdminContext.jsx';
 import Products from './pages/Products.jsx';
@@ -43,7 +44,7 @@ import Logistics from './pages/Logistics.jsx';
 
 function HomeSwitch() {
   const { activeSystem } = useAdminContext();
-  return activeSystem === 'YUELIN' ? <YuelinHome /> : <Dashboard />;
+  return activeSystem === 'YUELIN' ? <YlGate><YuelinHome /></YlGate> : <Dashboard />;
 }
 
 const SESSION_KEY = 'xadmin_unlocked';
@@ -137,7 +138,7 @@ export default function App() {
           <Route path="/qr-portal" element={<QrPortal />} />
           <Route path="/logistics" element={<Logistics />} />
           <Route path="/settings"  element={<Settings />} />
-          <Route path="/yl/:table" element={<YuelinTable />} />
+          <Route path="/yl/:table" element={<YlGate><YuelinTable /></YlGate>} />
           <Route path="*"          element={<Navigate to="/" replace />} />
         </Routes>
       </Layout>
