@@ -1,0 +1,74 @@
+@keyframes ylIn{from{opacity:0}to{opacity:1}}
+@keyframes ylUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+@keyframes ylPop{from{opacity:0;transform:translateY(18px) scale(.94)}to{opacity:1;transform:none}}
+@keyframes ylGrow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes ylRow{from{opacity:0;transform:translateX(-16px)}to{opacity:1;transform:none}}
+@keyframes ylSlide{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:none}}
+@keyframes ylShimmer{0%{background-position:-600px 0}100%{background-position:600px 0}}
+@keyframes ylSheen{0%{background-position:0% 50%}100%{background-position:200% 50%}}
+@keyframes ylPulse{0%,100%{box-shadow:0 0 0 0 rgba(184,134,11,0)}50%{box-shadow:0 0 0 7px rgba(184,134,11,.14)}}
+.yl-page{animation:ylIn .4s ease both}
+.yl-page>*{animation:ylUp .6s cubic-bezier(.2,.8,.2,1) both}
+.yl-page h1{background:linear-gradient(90deg,#8a6410,#e6bf55,#8a6410);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:ylSheen 7s linear infinite}
+.yl-stats>*{animation:ylPop .65s cubic-bezier(.2,.8,.2,1) both}
+.yl-card{transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s}
+.yl-stats>.yl-card:hover{transform:translateY(-5px)}
+.yl-stats>.yl-card:first-child{animation:ylPop .65s cubic-bezier(.2,.8,.2,1) both,ylPulse 3.5s ease-in-out 1.2s infinite}
+.yl-bar{transform-origin:left center;animation:ylGrow 1s cubic-bezier(.2,.8,.2,1) .3s both}
+.yl-row{transition:transform .25s cubic-bezier(.2,.8,.2,1)}
+.yl-row:hover{transform:translateX(6px)}
+.yl-tr{animation:ylRow .5s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0) * 38ms)}
+.yl-tr td{transition:background .2s}
+.yl-tr:hover td{background:rgba(184,134,11,.07)}
+.yl-skel{height:16px;border-radius:8px;background:linear-gradient(90deg,rgba(163,177,198,.18) 25%,rgba(163,177,198,.4) 50%,rgba(163,177,198,.18) 75%);background-size:1200px 100%;animation:ylShimmer 1.4s linear infinite}
+.yl-page button{transition:transform .18s cubic-bezier(.2,.8,.2,1),box-shadow .2s}
+.yl-page button:hover:not(:disabled){transform:translateY(-2px)}
+.yl-page button:active:not(:disabled){transform:scale(.95)}
+.yl-overlay{animation:ylIn .22s ease both;backdrop-filter:blur(5px)}
+.yl-modal{animation:ylPop .38s cubic-bezier(.2,.9,.3,1.15) both}
+.yl-nav .nav-item{animation:ylSlide .55s cubic-bezier(.2,.8,.2,1) both;transition:transform .2s}
+.yl-nav .nav-item:hover{transform:translateX(4px)}
+.yl-page>*:nth-child(1){animation-delay:55ms}
+.yl-page>*:nth-child(2){animation-delay:110ms}
+.yl-page>*:nth-child(3){animation-delay:165ms}
+.yl-page>*:nth-child(4){animation-delay:220ms}
+.yl-page>*:nth-child(5){animation-delay:275ms}
+.yl-page>*:nth-child(6){animation-delay:330ms}
+.yl-page>*:nth-child(7){animation-delay:385ms}
+.yl-page>*:nth-child(8){animation-delay:440ms}
+.yl-page>*:nth-child(9){animation-delay:495ms}
+.yl-page>*:nth-child(10){animation-delay:550ms}
+.yl-page>*:nth-child(11){animation-delay:605ms}
+.yl-page>*:nth-child(12){animation-delay:660ms}
+.yl-stats>*:nth-child(1){animation-delay:230ms}
+.yl-stats>*:nth-child(2){animation-delay:320ms}
+.yl-stats>*:nth-child(3){animation-delay:410ms}
+.yl-stats>*:nth-child(4){animation-delay:500ms}
+.yl-stats>*:nth-child(5){animation-delay:590ms}
+.yl-stats>*:nth-child(6){animation-delay:680ms}
+.yl-nav .nav-item:nth-child(1){animation-delay:42ms}
+.yl-nav .nav-item:nth-child(2){animation-delay:84ms}
+.yl-nav .nav-item:nth-child(3){animation-delay:126ms}
+.yl-nav .nav-item:nth-child(4){animation-delay:168ms}
+.yl-nav .nav-item:nth-child(5){animation-delay:210ms}
+.yl-nav .nav-item:nth-child(6){animation-delay:252ms}
+.yl-nav .nav-item:nth-child(7){animation-delay:294ms}
+.yl-nav .nav-item:nth-child(8){animation-delay:336ms}
+.yl-nav .nav-item:nth-child(9){animation-delay:378ms}
+.yl-nav .nav-item:nth-child(10){animation-delay:420ms}
+.yl-nav .nav-item:nth-child(11){animation-delay:462ms}
+.yl-nav .nav-item:nth-child(12){animation-delay:504ms}
+.yl-nav .nav-item:nth-child(13){animation-delay:546ms}
+.yl-nav .nav-item:nth-child(14){animation-delay:588ms}
+.yl-nav .nav-item:nth-child(15){animation-delay:630ms}
+.yl-nav .nav-item:nth-child(16){animation-delay:672ms}
+.yl-nav .nav-item:nth-child(17){animation-delay:714ms}
+.yl-nav .nav-item:nth-child(18){animation-delay:756ms}
+.yl-nav .nav-item:nth-child(19){animation-delay:798ms}
+.yl-nav .nav-item:nth-child(20){animation-delay:840ms}
+.yl-nav .nav-item:nth-child(21){animation-delay:882ms}
+.yl-nav .nav-item:nth-child(22){animation-delay:924ms}
+.yl-nav .nav-item:nth-child(23){animation-delay:966ms}
+.yl-nav .nav-item:nth-child(24){animation-delay:1008ms}
+.yl-overlay,.yl-modal{animation-delay:0ms!important}
+@media (prefers-reduced-motion:reduce){.yl-page,.yl-page>*,.yl-page h1,.yl-stats>*,.yl-bar,.yl-tr,.yl-skel,.yl-overlay,.yl-modal,.yl-nav .nav-item{animation:none!important}}

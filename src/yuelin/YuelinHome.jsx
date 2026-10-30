@@ -5,6 +5,8 @@ import { ylDb as db } from './ylDb.js';
 import { useYlTables } from './useYlTables.js';
 import { addManualTable, removeManualTable, getManualTables } from './schema.js';
 import { S, ACCENT } from './ui.js';
+import './anim.css';
+import { CountUp } from './Fx.jsx';
 
 const fmt = (n) => (n === null || n === undefined ? '-' : Number(n).toLocaleString());
 
@@ -47,36 +49,36 @@ export default function YuelinHome() {
   };
 
   return (
-    <div>
+    <div className="yl-page">
       <h1 style={S.h1}>YUELIN Dashboard</h1>
       <p style={S.sub}>Live statistics from the YUELIN database.</p>
 
       {!ENV_OK.yl && <div style={S.err}>YUELIN is not configured. Add VITE_YL_SUPABASE_URL and VITE_YL_SUPABASE_ANON_KEY in Render and redeploy.</div>}
       {error && <div style={S.warn}>Could not auto-detect tables: {error} You can add table names manually below.</div>}
 
-      <div style={{ ...S.grid, margin: '18px 0' }}>
-        <div style={S.card}><div style={S.sub}>Tables</div><div style={{ fontSize: 28, fontWeight: 800, color: ACCENT }}>{fmt(tables.length)}</div></div>
-        <div style={S.card}><div style={S.sub}>Total rows</div><div style={{ fontSize: 28, fontWeight: 800, color: ACCENT }}>{fmt(totalRows)}</div></div>
-        <div style={S.card}><div style={S.sub}>New in 7 days</div><div style={{ fontSize: 28, fontWeight: 800, color: ACCENT }}>{fmt(totalRecent)}</div></div>
+      <div className="yl-stats" style={{ ...S.grid, margin: '18px 0' }}>
+        <div className="yl-card" style={S.card}><div style={S.sub}>Tables</div><div style={{ fontSize: 28, fontWeight: 800, color: ACCENT }}><CountUp value={tables.length} /></div></div>
+        <div className="yl-card" style={S.card}><div style={S.sub}>Total rows</div><div style={{ fontSize: 28, fontWeight: 800, color: ACCENT }}><CountUp value={totalRows} /></div></div>
+        <div className="yl-card" style={S.card}><div style={S.sub}>New in 7 days</div><div style={{ fontSize: 28, fontWeight: 800, color: ACCENT }}><CountUp value={totalRecent} /></div></div>
       </div>
 
-      <div style={{ ...S.card, marginBottom: 18 }}>
+      <div className="yl-card" style={{ ...S.card, marginBottom: 18 }}>
         <div style={{ ...S.label, marginTop: 0 }}>Rows per table</div>
         {ranked.length === 0 && <div style={S.dim}>{loading ? 'Loading...' : 'No tables yet.'}</div>}
         {ranked.map((t) => (
-          <Link key={t.name} to={'/yl/' + encodeURIComponent(t.name)} style={{ display: 'block', textDecoration: 'none', color: 'inherit', margin: '8px 0' }}>
+          <Link key={t.name} className="yl-row" to={'/yl/' + encodeURIComponent(t.name)} style={{ display: 'block', textDecoration: 'none', color: 'inherit', margin: '8px 0' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
               <span>{t.label}</span>
               <b>{t.error ? 'no access' : fmt(t.count)}{t.recent ? <span style={{ ...S.dim, fontWeight: 400 }}> (+{t.recent} this week)</span> : null}</b>
             </div>
             <div style={{ height: 8, borderRadius: 6, marginTop: 4, background: 'rgba(163,177,198,0.25)' }}>
-              <div style={{ height: 8, borderRadius: 6, width: ((t.count || 0) / max * 100) + '%', background: ACCENT }} />
+              <div className="yl-bar" style={{ height: 8, borderRadius: 6, width: ((t.count || 0) / max * 100) + '%', background: ACCENT }} />
             </div>
           </Link>
         ))}
       </div>
 
-      <div style={S.card}>
+      <div className="yl-card" style={S.card}>
         <div style={{ ...S.label, marginTop: 0 }}>Add a table by name</div>
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
           <input style={{ ...S.input, flex: 1, minWidth: 180 }} placeholder="e.g. products" value={name} onChange={(e) => setName(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') add(); }} />

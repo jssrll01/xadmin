@@ -4,6 +4,7 @@ import { ylDb as db } from './ylDb.js';
 import { useYlTables } from './useYlTables.js';
 import { prettify } from './schema.js';
 import { S, ACCENT } from './ui.js';
+import './anim.css';
 
 const PAGE = 25;
 const isNum = (t) => /int|numeric|decimal|double|real|float|number/i.test(t);
@@ -206,7 +207,7 @@ export default function YuelinTable() {
   };
 
   return (
-    <div>
+    <div className="yl-page" key={table}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 10 }}>
         <div>
           <h1 style={S.h1}>{prettify(table)}</h1>
@@ -221,7 +222,7 @@ export default function YuelinTable() {
       <input style={{ ...S.input, margin: '16px 0 12px', maxWidth: 360 }} placeholder="Search this page..." value={search} onChange={(e) => setSearch(e.target.value)} />
       {err && <div style={S.err}>{err}</div>}
 
-      <div style={{ ...S.card, padding: 0, overflowX: 'auto' }}>
+      <div className="yl-card" style={{ ...S.card, padding: 0, overflowX: 'auto' }}>
         <table style={{ borderCollapse: 'collapse', width: '100%' }}>
           <thead>
             <tr>
@@ -231,7 +232,7 @@ export default function YuelinTable() {
           </thead>
           <tbody>
             {shown.map((row, i) => (
-              <tr key={i}>
+              <tr key={i} className="yl-tr" style={{ '--i': Math.min(i, 14) }}>
                 <td style={{ ...S.td, whiteSpace: 'nowrap' }}>
                   <button type="button" style={{ ...S.btn, padding: '5px 10px', marginRight: 6 }} onClick={() => openEdit(row)}>Edit</button>
                   <button type="button" style={{ ...S.btnDanger, padding: '5px 10px' }} onClick={() => del(row)}>Delete</button>
@@ -243,7 +244,7 @@ export default function YuelinTable() {
               <tr><td style={{ ...S.td, ...S.dim }} colSpan={cols.length + 1}>No rows.</td></tr>
             )}
             {loading && (
-              <tr><td style={{ ...S.td, ...S.dim }} colSpan={cols.length + 1}>Loading...</td></tr>
+              [0, 1, 2, 3].map((n) => (<tr key={'sk' + n}><td style={S.td} colSpan={cols.length + 1}><div className="yl-skel" /></td></tr>))
             )}
           </tbody>
         </table>
@@ -256,8 +257,8 @@ export default function YuelinTable() {
       </div>
 
       {edit && (
-        <div style={S.overlay} onMouseDown={(e) => { if (e.target === e.currentTarget) setEdit(null); }}>
-          <div style={S.modal}>
+        <div className="yl-overlay" style={S.overlay} onMouseDown={(e) => { if (e.target === e.currentTarget) setEdit(null); }}>
+          <div className="yl-modal" style={S.modal}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <h2 style={{ ...S.h1, fontSize: 18 }}>{edit.mode === 'new' ? 'New row' : 'Edit row'} - {prettify(table)}</h2>
               <label style={{ fontSize: 12 }}>

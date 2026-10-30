@@ -65,7 +65,7 @@ export function loadSchema(force) {
     }
     const m = getManualTables();
     [...m.env, ...m.ls].forEach((n) => { if (!found[n]) found[n] = null; });
-    const tables = Object.keys(found).sort().map((name) => ({ name, label: prettify(name), columns: found[name] }));
+    const tables = Object.keys(found).filter((n) => !/admin/i.test(n) && n !== 'game_plays').sort().map((name) => ({ name, label: prettify(name), columns: found[name] }));
     return { tables, error };
   })();
   return cache;

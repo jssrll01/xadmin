@@ -89,7 +89,7 @@ export default function Sidebar() {
         <button type="button" onClick={() => { setActiveSystem('XMARKET'); nav('/'); }} style={seg(activeSystem === 'XMARKET', '#2563EB')}>XMARKET</button>
         <button type="button" onClick={() => { setActiveSystem('YUELIN'); nav('/'); }} style={seg(activeSystem === 'YUELIN', '#b8860b')}>YUELIN</button>
       </div>
-      <nav className="sidebar-nav">
+      <nav key={activeSystem} className={'sidebar-nav' + (activeSystem === 'YUELIN' ? ' yl-nav' : '')}>
         {items.map(([to, label, Icon]) => (
           <NavLink
             key={to}
