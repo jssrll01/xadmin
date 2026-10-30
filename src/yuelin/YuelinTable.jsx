@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useParams } from 'react-router-dom';
 import { api } from './ylApi.js';
 import { useYlTables } from './useYlTables.js';
@@ -13,6 +14,14 @@ const isBool = (t) => /bool/i.test(t);
 const isJson = (t) => /json|\[\]|array/i.test(t);
 const IMG = /^https?:\/\/\S+\.(png|jpe?g|webp|gif|svg)(\?\S*)?$/i;
 const OK = { background: '#e7f6ec', color: '#1b6b3a', borderRadius: 12, padding: '10px 14px', fontSize: 13, margin: '12px 0' };
+
+const STATUS = {
+  vip_applications: ['pending', 'verified', 'rejected'],
+  vip_memberships: ['active', 'expired', 'cancelled'],
+  vip_entitlements: ['available', 'requested', 'redeemed', 'issued', 'fulfilled', 'unavailable'],
+};
+const GENERIC = ['pending', 'approved', 'rejected', 'completed', 'cancelled'];
+const cap = (v) => String(v).replace(/_/g, ' ').replace(/^\w/, (c) => c.toUpperCase());
 
 function inferType(v) {
   if (typeof v === 'boolean') return 'boolean';
@@ -32,7 +41,15 @@ function show(v, lab) {
     return <span title={j}>{j.length > 50 ? j.slice(0, 50) + '...' : j}</span>;
   }
   const s = String(v);
-  if (IMG.test(s)) return <img src={s} alt="" style={{ width: 32, height: 32, objectFit: 'cover', borderRadius: 8 }} />;
+  if (/^https?:\/\/\S+$/i.test(s)) {
+    const isImg = IMG.test(s) || /res\.cloudinary\.com/.test(s);
+    return (
+      <a href={s} target="_blank" rel="noopener noreferrer" style={{ color: ACCENT, fontWeight: 700 }}>
+        {isImg ? <img src={s} alt="" onError={(e) => { e.currentTarget.style.display = 'none'; }} style={{ width: 32, height: 32, objectFit: 'cover', borderRadius: 8, verticalAlign: 'middle', marginRight: 6 }} /> : null}
+        {isImg ? 'Open' : (s.length > 40 ? s.slice(0, 40) + '...' : s)}
+      </a>
+    );
+  }
   return <span title={s}>{s.length > 60 ? s.slice(0, 60) + '...' : s}</span>;
 }
 
@@ -199,6 +216,77 @@ export default function YuelinTable() {
     setSaving(false);
   };
 
+  const [busy, setBusy] = useState('');
+
+  const optsFor = (c) => {
+    const n = c.name.toLowerCase();
+    if (isBool(c.type) && /^(is_)?(active|enabled|published)$/.test(n)) return [{ v: 'true', l: 'Active' }, { v: 'false', l: 'Inactive' }];
+    if (isBool(c.type) || !/(^|_)status$/.test(n)) return null;
+    const known = STATUS[table];
+    const seen = rows.map((r) => r[c.name]).filter((v) => v !== null && v !== undefined && v !== '').map(String);
+    const list = known ? [...known, ...seen.filter((x) => !known.includes(x))] : [...new Set([...seen, ...GENERIC])];
+    return list.map((v) => ({ v, l: cap(v) }));
+  };
+
+  const grantVip = async (uid) => {
+    const now = new Date().toISOString();
+    const all = await api.select('vip_memberships', 1000, 0, null);
+    const ex = ((all && all.rows) || []).find((r) => r.user_id === uid);
+    const from = ex && ex.status === 'active' && ex.ends_at > now ? ex.ends_at : now;
+    const d = new Date(from);
+    d.setDate(d.getDate() + 30);
+    const ends = d.toISOString();
+    if (ex) {
+      const r = await api.update('vip_memberships', { user_id: uid }, { status: 'active', ends_at: ends });
+      if (!r || !r.length) throw new Error('Could not extend the membership.');
+    } else {
+      await api.insert('vip_memberships', [{ user_id: uid, status: 'active', ends_at: ends }]);
+    }
+  };
+
+  const changeStatus = async (row, c, val, extra) => {
+    const k = keyOf(row);
+    if (!Object.keys(k).length) { setErr('Cannot identify this row (no key column).'); return; }
+    setBusy(JSON.stringify(k) + c.name);
+    setErr(''); setOk('');
+    try {
+      const vipApp = table === 'vip_applications' && c.name === 'status';
+      if (vipApp && val === 'verified' && row.status !== 'verified') await grantVip(row.user_id);
+      const data = { [c.name]: isBool(c.type) ? val === 'true' : val, ...(extra || {}) };
+      if (vipApp) data.reviewed_at = new Date().toISOString();
+      const res = await api.update(table, k, data);
+      if (!res || !res.length) throw new Error('No rows were updated.');
+      setOk((vipApp && val === 'verified' ? 'VIP activated for 30 days. ' : '') + cap(c.name) + ' is now ' + cap(val) + '.');
+      load();
+    } catch (e) { setErr('Could not change it: ' + (e.message || e)); }
+    setBusy('');
+  };
+
+  const approveVip = (row) => {
+    if (!window.confirm('Receipt checked? This activates 30 days of VIP for this user.')) return;
+    changeStatus(row, { name: 'status', type: 'text' }, 'verified');
+  };
+  const rejectVip = (row) => {
+    const why = window.prompt('Reason for rejecting:', '');
+    if (why === null) return;
+    changeStatus(row, { name: 'status', type: 'text' }, 'rejected', { reject_reason: why || null });
+  };
+
+  const cell = (row, c) => {
+    const so = optsFor(c);
+    if (!so) return show(row[c.name], labels[c.name]);
+    const raw = row[c.name];
+    const cur = raw === null || raw === undefined ? '' : String(raw);
+    const list = !cur || so.some((o) => o.v === cur) ? so : [{ v: cur, l: cap(cur) }, ...so];
+    return (
+      <select style={{ ...S.input, padding: '6px 10px', minWidth: 120, width: 'auto' }} value={cur}
+        disabled={busy === JSON.stringify(keyOf(row)) + c.name} onChange={(e) => changeStatus(row, c, e.target.value)}>
+        {!cur && <option value="">(not set)</option>}
+        {list.map((o) => <option key={o.v} value={o.v}>{o.l}</option>)}
+      </select>
+    );
+  };
+
   const del = async (row) => {
     const f = keyOf(row);
     if (!Object.keys(f).length) { setErr('Cannot identify this row (no key column).'); return; }
@@ -251,7 +339,15 @@ export default function YuelinTable() {
     const locked = edit.mode === 'edit' && pkCols.includes(c.name);
     const multi = isJson(c.type) || v.length > 80 || /desc|note|body|content|message|detail|address/i.test(c.name);
     let input;
-    if (isBool(c.type)) {
+    const so = optsFor(c);
+    if (so) {
+      input = (
+        <select style={S.input} value={v} disabled={locked} onChange={(e) => set(e.target.value)}>
+          <option value="">(empty / default)</option>
+          {so.map((o) => <option key={o.v} value={o.v}>{o.l}</option>)}
+        </select>
+      );
+    } else if (isBool(c.type)) {
       input = (
         <select style={S.input} value={v} disabled={locked} onChange={(e) => set(e.target.value)}>
           <option value="">(empty / default)</option>
@@ -304,8 +400,14 @@ export default function YuelinTable() {
                 <td style={{ ...S.td, whiteSpace: 'nowrap' }}>
                   <button type="button" style={{ ...S.btn, padding: '5px 10px', marginRight: 6 }} onClick={() => openEdit(row)}>Edit</button>
                   <button type="button" style={{ ...S.btnDanger, padding: '5px 10px' }} onClick={() => del(row)}>Delete</button>
+                  {table === 'vip_applications' && row.status === 'pending' && (
+                    <>
+                      <button type="button" style={{ ...S.btnAccent, padding: '5px 10px', marginLeft: 6 }} onClick={() => approveVip(row)}>Approve VIP</button>
+                      <button type="button" style={{ ...S.btnDanger, padding: '5px 10px', marginLeft: 6 }} onClick={() => rejectVip(row)}>Reject</button>
+                    </>
+                  )}
                 </td>
-                {cols.map((c) => <td key={c.name} style={S.td}>{show(row[c.name], labels[c.name])}</td>)}
+                {cols.map((c) => <td key={c.name} style={S.td}>{cell(row, c)}</td>)}
               </tr>
             ))}
             {!loading && shown.length === 0 && (
@@ -324,9 +426,9 @@ export default function YuelinTable() {
         <button type="button" style={S.btn} disabled={page + 1 >= pages} onClick={() => setPage((p) => p + 1)}>Next</button>
       </div>
 
-      {edit && (
-        <div className="yl-overlay" style={S.overlay} onMouseDown={(e) => { if (e.target === e.currentTarget) setEdit(null); }}>
-          <div className="yl-modal" style={S.modal}>
+      {edit && createPortal(
+        <div className="yl-overlay" style={{ ...S.overlay, alignItems: 'center', zIndex: 3000 }} onMouseDown={(e) => { if (e.target === e.currentTarget) setEdit(null); }}>
+          <div className="yl-modal" style={{ ...S.modal, maxHeight: '90vh', overflowY: 'auto' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <h2 style={{ ...S.h1, fontSize: 18 }}>{edit.mode === 'new' ? 'New row' : 'Edit row'} - {prettify(table)}</h2>
               <label style={{ fontSize: 12 }}>
@@ -342,12 +444,12 @@ export default function YuelinTable() {
               <button type="button" style={{ ...S.btn, color: ACCENT }} disabled={saving} onClick={save}>{saving ? 'Saving...' : 'Save'}</button>
             </div>
           </div>
-        </div>
-      )}
+        </div>,
+        document.body)}
 
-      {bulkOpen && (
-        <div className="yl-overlay" style={S.overlay} onMouseDown={(e) => { if (e.target === e.currentTarget) setBulkOpen(false); }}>
-          <div className="yl-modal" style={{ ...S.modal, maxWidth: 680 }}>
+      {bulkOpen && createPortal(
+        <div className="yl-overlay" style={{ ...S.overlay, alignItems: 'center', zIndex: 3000 }} onMouseDown={(e) => { if (e.target === e.currentTarget) setBulkOpen(false); }}>
+          <div className="yl-modal" style={{ ...S.modal, maxWidth: 680, maxHeight: '90vh', overflowY: 'auto' }}>
             <h2 style={{ ...S.h1, fontSize: 18 }}>Bulk add - {prettify(table)}</h2>
             <p style={S.sub}>Paste a JSON array of rows (up to {MAX_BULK}). Columns you leave out use the table's defaults. All rows are added together, or none if any row fails.</p>
             <div style={{ display: 'flex', gap: 10, margin: '12px 0', flexWrap: 'wrap' }}>
@@ -370,8 +472,8 @@ export default function YuelinTable() {
               </button>
             </div>
           </div>
-        </div>
-      )}
+        </div>,
+        document.body)}
     </div>
   );
 }

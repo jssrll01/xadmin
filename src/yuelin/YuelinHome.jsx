@@ -8,6 +8,7 @@ import { S } from './ui.js';
 import './anim.css';
 import './dash.css';
 import { CountUp } from './Fx.jsx';
+import YlTodo from './YlTodo.jsx';
 
 const GOLD = '#b8860b';
 const PALETTE = ['#b8860b', '#2563eb', '#10b981', '#8b5cf6', '#ef4444', '#06b6d4', '#94a3b8'];
@@ -173,7 +174,6 @@ export default function YuelinHome() {
           </div>
           <div style={{ display: 'flex', gap: 10 }}>
             <button type="button" className="yd-btn" onClick={reload}>Refresh</button>
-            <button type="button" className="yd-btn" onClick={() => setPin('')}>Lock</button>
           </div>
         </div>
         <div className="yd-kpis">
@@ -191,6 +191,8 @@ export default function YuelinHome() {
           ))}
         </div>
       </div>
+
+      <YlTodo tables={tables} />
 
       {!ENV_OK.yl && <div style={S.err}>YUELIN is not configured. Add VITE_YL_SUPABASE_URL and VITE_YL_SUPABASE_ANON_KEY in Render and redeploy.</div>}
       {error && <div style={S.err}>Could not load tables: {error}</div>}
