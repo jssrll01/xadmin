@@ -16,6 +16,7 @@ const IMG = /^https?:\/\/\S+\.(png|jpe?g|webp|gif|svg)(\?\S*)?$/i;
 const OK = { background: '#e7f6ec', color: '#1b6b3a', borderRadius: 12, padding: '10px 14px', fontSize: 13, margin: '12px 0' };
 
 const STATUS = {
+  redemptions: ['pending', 'fulfilled', 'cancelled'],
   vip_applications: ['pending', 'verified', 'rejected'],
   vip_memberships: ['active', 'expired', 'cancelled'],
   vip_entitlements: ['available', 'requested', 'redeemed', 'issued', 'fulfilled', 'unavailable'],
