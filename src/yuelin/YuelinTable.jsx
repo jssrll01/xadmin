@@ -27,7 +27,15 @@ function show(v) {
     return <span title={j}>{j.length > 50 ? j.slice(0, 50) + '...' : j}</span>;
   }
   const s = String(v);
-  if (IMG.test(s)) return <img src={s} alt="" style={{ width: 32, height: 32, objectFit: 'cover', borderRadius: 8 }} />;
+  if (/^https?:\/\/\S+$/i.test(s)) {
+    const isImg = IMG.test(s) || /res\.cloudinary\.com/.test(s);
+    return (
+      <a href={s} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} style={{ color: ACCENT, fontWeight: 700 }}>
+        {isImg ? <img src={s} alt="" onError={(e) => { e.currentTarget.style.display = 'none'; }} style={{ width: 32, height: 32, objectFit: 'cover', borderRadius: 8, verticalAlign: 'middle', marginRight: 6 }} /> : null}
+        {isImg ? 'Open' : (s.length > 40 ? s.slice(0, 40) + '...' : s)}
+      </a>
+    );
+  }
   return <span title={s}>{s.length > 60 ? s.slice(0, 60) + '...' : s}</span>;
 }
 
@@ -166,6 +174,37 @@ export default function YuelinTable() {
     setSaving(false);
   };
 
+  const [busy, setBusy] = useState('');
+  const addDays = (iso, d) => { const t = new Date(iso); t.setDate(t.getDate() + d); return t.toISOString(); };
+  const approveVip = async (row) => {
+    if (!window.confirm('Receipt checked? This activates 30 days of VIP for this user.')) return;
+    setBusy(row.id); setErr('');
+    try {
+      const now = new Date().toISOString();
+      const cur = await db.from('vip_memberships').select('*').match({ user_id: row.user_id });
+      if (cur.error) throw cur.error;
+      const ex = cur.data && cur.data[0];
+      const from = ex && ex.status === 'active' && ex.ends_at > now ? ex.ends_at : now;
+      const ends = addDays(from, 30);
+      const m = ex
+        ? await db.from('vip_memberships').update({ status: 'active', ends_at: ends }).match({ user_id: row.user_id })
+        : await db.from('vip_memberships').insert({ user_id: row.user_id, status: 'active', ends_at: ends });
+      if (m.error) throw m.error;
+      const a = await db.from('vip_applications').update({ status: 'verified', reviewed_at: now }).match({ id: row.id });
+      if (a.error) throw a.error;
+      load();
+    } catch (e) { setErr('Could not approve: ' + (e.message || e)); }
+    setBusy('');
+  };
+  const rejectVip = async (row) => {
+    const why = window.prompt('Reason for rejecting:', '');
+    if (why === null) return;
+    setBusy(row.id); setErr('');
+    const a = await db.from('vip_applications').update({ status: 'rejected', reject_reason: why || null, reviewed_at: new Date().toISOString() }).match({ id: row.id });
+    if (a.error) setErr('Could not reject: ' + a.error.message); else load();
+    setBusy('');
+  };
+
   const del = async (row) => {
     const f = keyOf(row);
     if (!Object.keys(f).length) { setErr('Cannot identify this row (no key column).'); return; }
@@ -236,6 +275,12 @@ export default function YuelinTable() {
                 <td style={{ ...S.td, whiteSpace: 'nowrap' }}>
                   <button type="button" style={{ ...S.btn, padding: '5px 10px', marginRight: 6 }} onClick={() => openEdit(row)}>Edit</button>
                   <button type="button" style={{ ...S.btnDanger, padding: '5px 10px' }} onClick={() => del(row)}>Delete</button>
+                  {table === 'vip_applications' && row.status === 'pending' && (
+                    <>
+                      <button type="button" disabled={busy === row.id} style={{ ...S.btnAccent, padding: '5px 10px', marginLeft: 6 }} onClick={() => approveVip(row)}>Approve VIP</button>
+                      <button type="button" disabled={busy === row.id} style={{ ...S.btnDanger, padding: '5px 10px', marginLeft: 6 }} onClick={() => rejectVip(row)}>Reject</button>
+                    </>
+                  )}
                 </td>
                 {cols.map((c) => <td key={c.name} style={S.td}>{show(row[c.name])}</td>)}
               </tr>
