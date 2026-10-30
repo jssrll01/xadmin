@@ -21,8 +21,11 @@ function inferType(v) {
   return 'text';
 }
 
-function show(v) {
+function show(v, lab) {
   if (v === null || v === undefined) return <span style={S.dim}>-</span>;
+  if (lab && lab[String(v)]) {
+    return <span title={String(v)}><b>{lab[String(v)]}</b> <span style={S.dim}>{String(v).slice(0, 6)}</span></span>;
+  }
   if (typeof v === 'boolean') return v ? 'yes' : 'no';
   if (typeof v === 'object') {
     const j = JSON.stringify(v);
@@ -73,6 +76,7 @@ export default function YuelinTable() {
   const meta = tables.find((t) => t.name === table);
 
   const [rows, setRows] = useState([]);
+  const [labels, setLabels] = useState({});
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -115,6 +119,7 @@ export default function YuelinTable() {
     try {
       const d = await api.select(table, PAGE, page * PAGE, orderCol);
       setRows((d && d.rows) || []);
+      setLabels((d && d.labels) || {});
       setTotal((d && d.total) || 0);
     } catch (e) {
       setErr(e.message || String(e));
@@ -300,7 +305,7 @@ export default function YuelinTable() {
                   <button type="button" style={{ ...S.btn, padding: '5px 10px', marginRight: 6 }} onClick={() => openEdit(row)}>Edit</button>
                   <button type="button" style={{ ...S.btnDanger, padding: '5px 10px' }} onClick={() => del(row)}>Delete</button>
                 </td>
-                {cols.map((c) => <td key={c.name} style={S.td}>{show(row[c.name])}</td>)}
+                {cols.map((c) => <td key={c.name} style={S.td}>{show(row[c.name], labels[c.name])}</td>)}
               </tr>
             ))}
             {!loading && shown.length === 0 && (
