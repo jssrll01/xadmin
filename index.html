@@ -14,7 +14,12 @@
     <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512.png" />
     <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192.png" />
     <title>XADMIN · XMARKET Console</title>
-  </head>
+  <script>
+function showErr(m){document.body.insertAdjacentHTML('beforeend','<pre style="position:fixed;inset:0;z-index:99999;background:#fff;color:#b00020;padding:16px;white-space:pre-wrap;font:13px monospace">'+m+'</pre>')}
+addEventListener('error',function(e){showErr(e.message)});
+addEventListener('unhandledrejection',function(e){showErr(String(e.reason))});
+</script>
+</head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
