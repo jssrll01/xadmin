@@ -238,7 +238,7 @@ export default function YuelinHome() {
             <Link key={t.name} to={'/yl/' + encodeURIComponent(t.name)} style={{ display: 'block', textDecoration: 'none', color: 'inherit', margin: '10px 0' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}><span>{t.label}</span><b>+{t.recent}</b></div>
               <div style={{ height: 8, borderRadius: 6, marginTop: 4, background: 'rgba(163,177,198,0.25)' }}>
-                <div className="yl-bar" style={{ height: 8, borderRadius: 6, width: (t.recent / gmax * 100) + '%', background: 'linear-gradient(90deg,#b8860b,#f3d37a)' }} />
+                <div className="yl-bar" style={{ height: 8, borderRadius: 6, width: (t.recent / gmax * 100) + '%', background: '#fff', border: '1px solid rgba(163,177,198,0.25)', boxShadow: '0 4px 24px rgba(0,0,0,0.02)' }} />
               </div>
             </Link>
           ))}
