@@ -1,3 +1,4 @@
+import React from 'react';
 import { YL_URL, YL_KEY, ylSupabase } from '../supabase.js';
 
 const LS = 'xadmin_yl_tables';
