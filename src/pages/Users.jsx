@@ -4,7 +4,7 @@ import CrudPage from '../components/CrudPage.jsx';
 import { fetchUsers, userCrud } from '../lib/api.js';
 import { peso, dateOnly, initials } from '../lib/format.js';
 
-import { getDb } from '../supabase.js';
+import { getDb, supabase } from '../supabase.js';
 
 const CODE = import.meta.env.VITE_XADMIN_PIN;
 async function adminCall(fn, args) {

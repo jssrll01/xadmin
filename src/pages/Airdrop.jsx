@@ -4,7 +4,7 @@ import Card from '../components/Card.jsx';
 import Btn from '../components/Btn.jsx';
 import { useToast } from '../components/Toast.jsx';
 import useAutoRefresh from '../lib/useAutoRefresh.js';
-import { getDb } from '../supabase.js';
+import { getDb, supabase } from '../supabase.js';
 
 const CODE = import.meta.env.VITE_XADMIN_PIN;
 const TABS = [['tiers', 'Tiers'], ['draws', 'Draws'], ['bets', 'Bets']];

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import Modal from '../components/Modal.jsx';
 import CrudPage from '../components/CrudPage.jsx';
 import { fetchTopUps, topupCrud } from '../lib/api.js';
-import { getDb } from '../supabase.js';
+import { getDb, supabase } from '../supabase.js';
 import { peso, dateTime } from '../lib/format.js';
 import { Check, X } from 'lucide-react';
 import { useToast } from '../components/Toast.jsx';

@@ -7,7 +7,7 @@ import Btn from '../components/Btn.jsx';
 import AnimatedNumber from '../components/AnimatedNumber.jsx';
 import { useToast } from '../components/Toast.jsx';
 import useAutoRefresh from '../lib/useAutoRefresh.js';
-import { getDb } from '../supabase.js';
+import { getDb, supabase } from '../supabase.js';
 import { logAudit } from '../lib/api.js';
 import { Plus, Edit2, Trash2, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 

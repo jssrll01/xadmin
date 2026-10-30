@@ -1,7 +1,7 @@
 import { useAdminContext } from "../context/AdminContext";
 import React, { useCallback, useEffect, useState } from 'react';
 import { Plus, Trash2, Edit3, Check, Search } from 'lucide-react';
-import { getDb } from '../supabase.js';
+import { getDb, supabase } from '../supabase.js';
 import Card from '../components/Card.jsx';
 import Btn from '../components/Btn.jsx';
 import { useToast } from '../components/Toast.jsx';

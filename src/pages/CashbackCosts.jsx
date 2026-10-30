@@ -3,7 +3,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import Card from '../components/Card.jsx';
 import Btn from '../components/Btn.jsx';
 import { useToast } from '../components/Toast.jsx';
-import { getDb } from '../supabase.js';
+import { getDb, supabase } from '../supabase.js';
 import * as P from '../lib/pricingApi.js';
 
 const L = { fontSize: 12, fontWeight: 700, margin: '6px 0 2px', display: 'block' };

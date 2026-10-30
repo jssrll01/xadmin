@@ -1,6 +1,6 @@
 import { useAdminContext } from "../context/AdminContext";
 import React, { useState, useEffect, useCallback } from 'react';
-import { getDb } from '../supabase.js';
+import { getDb, supabase } from '../supabase.js';
 
 const CODE = import.meta.env.VITE_XADMIN_PIN;
 const PAD = 16;

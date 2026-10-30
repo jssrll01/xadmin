@@ -1,4 +1,4 @@
-import { YL_URL, YL_KEY } from '../supabase.js';
+import { YL_URL, YL_KEY, ylSupabase } from '../supabase.js';
 
 const LS = 'xadmin_yl_tables';
 let cache = null;
@@ -53,7 +53,16 @@ export function loadSchema(force) {
   cache = (async () => {
     let found = {};
     let error = null;
-    try { found = await fromOpenApi(); } catch (e) { error = e.message || String(e); }
+    if (!YL_URL || !YL_KEY) {
+      error = 'YUELIN env vars are missing (VITE_YL_SUPABASE_URL / VITE_YL_SUPABASE_ANON_KEY).';
+    } else {
+      const { data, error: rpcErr } = await ylSupabase.rpc('yl_schema');
+      if (!rpcErr && Array.isArray(data)) {
+        data.forEach((t) => { found[t.name] = t.columns || []; });
+      } else {
+        try { found = await fromOpenApi(); } catch (e) { error = 'Run the yl_schema SQL in the YUELIN project. ' + (rpcErr ? rpcErr.message : ''); }
+      }
+    }
     const m = getManualTables();
     [...m.env, ...m.ls].forEach((n) => { if (!found[n]) found[n] = null; });
     const tables = Object.keys(found).sort().map((name) => ({ name, label: prettify(name), columns: found[name] }));

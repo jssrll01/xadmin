@@ -4,7 +4,7 @@ import Card from '../components/Card.jsx';
 import Modal from '../components/Modal.jsx';
 import Btn from '../components/Btn.jsx';
 import { useToast } from '../components/Toast.jsx';
-import { getDb } from '../supabase.js';
+import { getDb, supabase } from '../supabase.js';
 import { logAudit, orderCrud } from '../lib/api.js';
 import { peso, dateTime } from '../lib/format.js';
 import { RefreshCw } from 'lucide-react';

@@ -2,7 +2,7 @@ import { useAdminContext } from "../context/AdminContext";
 import { adminDb, adminRows } from '../lib/api';
 import React, { useEffect, useState } from 'react';
 import { Star, Search, Trash2, Edit3, Save, X, PlusCircle, MessageCircle } from 'lucide-react';
-import { getDb } from '../supabase.js';
+import { getDb, supabase } from '../supabase.js';
 import { fetchReviews, reviewCrud } from '../lib/api.js';
 
 function Stars({ value = 0, size = 14 }) {

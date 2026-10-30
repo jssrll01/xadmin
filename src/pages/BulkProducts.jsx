@@ -5,7 +5,7 @@ import Card from '../components/Card.jsx';
 import Btn from '../components/Btn.jsx';
 import Modal from '../components/Modal.jsx';
 import { useToast } from '../components/Toast.jsx';
-import { getDb } from '../supabase.js';
+import { getDb, supabase } from '../supabase.js';
 import { fetchProducts } from '../lib/api.js';
 import { uploadToCloudinary } from '../lib/cloud.js';
 import { HEADERS, CATEGORIES, normalizeRow, processImages } from '../lib/bulkImport.js';
