@@ -4,12 +4,13 @@ import Sidebar from './Sidebar.jsx';
 import Topbar from './Topbar.jsx';
 
 export default function Layout({ children }) {
+  const { activeSystem } = useAdminContext();
   return (
     <div className="shell">
       <Sidebar />
       <main className="main">
         <Topbar />
-        {children}
+        <div key={activeSystem}>{children}</div>
       </main>
     </div>
   );

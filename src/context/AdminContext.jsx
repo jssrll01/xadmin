@@ -1,3 +1,4 @@
+import { setDbSystem } from '../supabase';
 import React from "react";
 import { createContext, useContext, useState } from 'react';
 
@@ -5,7 +6,8 @@ const AdminContext = createContext();
 
 export function AdminProvider({ children }) {
   // Default to XMARKET, but allows switching to YUELIN
-  const [activeSystem, setActiveSystem] = useState('XMARKET'); 
+  const [activeSystem, setActiveSystem] = useState('XMARKET');
+  setDbSystem(activeSystem); 
 
   return (
     <AdminContext.Provider value={{ activeSystem, setActiveSystem }}>
