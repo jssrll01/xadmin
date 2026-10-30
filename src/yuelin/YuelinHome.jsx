@@ -186,7 +186,7 @@ export default function YuelinHome() {
             <div key={label} className="yd-kpi" style={{ animationDelay: (150 + i * 90) + 'ms' }}>
               <small>{label}</small>
               <b><CountUp value={val} /></b>
-              {spark ? <Spark data={spark} color="#f3d37a" h={30} /> : <div style={{ height: 30 }} />}
+              {spark ? <Spark data={spark} color="#2563eb" h={30} /> : <div style={{ height: 30 }} />}
             </div>
           ))}
         </div>

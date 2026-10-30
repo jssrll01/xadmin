@@ -42,3 +42,91 @@
 .yd-tag{font-size:11px;font-weight:800;color:#8a6410;background:rgba(184,134,11,.12);border-radius:8px;padding:3px 8px;white-space:nowrap}
 .yd-tip{position:absolute;transform:translate(-50%,-110%);background:#14172b;color:#fff;border-radius:10px;padding:6px 10px;font-size:12px;white-space:nowrap;pointer-events:none;box-shadow:0 8px 20px rgba(0,0,0,.25)}
 @media (prefers-reduced-motion:reduce){.yd>*,.yd-orb,.yd-hero::before,.yd-title,.yd-dot::after,.yd-kpi,.yd-line,.yd-area,.yd-seg,.yd-tile,.yd-feed a{animation:none!important}.yd-line{stroke-dashoffset:0}.yd-area{opacity:1}}
+
+/* =====================================
+   YUELIN WHITE NEUMORPHIC COMMAND CENTER
+===================================== */
+
+.yd .yd-hero {
+  position: relative;
+  overflow: hidden;
+  background: #f4f6fb !important;
+  color: #252b3a !important;
+  border: 1px solid rgba(255,255,255,.9);
+  border-radius: 26px;
+  box-shadow:
+    12px 12px 28px rgba(163,177,198,.24),
+    -12px -12px 28px rgba(255,255,255,.95);
+}
+
+.yd .yd-hero::before {
+  display: none !important;
+  content: none !important;
+}
+
+.yd .yd-orb {
+  display: none !important;
+}
+
+.yd .yd-title {
+  color: #202938 !important;
+  background: none !important;
+  -webkit-text-fill-color: #202938 !important;
+  animation: none !important;
+  font-weight: 800;
+}
+
+.yd .yd-live {
+  color: #737e91 !important;
+}
+
+.yd .yd-kpis {
+  position: relative;
+  z-index: 1;
+}
+
+.yd .yd-kpi {
+  background: #f4f6fb !important;
+  border: 1px solid rgba(255,255,255,.95) !important;
+  border-radius: 19px !important;
+  box-shadow:
+    7px 7px 16px rgba(163,177,198,.22),
+    -7px -7px 16px rgba(255,255,255,.95) !important;
+  backdrop-filter: none !important;
+}
+
+.yd .yd-kpi small {
+  color: #8792a5 !important;
+}
+
+.yd .yd-kpi b {
+  color: #202938 !important;
+}
+
+.yd .yd-btn {
+  background: #f4f6fb !important;
+  color: #2563eb !important;
+  border: 1px solid #fff !important;
+  border-radius: 12px !important;
+  box-shadow:
+    5px 5px 10px rgba(163,177,198,.22),
+    -5px -5px 10px rgba(255,255,255,.95) !important;
+  backdrop-filter: none !important;
+}
+
+.yd .yd-btn:active {
+  box-shadow: inset 3px 3px 7px rgba(163,177,198,.25),
+              inset -3px -3px 7px rgba(255,255,255,.95) !important;
+}
+
+@media (max-width: 600px) {
+  .yd .yd-hero {
+    padding: 20px !important;
+  }
+
+  .yd .yd-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+}
+
