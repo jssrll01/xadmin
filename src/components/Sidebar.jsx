@@ -1,11 +1,12 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import { useAdminContext } from '../context/AdminContext';
 import {
   LayoutDashboard, Users, Package, ShoppingBag, Wallet, RotateCcw,
-  AlertTriangle, Store, CreditCard, Gift, Boxes, Settings as Cog, ScrollText, Bell, BarChart3, FileText, Star, Gamepad2, Image as ImageIcon, Percent, Radio, ClipboardList, QrCode, Truck,
+  AlertTriangle, Store, CreditCard, Gift, Boxes, Settings as Cog, ScrollText, Bell, BarChart3, FileText, Star, Gamepad2, Image as ImageIcon, Percent, Radio, ClipboardList, QrCode, Truck, Crown,
 } from 'lucide-react';
 
-const items = [
+const XMARKET_ITEMS = [
   ['/', 'Dashboard', LayoutDashboard],
   ['/daily', 'Daily Tasks & Notes', ClipboardList],
   ['/users', 'Users', Users],
@@ -39,7 +40,25 @@ const items = [
   ['/settings', 'Settings', Cog],
 ];
 
+const YUELIN_ITEMS = [
+  ['/', 'Dashboard', LayoutDashboard],
+  ['/products', 'Products', Package],
+  ['/promos', 'Offers', Gift],
+  ['/qr-portal', 'Redeem Codes', QrCode],
+  ['/vip', 'VIP Applications', Crown],
+  ['/settings', 'Settings', Cog],
+];
+
+const seg = (on, color) => ({
+  flex: 1, padding: '8px 10px', border: 'none', borderRadius: 12, fontSize: 12, fontWeight: 700,
+  cursor: 'pointer', color: on ? color : '#8a93a3', background: on ? 'var(--bg, #e0e5ec)' : 'transparent',
+  boxShadow: on ? '4px 4px 8px rgba(163,177,198,0.6), -4px -4px 8px rgba(255,255,255,0.7)' : 'none',
+  transition: 'all 0.25s ease',
+});
+
 export default function Sidebar() {
+  const { activeSystem, setActiveSystem } = useAdminContext();
+  const items = activeSystem === 'YUELIN' ? YUELIN_ITEMS : XMARKET_ITEMS;
   return (
     <aside className="sidebar">
       <div className="sidebar-brand">
@@ -58,8 +77,12 @@ export default function Sidebar() {
         </div>
         <div>
           <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: -0.3 }}>XADMIN</div>
-          <div style={{ fontSize: 10, color: 'var(--text-dim)', fontWeight: 600 }}>XMARKET</div>
+          <div style={{ fontSize: 10, color: 'var(--text-dim)', fontWeight: 600 }}>{activeSystem}</div>
         </div>
+      </div>
+      <div style={{ display: 'flex', padding: 5, margin: '0 0 14px', borderRadius: 16, background: 'var(--bg, #e0e5ec)', boxShadow: 'inset 4px 4px 8px rgba(163,177,198,0.6), inset -4px -4px 8px rgba(255,255,255,0.7)' }}>
+        <button type="button" onClick={() => setActiveSystem('XMARKET')} style={seg(activeSystem === 'XMARKET', '#2563EB')}>XMARKET</button>
+        <button type="button" onClick={() => setActiveSystem('YUELIN')} style={seg(activeSystem === 'YUELIN', '#b8860b')}>YUELIN</button>
       </div>
       <nav className="sidebar-nav">
         {items.map(([to, label, Icon]) => (
