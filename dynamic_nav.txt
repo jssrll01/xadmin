@@ -1,0 +1,19 @@
+  const navItems = activeSystem === 'XMARKET' 
+    ? [
+        { path: '/', icon: LayoutDashboard, label: 'Dashboard' },
+        { path: '/products', icon: Package, label: 'Products' },
+        { path: '/promos', icon: Tag, label: 'Promos & Offers' },
+        { path: '/stores', icon: Store, label: 'Stores' },
+        { path: '/orders', icon: ShoppingCart, label: 'Orders' },
+        { path: '/qrportal', icon: QrCode, label: 'QR Portal' },
+        { path: '/users', icon: Users, label: 'Users' },
+        { path: '/settings', icon: Settings, label: 'Settings' }
+      ]
+    : [
+        { path: '/', icon: LayoutDashboard, label: 'Dashboard' },
+        { path: '/products', icon: Package, label: 'Products' },
+        { path: '/promos', icon: Tag, label: 'Offers' },
+        { path: '/qrportal', icon: QrCode, label: 'Redeem Codes' },
+        { path: '/vip', icon: Crown, label: 'VIP Applications' },
+        { path: '/settings', icon: Settings, label: 'Settings' }
+      ];

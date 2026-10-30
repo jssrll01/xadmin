@@ -27,6 +27,7 @@ import Bundles from './pages/Bundles.jsx';
 import Xcards from './pages/Xcards.jsx';
 import Promos from './pages/Promos.jsx';
 import Settings from './pages/Settings.jsx';
+import Vip from "./pages/Vip.jsx";
 import AuditLog from './pages/AuditLog.jsx';
 import Notifications from './pages/Notifications.jsx';
 import Supplier from './pages/Supplier.jsx';
@@ -129,6 +130,7 @@ export default function App() {
           <Route path="/qr-portal" element={<QrPortal />} />
           <Route path="/logistics" element={<Logistics />} />
           <Route path="/settings"  element={<Settings />} />
+        <Route path="/vip" element={<Vip />} />
           <Route path="*"          element={<Navigate to="/" replace />} />
         </Routes>
       </Layout>
