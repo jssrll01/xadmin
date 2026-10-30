@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useParams } from 'react-router-dom';
 import { ylDb as db } from './ylDb.js';
 import { useYlTables } from './useYlTables.js';
@@ -301,9 +302,9 @@ export default function YuelinTable() {
         <button type="button" style={S.btn} disabled={page + 1 >= pages} onClick={() => setPage((p) => p + 1)}>Next</button>
       </div>
 
-      {edit && (
-        <div className="yl-overlay" style={S.overlay} onMouseDown={(e) => { if (e.target === e.currentTarget) setEdit(null); }}>
-          <div className="yl-modal" style={S.modal}>
+      {edit && createPortal(
+        <div className="yl-overlay" style={{ ...S.overlay, alignItems: 'center', zIndex: 3000 }} onMouseDown={(e) => { if (e.target === e.currentTarget) setEdit(null); }}>
+          <div className="yl-modal" style={{ ...S.modal, maxHeight: '90vh', overflowY: 'auto' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <h2 style={{ ...S.h1, fontSize: 18 }}>{edit.mode === 'new' ? 'New row' : 'Edit row'} - {prettify(table)}</h2>
               <label style={{ fontSize: 12 }}>
@@ -319,7 +320,8 @@ export default function YuelinTable() {
               <button type="button" style={{ ...S.btn, color: ACCENT }} disabled={saving} onClick={save}>{saving ? 'Saving...' : 'Save'}</button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
