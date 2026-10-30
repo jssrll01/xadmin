@@ -1,0 +1,55 @@
+:root {
+  --bg: #e0e5ec;
+  --text: #6b7385;
+  --text-dark: #444;
+  --primary: #4a90e2;
+  --danger: #e24a4a;
+  --success: #4ae28a;
+  
+  --shadow-light: rgba(255, 255, 255, 0.5);
+  --shadow-dark: rgba(163, 177, 198, 0.6);
+  --shadow-inset-light: inset -4px -4px 8px var(--shadow-light);
+  --shadow-inset-dark: inset 4px 4px 8px var(--shadow-dark);
+  --shadow-outset-light: -6px -6px 16px var(--shadow-light);
+  --shadow-outset-dark: 6px 6px 16px var(--shadow-dark);
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+.card {
+  background: var(--bg);
+  border-radius: 20px;
+  box-shadow: var(--shadow-outset-dark), var(--shadow-outset-light);
+}
+
+.btn {
+  background: var(--bg);
+  border: none;
+  color: var(--text-dark);
+  font-weight: 600;
+  border-radius: 12px;
+  padding: 12px 24px;
+  box-shadow: 4px 4px 8px var(--shadow-dark), -4px -4px 8px var(--shadow-light);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn:active {
+  box-shadow: var(--shadow-inset-dark), var(--shadow-inset-light);
+}
+
+.input {
+  background: var(--bg);
+  border: none;
+  border-radius: 12px;
+  padding: 12px;
+  color: var(--text-dark);
+  box-shadow: var(--shadow-inset-dark), var(--shadow-inset-light);
+  outline: none;
+}
