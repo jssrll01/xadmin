@@ -1,3 +1,4 @@
+import React from "react";
 import { useState, useEffect } from 'react';
 import { useAdminContext } from '../context/AdminContext';
 import { getDb } from '../supabase';
