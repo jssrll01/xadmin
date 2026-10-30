@@ -1,9 +1,10 @@
+import { useAdminContext } from "../context/AdminContext";
 import React, { useState, useCallback, useEffect } from 'react';
 import Card from '../components/Card.jsx';
 import Modal from '../components/Modal.jsx';
 import Btn from '../components/Btn.jsx';
 import { useToast } from '../components/Toast.jsx';
-import { supabase } from '../supabase.js';
+import { getDb } from '../supabase.js';
 import { logAudit, orderCrud } from '../lib/api.js';
 import { peso, dateTime } from '../lib/format.js';
 import { RefreshCw } from 'lucide-react';
@@ -27,6 +28,8 @@ async function rpc(fn, args) {
 const audit = async (...a) => { try { await logAudit(...a); } catch {} };
 
 export default function Logistics() {
+  const { activeSystem } = useAdminContext();
+  const supabase = getDb(activeSystem);
   const { show } = useToast();
   const [sum, setSum] = useState(null);
   const [list, setList] = useState({ total: 0, rows: [] });

@@ -1,3 +1,4 @@
+import { useAdminContext } from "../context/AdminContext";
 import { adminDb, adminRows } from '../lib/api';
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import Card from '../components/Card.jsx';
@@ -6,7 +7,7 @@ import Btn from '../components/Btn.jsx';
 import AnimatedNumber from '../components/AnimatedNumber.jsx';
 import { useToast } from '../components/Toast.jsx';
 import useAutoRefresh from '../lib/useAutoRefresh.js';
-import { supabase } from '../supabase.js';
+import { getDb } from '../supabase.js';
 import { logAudit } from '../lib/api.js';
 import { Plus, Edit2, Trash2, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 
@@ -17,6 +18,8 @@ const lab = { fontSize: 11, fontWeight: 700, color: 'var(--text-dim)', marginBot
 const PAGE_SIZE = 25;
 
 export default function Stores() {
+  const { activeSystem } = useAdminContext();
+  const supabase = getDb(activeSystem);
   const { show } = useToast();
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);

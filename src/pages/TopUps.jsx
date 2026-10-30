@@ -1,13 +1,16 @@
+import { useAdminContext } from "../context/AdminContext";
 import React, { useState } from 'react';
 import Modal from '../components/Modal.jsx';
 import CrudPage from '../components/CrudPage.jsx';
 import { fetchTopUps, topupCrud } from '../lib/api.js';
-import { supabase } from '../supabase.js';
+import { getDb } from '../supabase.js';
 import { peso, dateTime } from '../lib/format.js';
 import { Check, X } from 'lucide-react';
 import { useToast } from '../components/Toast.jsx';
 
 export default function TopUps() {
+  const { activeSystem } = useAdminContext();
+  const supabase = getDb(activeSystem);
   const { show } = useToast();
   const [viewer, setViewer] = useState(null);
 

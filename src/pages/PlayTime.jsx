@@ -1,3 +1,4 @@
+import { useAdminContext } from "../context/AdminContext";
 import { adminDb, adminRows } from '../lib/api';
 import React, { useState, useCallback } from 'react';
 import Card from '../components/Card.jsx';
@@ -5,7 +6,7 @@ import Modal from '../components/Modal.jsx';
 import Btn from '../components/Btn.jsx';
 import { useToast } from '../components/Toast.jsx';
 import useAutoRefresh from '../lib/useAutoRefresh.js';
-import { supabase } from '../supabase.js';
+import { getDb } from '../supabase.js';
 import { logAudit } from '../lib/api.js';
 import { Plus, Edit2, Trash2 } from 'lucide-react';
 
@@ -23,6 +24,8 @@ async function rpc(fn, args) {
 const audit = async (...a) => { try { await logAudit(...a); } catch {} };
 
 export default function PlayTime() {
+  const { activeSystem } = useAdminContext();
+  const supabase = getDb(activeSystem);
   const { show } = useToast();
   const [tab, setTab] = useState('settings');
   const [rows, setRows] = useState([]);

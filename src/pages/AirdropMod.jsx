@@ -1,5 +1,6 @@
+import { useAdminContext } from "../context/AdminContext";
 import React, { useState, useEffect, useCallback } from 'react';
-import { supabase } from '../supabase.js';
+import { getDb } from '../supabase.js';
 
 const CODE = import.meta.env.VITE_XADMIN_PIN;
 const PAD = 16;
@@ -21,6 +22,8 @@ async function rpc(fn, args) {
 const delMsg = (r) => 'Deleted ' + r.deleted + (r.skipped ? ' · kept ' + r.skipped + ' protected' : '');
 
 export default function AirdropMod() {
+  const { activeSystem } = useAdminContext();
+  const supabase = getDb(activeSystem);
   const [tab, setTab] = useState('tiers');
   const [rows, setRows] = useState([]);
   const [sel, setSel] = useState(new Set());

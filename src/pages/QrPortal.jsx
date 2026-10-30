@@ -1,10 +1,11 @@
+import { useAdminContext } from "../context/AdminContext";
 import React, { useState, useCallback, useMemo } from 'react';
 import Card from '../components/Card.jsx';
 import Modal from '../components/Modal.jsx';
 import Btn from '../components/Btn.jsx';
 import { useToast } from '../components/Toast.jsx';
 import useAutoRefresh from '../lib/useAutoRefresh.js';
-import { supabase } from '../supabase.js';
+import { getDb } from '../supabase.js';
 import { logAudit } from '../lib/api.js';
 import { uploadToCloudinary } from '../lib/cloud.js';
 import { Plus, Edit2, Trash2, ArrowUp, ArrowDown, RefreshCw, ExternalLink } from 'lucide-react';
@@ -74,6 +75,8 @@ async function rpc(fn, args) {
 const audit = async (...a) => { try { await logAudit(...a); } catch {} };
 
 export default function QrPortal() {
+  const { activeSystem } = useAdminContext();
+  const supabase = getDb(activeSystem);
   const { show } = useToast();
   const [data, setData] = useState({});
   const [loading, setLoading] = useState(true);

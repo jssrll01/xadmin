@@ -1,9 +1,10 @@
+import { useAdminContext } from "../context/AdminContext";
 import React from 'react';
 import CrudPage from '../components/CrudPage.jsx';
 import { fetchUsers, userCrud } from '../lib/api.js';
 import { peso, dateOnly, initials } from '../lib/format.js';
 
-import { supabase } from '../supabase.js';
+import { getDb } from '../supabase.js';
 
 const CODE = import.meta.env.VITE_XADMIN_PIN;
 async function adminCall(fn, args) {
@@ -27,6 +28,8 @@ const setPoints = async (row) => {
 const STATUS_OPTS = ['active', 'frozen', 'banned'];
 
 export default function Users() {
+  const { activeSystem } = useAdminContext();
+  const supabase = getDb(activeSystem);
   return (
     <CrudPage
       title="Users"

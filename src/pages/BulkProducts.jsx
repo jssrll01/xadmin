@@ -1,10 +1,11 @@
+import { useAdminContext } from "../context/AdminContext";
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import * as XLSX from 'xlsx';
 import Card from '../components/Card.jsx';
 import Btn from '../components/Btn.jsx';
 import Modal from '../components/Modal.jsx';
 import { useToast } from '../components/Toast.jsx';
-import { supabase } from '../supabase.js';
+import { getDb } from '../supabase.js';
 import { fetchProducts } from '../lib/api.js';
 import { uploadToCloudinary } from '../lib/cloud.js';
 import { HEADERS, CATEGORIES, normalizeRow, processImages } from '../lib/bulkImport.js';
@@ -29,6 +30,8 @@ const FLAG_LIST = [['save_more','Save More'],['flash_sale','Flash Sale'],['show_
 const L = { fontSize: 12, fontWeight: 700, margin: '6px 0 2px', display: 'block' };
 
 export default function BulkProducts() {
+  const { activeSystem } = useAdminContext();
+  const supabase = getDb(activeSystem);
   const { show } = useToast();
   const [preview, setPreview] = useState(null);
   const [pasted, setPasted] = useState('');

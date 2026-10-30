@@ -1,13 +1,16 @@
+import { useAdminContext } from "../context/AdminContext";
 import React, { useEffect, useState, useCallback } from 'react';
 import Card from '../components/Card.jsx';
 import Btn from '../components/Btn.jsx';
 import { useToast } from '../components/Toast.jsx';
-import { supabase } from '../supabase.js';
+import { getDb } from '../supabase.js';
 import * as P from '../lib/pricingApi.js';
 
 const L = { fontSize: 12, fontWeight: 700, margin: '6px 0 2px', display: 'block' };
 
 export default function CashbackCosts() {
+  const { activeSystem } = useAdminContext();
+  const supabase = getDb(activeSystem);
   const { show } = useToast();
   const [cb, setCb] = useState(null);
   const [products, setProducts] = useState([]);

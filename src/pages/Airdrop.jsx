@@ -1,9 +1,10 @@
+import { useAdminContext } from "../context/AdminContext";
 import React, { useState, useCallback } from 'react';
 import Card from '../components/Card.jsx';
 import Btn from '../components/Btn.jsx';
 import { useToast } from '../components/Toast.jsx';
 import useAutoRefresh from '../lib/useAutoRefresh.js';
-import { supabase } from '../supabase.js';
+import { getDb } from '../supabase.js';
 
 const CODE = import.meta.env.VITE_XADMIN_PIN;
 const TABS = [['tiers', 'Tiers'], ['draws', 'Draws'], ['bets', 'Bets']];
@@ -18,6 +19,8 @@ async function rpc(fn, args) {
 }
 
 export default function Airdrop() {
+  const { activeSystem } = useAdminContext();
+  const supabase = getDb(activeSystem);
   const { show } = useToast();
   const [tab, setTab] = useState('tiers');
   const [rows, setRows] = useState([]);

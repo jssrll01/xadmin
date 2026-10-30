@@ -1,3 +1,4 @@
+import { useAdminContext } from "../context/AdminContext";
 import { uploadToCloudinary } from '../lib/cloud.js';
 import React, { useState, useCallback } from 'react';
 import Card from '../components/Card.jsx';
@@ -5,7 +6,7 @@ import Modal from '../components/Modal.jsx';
 import Btn from '../components/Btn.jsx';
 import { useToast } from '../components/Toast.jsx';
 import useAutoRefresh from '../lib/useAutoRefresh.js';
-import { supabase } from '../supabase.js';
+import { getDb } from '../supabase.js';
 import { logAudit } from '../lib/api.js';
 import { Plus, Edit2, Trash2, ArrowUp, ArrowDown } from 'lucide-react';
 
@@ -28,6 +29,8 @@ const toPayload = (b) => ({
 });
 
 export default function Banners() {
+  const { activeSystem } = useAdminContext();
+  const supabase = getDb(activeSystem);
   const { show } = useToast();
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
