@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ylSupabase as db, ENV_OK } from '../supabase.js';
+import { ENV_OK } from '../supabase.js';
+import { ylDb as db } from './ylDb.js';
 import { useYlTables } from './useYlTables.js';
 import { addManualTable, removeManualTable, getManualTables } from './schema.js';
 import { S, ACCENT } from './ui.js';

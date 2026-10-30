@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { ylSupabase as db } from '../supabase.js';
+import { ylDb as db } from './ylDb.js';
 import { useYlTables } from './useYlTables.js';
 import { prettify } from './schema.js';
 import { S, ACCENT } from './ui.js';
