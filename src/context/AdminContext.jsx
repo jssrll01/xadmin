@@ -6,7 +6,8 @@ const AdminContext = createContext();
 
 export function AdminProvider({ children }) {
   // Default to XMARKET, but allows switching to YUELIN
-  const [activeSystem, setActiveSystem] = useState('XMARKET');
+  const [activeSystem, setSys] = useState(() => { try { return localStorage.getItem('xadmin_system') === 'YUELIN' ? 'YUELIN' : 'XMARKET'; } catch (e) { return 'XMARKET'; } });
+  const setActiveSystem = (v) => { try { localStorage.setItem('xadmin_system', v); } catch (e) { /* ignore */ } setSys(v); };
   setDbSystem(activeSystem); 
 
   return (

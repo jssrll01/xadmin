@@ -1,9 +1,10 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { useYlTables } from '../yuelin/useYlTables.js';
 import { useAdminContext } from '../context/AdminContext';
 import {
   LayoutDashboard, Users, Package, ShoppingBag, Wallet, RotateCcw,
-  AlertTriangle, Store, CreditCard, Gift, Boxes, Settings as Cog, ScrollText, Bell, BarChart3, FileText, Star, Gamepad2, Image as ImageIcon, Percent, Radio, ClipboardList, QrCode, Truck, Crown,
+  AlertTriangle, Store, CreditCard, Gift, Boxes, Settings as Cog, ScrollText, Bell, BarChart3, FileText, Star, Gamepad2, Image as ImageIcon, Percent, Radio, ClipboardList, QrCode, Truck, Crown, Database,
 } from 'lucide-react';
 
 const XMARKET_ITEMS = [
@@ -58,7 +59,11 @@ const seg = (on, color) => ({
 
 export default function Sidebar() {
   const { activeSystem, setActiveSystem } = useAdminContext();
-  const items = activeSystem === 'YUELIN' ? YUELIN_ITEMS : XMARKET_ITEMS;
+  const nav = useNavigate();
+  const yl = useYlTables(activeSystem === 'YUELIN');
+  const items = activeSystem === 'YUELIN'
+    ? [['/', 'Dashboard', LayoutDashboard], ...yl.tables.map((t) => ['/yl/' + encodeURIComponent(t.name), t.label, Database])]
+    : XMARKET_ITEMS;
   return (
     <aside className="sidebar">
       <div className="sidebar-brand">
@@ -81,8 +86,8 @@ export default function Sidebar() {
         </div>
       </div>
       <div style={{ display: 'flex', padding: 5, margin: '0 0 14px', borderRadius: 16, background: 'var(--bg, #e0e5ec)', boxShadow: 'inset 4px 4px 8px rgba(163,177,198,0.6), inset -4px -4px 8px rgba(255,255,255,0.7)' }}>
-        <button type="button" onClick={() => setActiveSystem('XMARKET')} style={seg(activeSystem === 'XMARKET', '#2563EB')}>XMARKET</button>
-        <button type="button" onClick={() => setActiveSystem('YUELIN')} style={seg(activeSystem === 'YUELIN', '#b8860b')}>YUELIN</button>
+        <button type="button" onClick={() => { setActiveSystem('XMARKET'); nav('/'); }} style={seg(activeSystem === 'XMARKET', '#2563EB')}>XMARKET</button>
+        <button type="button" onClick={() => { setActiveSystem('YUELIN'); nav('/'); }} style={seg(activeSystem === 'YUELIN', '#b8860b')}>YUELIN</button>
       </div>
       <nav className="sidebar-nav">
         {items.map(([to, label, Icon]) => (
