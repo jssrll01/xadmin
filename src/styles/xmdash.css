@@ -1,0 +1,23 @@
+@keyframes xmDraw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+@keyframes xmRise{from{opacity:0;transform:translateY(16px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes xmPing{0%{transform:scale(.7);opacity:.9}100%{transform:scale(2.6);opacity:0}}
+@keyframes xmDonut{from{stroke-dasharray:0 100}}
+.xm-hero{background:var(--surface,#fff);border:1px solid var(--border,#d6dee9);border-radius:24px;padding:22px;margin-bottom:16px;box-shadow:0 1px 2px rgba(15,23,42,.04),0 10px 28px rgba(15,23,42,.07);animation:xmRise .6s cubic-bezier(.2,.8,.2,1) both}
+.xm-hero-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.xm-title{font-size:24px;font-weight:900;margin:0;letter-spacing:-.4px;color:var(--text,#1f2430)}
+.xm-live{display:inline-flex;align-items:center;gap:8px;font-size:12px;color:var(--text-dim,#6b7280);margin-top:6px}
+.xm-dot{position:relative;width:9px;height:9px;border-radius:50%;background:#10b981}
+.xm-dot::after{content:"";position:absolute;inset:0;border-radius:50%;background:#10b981;animation:xmPing 1.8s ease-out infinite}
+.xm-btn{border:1px solid var(--border,#d6dee9);background:var(--surface,#fff);color:#4f46e5;border-radius:12px;padding:8px 14px;font-weight:700;font-size:13px;transition:transform .18s}
+.xm-btn:active{transform:scale(.95)}
+.xm-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:18px}
+.xm-kpi{border-radius:18px;padding:14px;background:var(--surface-2,#f7f9fc);border:1px solid var(--border,#e3e8f0);animation:xmRise .6s cubic-bezier(.2,.8,.2,1) both;transition:transform .25s,box-shadow .25s}
+.xm-kpi:hover{transform:translateY(-4px);box-shadow:0 10px 24px rgba(15,23,42,.08)}
+.xm-kpi small{display:block;font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:var(--text-dim,#6b7280)}
+.xm-kpi b{display:block;font-size:26px;font-weight:900;margin:4px 0 6px;color:var(--text,#1f2430)}
+.xm-line{stroke-dasharray:1;stroke-dashoffset:1;animation:xmDraw 1.4s cubic-bezier(.2,.8,.2,1) .2s forwards}
+.xm-seg{animation:xmDonut 1.2s cubic-bezier(.2,.8,.2,1) both}
+.xm-leg{display:flex;align-items:center;gap:8px;font-size:13px;margin:6px 0}
+.xm-leg span{width:10px;height:10px;border-radius:3px;flex:none}
+.xm-leg em{flex:1;font-style:normal;text-transform:capitalize}
+@media (prefers-reduced-motion:reduce){.xm-hero,.xm-kpi,.xm-dot::after,.xm-line,.xm-seg{animation:none!important}.xm-line{stroke-dashoffset:0}}
