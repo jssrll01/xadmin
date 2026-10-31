@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from 'react';
-
-import { supabase as defaultSupabase } from '../supabase';
-
-const supabase = ylDbModule.yuelinSupabase || ylDbModule.supabase || ylDbModule.default || defaultSupabase;
+import { supabase } from '../supabase';
 
 export default function XadminRedemptionQueue() {
   const [redemptions, setRedemptions] = useState([]);

@@ -1,8 +1,5 @@
 import React, { useState } from 'react';
-
-import { supabase as defaultSupabase } from '../supabase';
-
-const supabase = ylDbModule.yuelinSupabase || ylDbModule.supabase || ylDbModule.default || defaultSupabase;
+import { supabase } from '../supabase';
 
 export default function XadminPointsAdjuster() {
   const [targetUserId, setTargetUserId] = useState('');
