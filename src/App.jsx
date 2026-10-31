@@ -6,6 +6,7 @@ import Layout from './components/Layout.jsx';
 
 import Dashboard from './pages/Dashboard.jsx';
 import YuelinHome from './yuelin/YuelinHome.jsx';
+import YuelinAdminDashboard from './yuelin/YuelinAdminDashboard.jsx';
 import YlGate from './yuelin/YlGate.jsx';
 import YuelinTable from './yuelin/YuelinTable.jsx';
 import { useAdminContext } from './context/AdminContext.jsx';
