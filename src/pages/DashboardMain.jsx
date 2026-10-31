@@ -6,8 +6,6 @@ import { fetchStats, fetchSoldOutProducts, fetchReceiptsStats, fetchReviewsStats
 import { peso, pesoShort } from '../lib/format.js';
 import useAutoRefresh from '../lib/useAutoRefresh.js';
 import AnimatedNumber from '../components/AnimatedNumber.jsx';
-import { Spark, Donut } from '../components/XmFx.jsx';
-import '../styles/xmdash.css';
 
 const CSS = `
 .dx-hero,.dx-split{display:grid;grid-template-columns:1fr;gap:14px;margin-bottom:14px}
@@ -81,7 +79,7 @@ function Stat({ icon: Icon, value, num, fmt, label, color }) {
 }
 
 export default function Dashboard() {
-  const [period, setPeriod] = useState('daily');
+  const [period, setPeriod] = useState('yearly');
   const [stats, setStats] = useState(null);
   const [snap, setSnap] = useState(null);
   const [series, setSeries] = useState([]);
@@ -151,12 +149,6 @@ export default function Dashboard() {
     { icon: FileText, value: rc.total, label: 'Quotations', color: '#0EA5E9' },
     { icon: Star, value: rv.total + (rv.avg ? ' · ' + rv.avg + '★' : ''), label: 'Reviews', color: '#EAB308' },
   ];
-  const heroKpis = [
-    { label: 'Today', num: (snap && snap.today) || 0, color: '#10B981' },
-    { label: 'This week', num: (snap && snap.thisWeek) || 0, color: '#2563EB' },
-    { label: 'This month', num: (snap && snap.thisMonth) || 0, color: '#7C3AED' },
-    { label: 'All time', num: (snap && snap.allTime) || 0, color: '#F59E0B' },
-  ];
   const snaps = [
     { icon: Calendar, num: (snap && snap.today) || 0, fmt: pesoShort, label: 'Today', color: '#10B981' },
     { icon: TrendingUp, num: (snap && snap.thisWeek) || 0, fmt: pesoShort, label: 'This week', color: '#2563EB' },
@@ -169,24 +161,7 @@ export default function Dashboard() {
   return (
     <StateCtx.Provider value={st}>
       <style>{CSS}</style>
-      <div className="xm-hero">
-        <div className="xm-hero-top">
-          <div>
-            <h1 className="xm-title">XMARKET Command Center</h1>
-            <div className="xm-live"><span className="xm-dot" /> Live · {new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}</div>
-          </div>
-          <button type="button" className="xm-btn" onClick={load}>Refresh</button>
-        </div>
-        <div className="xm-kpis">
-          {heroKpis.map((k, i) => (
-            <div key={k.label} className="xm-kpi" style={{ animationDelay: (80 + i * 80) + 'ms' }}>
-              <small>{k.label} sales</small>
-              <b>{st === 'ready' ? <AnimatedNumber value={k.num} format={pesoShort} /> : '-'}</b>
-              <Spark data={series.map((d) => d.revenue)} color={k.color} />
-            </div>
-          ))}
-        </div>
-      </div>
+      <div className="page-head"><div><h1>Dashboard</h1><p>Overview &amp; analytics · live</p></div></div>
       {st === 'ready' && (
         <div className="xa-todo neu-card" role="region" aria-label="Action center">
           <div className="xa-todo-head">Action center</div>
@@ -204,6 +179,9 @@ export default function Dashboard() {
       )}
 
       <div className="stat-grid">{cards.map((c) => <Stat key={c.label} {...c} />)}</div>
+
+      <div className="dx-h2">Sales snapshot</div>
+      <div className="stat-grid">{snaps.map((c) => <Stat key={c.label} {...c} />)}</div>
 
       <div className="dx-hero" style={{ marginTop: 14 }}>
         <div className="neu-card">
@@ -244,9 +222,13 @@ export default function Dashboard() {
         <div className="neu-card">
           <div className="dx-title"><span>Orders by status</span><span className="dx-sub">{orders.length} total</span></div>
           {!byStatus.length && <div className="dx-sub">No orders yet</div>}
-          {byStatus.length > 0 && <Donut parts={byStatus.map(([k, n]) => ({ k, v: n, color: col(k) }))} total={orders.length} label="orders" />}
           {byStatus.map(([k, n]) => (
-            <div key={k} className="xm-leg"><span style={{ background: col(k) }} /><em>{k.replace('_', ' ')}</em><b>{n}</b></div>
+            <div key={k} style={{ marginBottom: 12 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, fontWeight: 700 }}>
+                <span style={{ textTransform: 'capitalize' }}>{k.replace('_', ' ')}</span><span>{n}</span>
+              </div>
+              <div className="dx-bar"><i style={{ width: (n / maxStatus) * 100 + '%', background: col(k) }} /></div>
+            </div>
           ))}
         </div>
       </div>
