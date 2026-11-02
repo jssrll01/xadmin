@@ -6,7 +6,7 @@ import Layout from './components/Layout.jsx';
 
 import Dashboard from './pages/Dashboard.jsx';
 import YuelinHome from './yuelin/YuelinHome.jsx';
-import YuelinAdminDashboard from './yuelin/YuelinAdminDashboard.jsx';
+import YlOps from './yuelin/YlOps.jsx';
 import YlGate from './yuelin/YlGate.jsx';
 import YuelinTable from './yuelin/YuelinTable.jsx';
 import { useAdminContext } from './context/AdminContext.jsx';
@@ -139,6 +139,7 @@ export default function App() {
           <Route path="/qr-portal" element={<QrPortal />} />
           <Route path="/logistics" element={<Logistics />} />
           <Route path="/settings"  element={<Settings />} />
+          <Route path="/yl-ops" element={<YlGate><YlOps /></YlGate>} />
           <Route path="/yl/:table" element={<YlGate><YuelinTable /></YlGate>} />
           <Route path="*"          element={<Navigate to="/" replace />} />
         </Routes>

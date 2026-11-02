@@ -62,7 +62,7 @@ export default function Sidebar() {
   const nav = useNavigate();
   const yl = useYlTables(activeSystem === 'YUELIN');
   const items = activeSystem === 'YUELIN'
-    ? [['/', 'Dashboard', LayoutDashboard], ...yl.tables.map((t) => ['/yl/' + encodeURIComponent(t.name), t.label, Database])]
+    ? [['/', 'Dashboard', LayoutDashboard], ['/yl-ops', 'Operations', Cog], ...yl.tables.map((t) => ['/yl/' + encodeURIComponent(t.name), t.label, Database])]
     : XMARKET_ITEMS;
   return (
     <aside className="sidebar">

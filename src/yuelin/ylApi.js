@@ -30,4 +30,10 @@ export const api = {
   insert: (tbl, rows) => call('yl_admin_insert', { p_tbl: tbl, p_rows: rows }),
   update: (tbl, key, data) => call('yl_admin_update', { p_tbl: tbl, p_key: key, p_data: data }),
   remove: (tbl, key) => call('yl_admin_delete', { p_tbl: tbl, p_key: key }),
+  lookup: (q) => call('yl_admin_member_lookup', { p_q: q }),
+  adjust: (user, delta, reason) => call('yl_admin_adjust_points', { p_user: user, p_delta: delta, p_reason: reason }),
+  setRedemption: (id, status, note) => call('yl_admin_set_redemption', { p_id: id, p_status: status, p_note: note || null }),
+  referrals: () => call('yl_admin_referral_review', {}),
+  audit: (limit, offset) => call('yl_admin_audit_list', { p_limit: limit, p_offset: offset }),
+  health: () => call('yl_admin_health', {}),
 };

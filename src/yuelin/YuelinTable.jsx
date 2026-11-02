@@ -16,11 +16,28 @@ const IMG = /^https?:\/\/\S+\.(png|jpe?g|webp|gif|svg)(\?\S*)?$/i;
 const OK = { background: '#e7f6ec', color: '#1b6b3a', borderRadius: 12, padding: '10px 14px', fontSize: 13, margin: '12px 0' };
 
 const STATUS = {
-  redemptions: ['pending', 'fulfilled', 'cancelled'],
+  redemptions: ['pending', 'processing', 'fulfilled', 'rejected', 'cancelled'],
   vip_applications: ['pending', 'verified', 'rejected'],
   vip_memberships: ['active', 'expired', 'cancelled'],
   vip_entitlements: ['available', 'requested', 'redeemed', 'issued', 'fulfilled', 'unavailable'],
 };
+const csvCell = (v) => { const t = v === null || v === undefined ? '' : typeof v === 'object' ? JSON.stringify(v) : String(v); return /[",\n\r]/.test(t) ? '"' + t.replace(/"/g, '""') + '"' : t; };
+async function exportCsv(table, setMsg) {
+  const all = []; let off = 0;
+  for (;;) {
+    const d = await api.select(table, 500, off, null);
+    const r = (d && d.rows) || []; all.push(...r); off += 500;
+    if (r.length < 500 || all.length >= 5000) break;
+  }
+  if (!all.length) { setMsg('Nothing to export.'); return; }
+  const cols = Object.keys(all[0]);
+  const csv = [cols.join(',')].concat(all.map((r) => cols.map((c) => csvCell(r[c])).join(','))).join('\r\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' }));
+  a.download = table + '-' + new Date().toISOString().slice(0, 10) + '.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+  setMsg('Exported ' + all.length + ' rows' + (all.length >= 5000 ? ' (first 5,000)' : '') + '.');
+}
 const GENERIC = ['pending', 'approved', 'rejected', 'completed', 'cancelled'];
 const cap = (v) => String(v).replace(/_/g, ' ').replace(/^\w/, (c) => c.toUpperCase());
 
@@ -379,6 +396,7 @@ export default function YuelinTable() {
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
           <button type="button" style={S.btn} onClick={load}>Refresh</button>
           <button type="button" style={S.btn} onClick={() => { setBulkErr(''); setOk(''); setBulkOpen(true); }}>Bulk JSON</button>
+          <button type="button" style={S.btn} onClick={() => exportCsv(table, setOk).catch((e) => setErr(e.message || String(e)))}>Export CSV</button>
           <button type="button" style={S.btnAccent} onClick={openNew}>+ New row</button>
         </div>
       </div>
