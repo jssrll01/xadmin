@@ -1,50 +1,19 @@
-@tailwind base;
 @tailwind components;
-@tailwind utilities;
 
-:root {
-  --nm-bg: #e6e9ef;
-  --nm-shadow-dark: #c3c7d1;
-  --nm-shadow-light: #ffffff;
-  --nm-accent: #2563eb;
-  --nm-text: #3a3f4b;
-  --nm-text-muted: #6b7280;
-  --nm-text-faint: #9aa0ac;
-}
-
-html.dark {
-  --nm-bg: #2a2d35;
-  --nm-shadow-dark: #1c1f24;
-  --nm-shadow-light: #383c46;
-  --nm-text: #e5e7eb;
-  --nm-text-muted: #9ca3af;
-  --nm-text-faint: #6b7280;
-}
-
-* { box-sizing: border-box; }
-
-html { scroll-behavior: smooth; }
-
-html, body, #root {
-  min-height: 100vh;
-  margin: 0;
-}
-
-body {
+.xa-root {
+  --nm-bg: #e6e9ef; --nm-shadow-dark: #c3c7d1; --nm-shadow-light: #ffffff;
+  --nm-accent: #2563eb; --nm-text: #3a3f4b; --nm-text-muted: #6b7280; --nm-text-faint: #9aa0ac;
+  background: var(--nm-bg); color: var(--nm-text);
   font-family: 'Segoe UI', system-ui, sans-serif;
-  background: var(--nm-bg);
-  color: var(--nm-text);
-  overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
-  transition: background 0.35s ease, color 0.35s ease;
+  min-height: calc(100vh - 120px); border-radius: 22px; padding: 4px 0 40px;
 }
+.xa-root *, .xa-root *::before, .xa-root *::after { box-sizing: border-box; border-width: 0; border-style: solid; border-color: #e5e7eb; }
+.xa-root button { font-family: inherit; cursor: pointer; background: none; }
+.xa-root input, .xa-root select, .xa-root textarea { font-family: inherit; }
+.xa-root h1, .xa-root h2, .xa-root h3, .xa-root p { margin: 0; }
+.xa-root img { max-width: 100%; display: inline-block; }
 
-::-webkit-scrollbar { width: 10px; }
-::-webkit-scrollbar-track { background: var(--nm-bg); }
-::-webkit-scrollbar-thumb {
-  background: var(--nm-shadow-dark);
-  border-radius: 10px;
-}
+@tailwind utilities;
 
 /* ============ NEUMORPHISM ============ */
 .nm-flat {
@@ -224,17 +193,4 @@ body {
 .animate-scale-in { animation: scaleIn 0.25s ease both; }
 .animate-shake { animation: shake 0.35s ease; }
 
-/* Global smooth transitions */
-* {
-  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
-  transition-duration: 200ms;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-}
 
-/* Respect user's motion preferences */
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
-  }
-}

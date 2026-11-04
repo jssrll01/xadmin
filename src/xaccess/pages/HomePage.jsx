@@ -1,8 +1,7 @@
 import React from 'react';
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+import { API_BASE } from '../api';
 
 function formatBytes(bytes) {
   if (!bytes) return '0 B';
@@ -23,7 +22,7 @@ function fileIcon(name) {
 }
 
 export default function HomePage() {
-  const navigate = useNavigate();
+  const navigate = (p) => window.dispatchEvent(new CustomEvent('access-go', { detail: p.replace('/', '') }));
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');

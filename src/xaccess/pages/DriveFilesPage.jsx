@@ -1,7 +1,7 @@
 import React from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+import { API_BASE } from '../api';
 
 function formatBytes(bytes) {
   if (!bytes) return '—';

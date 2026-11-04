@@ -42,10 +42,11 @@ import Pricing from './pages/Pricing.jsx';
 import NfcStudio from './pages/NfcStudio.jsx';
 import QrPortal from './pages/QrPortal.jsx';
 import Logistics from './pages/Logistics.jsx';
-import XAccessApp from './xaccess/App.jsx';
+import AccessApp from './xaccess/App.jsx';
 
 function HomeSwitch() {
   const { activeSystem } = useAdminContext();
+  if (activeSystem === 'ACCESS') return <AccessApp />;
   return activeSystem === 'YUELIN' ? <YlGate><YuelinHome /></YlGate> : <Dashboard />;
 }
 
@@ -138,7 +139,6 @@ export default function App() {
           <Route path="/bulk-products" element={<BulkProducts />} />
           <Route path="/nfc" element={<NfcStudio />} />
           <Route path="/qr-portal" element={<QrPortal />} />
-          <Route path="/access/*" element={<XAccessApp />} />
           <Route path="/logistics" element={<Logistics />} />
           <Route path="/settings"  element={<Settings />} />
           <Route path="/yl-ops" element={<YlGate><YlOps /></YlGate>} />

@@ -9,7 +9,7 @@ import {
 
 const XMARKET_ITEMS = [
   ['/', 'Dashboard', LayoutDashboard],
-  ['/access', 'XAccess', Database],
+
   ['/daily', 'Daily Tasks & Notes', ClipboardList],
   ['/users', 'Users', Users],
   ['/products', 'Products', Package],
@@ -44,7 +44,7 @@ const XMARKET_ITEMS = [
 
 const YUELIN_ITEMS = [
   ['/', 'Dashboard', LayoutDashboard],
-  ['/access', 'XAccess', Database],
+
   ['/products', 'Products', Package],
   ['/promos', 'Offers', Gift],
   ['/qr-portal', 'Redeem Codes', QrCode],
@@ -63,9 +63,11 @@ export default function Sidebar() {
   const { activeSystem, setActiveSystem } = useAdminContext();
   const nav = useNavigate();
   const yl = useYlTables(activeSystem === 'YUELIN');
-  const items = activeSystem === 'YUELIN'
+  const items = activeSystem === 'ACCESS'
+    ? [['/', 'Access', Database]]
+    : activeSystem === 'YUELIN'
     ? [['/', 'Dashboard', LayoutDashboard],
-  ['/access', 'XAccess', Database], ['/yl-ops', 'Operations', Cog], ...yl.tables.map((t) => ['/yl/' + encodeURIComponent(t.name), t.label, Database])]
+ ['/yl-ops', 'Operations', Cog], ...yl.tables.map((t) => ['/yl/' + encodeURIComponent(t.name), t.label, Database])]
     : XMARKET_ITEMS;
   return (
     <aside className="sidebar">
@@ -91,6 +93,7 @@ export default function Sidebar() {
       <div style={{ display: 'flex', padding: 5, margin: '0 0 14px', borderRadius: 16, background: 'var(--bg, #e0e5ec)', boxShadow: 'inset 4px 4px 8px rgba(163,177,198,0.6), inset -4px -4px 8px rgba(255,255,255,0.7)' }}>
         <button type="button" onClick={() => { setActiveSystem('XMARKET'); nav('/'); }} style={seg(activeSystem === 'XMARKET', '#2563EB')}>XMARKET</button>
         <button type="button" onClick={() => { setActiveSystem('YUELIN'); nav('/'); }} style={seg(activeSystem === 'YUELIN', '#b8860b')}>YUELIN</button>
+        <button type="button" onClick={() => { setActiveSystem('ACCESS'); nav('/'); }} style={seg(activeSystem === 'ACCESS', '#059669')}>ACCESS</button>
       </div>
       <nav key={activeSystem} className={'sidebar-nav' + (activeSystem === 'YUELIN' ? ' yl-nav' : '')}>
         {items.map(([to, label, Icon]) => (
