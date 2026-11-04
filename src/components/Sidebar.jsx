@@ -12,6 +12,7 @@ const XMARKET_ITEMS = [
   ['/', 'Dashboard', LayoutDashboard],
 
   ['/daily', 'Daily Tasks & Notes', ClipboardList],
+  ['/xcoin', 'XCOIN', BarChart3],
   ['/users', 'Users', Users],
   ['/products', 'Products', Package],
   ['/orders', 'Orders', ShoppingBag],
