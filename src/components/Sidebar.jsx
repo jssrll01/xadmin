@@ -9,6 +9,7 @@ import {
 
 const XMARKET_ITEMS = [
   ['/', 'Dashboard', LayoutDashboard],
+  ['/access', 'XAccess', Database],
   ['/daily', 'Daily Tasks & Notes', ClipboardList],
   ['/users', 'Users', Users],
   ['/products', 'Products', Package],
@@ -43,6 +44,7 @@ const XMARKET_ITEMS = [
 
 const YUELIN_ITEMS = [
   ['/', 'Dashboard', LayoutDashboard],
+  ['/access', 'XAccess', Database],
   ['/products', 'Products', Package],
   ['/promos', 'Offers', Gift],
   ['/qr-portal', 'Redeem Codes', QrCode],
@@ -62,7 +64,8 @@ export default function Sidebar() {
   const nav = useNavigate();
   const yl = useYlTables(activeSystem === 'YUELIN');
   const items = activeSystem === 'YUELIN'
-    ? [['/', 'Dashboard', LayoutDashboard], ['/yl-ops', 'Operations', Cog], ...yl.tables.map((t) => ['/yl/' + encodeURIComponent(t.name), t.label, Database])]
+    ? [['/', 'Dashboard', LayoutDashboard],
+  ['/access', 'XAccess', Database], ['/yl-ops', 'Operations', Cog], ...yl.tables.map((t) => ['/yl/' + encodeURIComponent(t.name), t.label, Database])]
     : XMARKET_ITEMS;
   return (
     <aside className="sidebar">
