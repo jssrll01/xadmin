@@ -9,6 +9,8 @@ import YuelinHome from './yuelin/YuelinHome.jsx';
 import YlOps from './yuelin/YlOps.jsx';
 import YlGate from './yuelin/YlGate.jsx';
 import YuelinTable from './yuelin/YuelinTable.jsx';
+import { InsightsBlock, ylPanelsFor } from './analytics/TabInsights.jsx';
+import { useParams } from 'react-router-dom';
 import { useAdminContext } from './context/AdminContext.jsx';
 import Products from './pages/Products.jsx';
 import Orders from './pages/Orders.jsx';
@@ -43,6 +45,12 @@ import NfcStudio from './pages/NfcStudio.jsx';
 import QrPortal from './pages/QrPortal.jsx';
 import Logistics from './pages/Logistics.jsx';
 import AccessApp from './xaccess/App.jsx';
+
+function YlTablePage() {
+  const { table } = useParams();
+  const panels = ylPanelsFor(table);
+  return <>{panels.length > 0 && <InsightsBlock key={table} panels={panels} />}<YuelinTable /></>;
+}
 
 function HomeSwitch() {
   const { activeSystem } = useAdminContext();
@@ -142,7 +150,8 @@ export default function App() {
           <Route path="/logistics" element={<Logistics />} />
           <Route path="/settings"  element={<Settings />} />
           <Route path="/yl-ops" element={<YlGate><YlOps /></YlGate>} />
-          <Route path="/yl/:table" element={<YlGate><YuelinTable /></YlGate>} />
+          <Route path="/yl/:table" element={<YlGate><YlTablePage /></YlGate>} />
+          <Route path="/access/:tab" element={<AccessApp />} />
           <Route path="*"          element={<Navigate to="/" replace />} />
         </Routes>
       </Layout>

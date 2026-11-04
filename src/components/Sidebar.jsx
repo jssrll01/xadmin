@@ -2,8 +2,9 @@ import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useYlTables } from '../yuelin/useYlTables.js';
 import { useAdminContext } from '../context/AdminContext';
+import { ACCESS_TABS, accessPath } from '../xaccess/App.jsx';
 import {
-  LayoutDashboard, Users, Package, ShoppingBag, Wallet, RotateCcw,
+  LayoutDashboard, Home as HomeIcon, FolderOpen, Trash2, Users, Package, ShoppingBag, Wallet, RotateCcw,
   AlertTriangle, Store, CreditCard, Gift, Boxes, Settings as Cog, ScrollText, Bell, BarChart3, FileText, Star, Gamepad2, Image as ImageIcon, Percent, Radio, ClipboardList, QrCode, Truck, Crown, Database,
 } from 'lucide-react';
 
@@ -64,7 +65,7 @@ export default function Sidebar() {
   const nav = useNavigate();
   const yl = useYlTables(activeSystem === 'YUELIN');
   const items = activeSystem === 'ACCESS'
-    ? [['/', 'Access', Database]]
+    ? ACCESS_TABS.map(([k, label]) => [accessPath(k), label, { home: HomeIcon, drive: FolderOpen, revoke: Trash2, settings: Cog }[k]])
     : activeSystem === 'YUELIN'
     ? [['/', 'Dashboard', LayoutDashboard],
  ['/yl-ops', 'Operations', Cog], ...yl.tables.map((t) => ['/yl/' + encodeURIComponent(t.name), t.label, Database])]

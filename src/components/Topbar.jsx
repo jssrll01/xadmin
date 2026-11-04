@@ -8,7 +8,7 @@ export default function Topbar() {
   const [theme, setTheme] = useState(() => document.documentElement.dataset.theme || 'light');
   const title =
     loc.pathname === '/' ? 'Dashboard' :
-    loc.pathname.replace('/', '').replace('-', ' ').replace(/^\w/, c => c.toUpperCase());
+    loc.pathname.split('/').filter(Boolean).pop().replace(/[-_]/g, ' ').replace(/^\w/, c => c.toUpperCase());
   const toggle = () => {
     const next = theme === 'dark' ? 'light' : 'dark';
     document.documentElement.dataset.theme = next;
