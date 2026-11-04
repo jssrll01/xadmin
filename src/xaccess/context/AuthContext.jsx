@@ -1,3 +1,4 @@
+import React from 'react';
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 
 const SECRET_CODE = '1010';

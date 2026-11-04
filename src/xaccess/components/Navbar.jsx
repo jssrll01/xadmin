@@ -1,3 +1,4 @@
+import React from 'react';
 import { NavLink } from 'react-router-dom';
 
 const linkBase = 'px-4 py-2.5 rounded-xl text-sm font-semibold transition-all';
