@@ -41,6 +41,7 @@ import Notify from './pages/Notify.jsx';
 import AirdropMod from './pages/AirdropMod.jsx';
 import DailyNotes from './pages/DailyNotes.jsx';
 import XCoinAdmin from './pages/XCoinAdmin.jsx';
+import BuyLoad from './pages/BuyLoad.jsx';
 import Pricing from './pages/Pricing.jsx';
 import NfcStudio from './pages/NfcStudio.jsx';
 import QrPortal from './pages/QrPortal.jsx';
@@ -141,6 +142,7 @@ export default function App() {
           <Route path="/quotations/new" element={<NewReceipt />} />
           <Route path="/quotations/:id" element={<ReceiptView />} />
           <Route path="/reviews"    element={<Reviews />} />
+          <Route path="/buy-load" element={<BuyLoad />} />
           <Route path="/xcoin" element={<XCoinAdmin />} />
           <Route path="/daily"     element={<DailyNotes />} />
           <Route path="/audit"     element={<AuditLog />} />
