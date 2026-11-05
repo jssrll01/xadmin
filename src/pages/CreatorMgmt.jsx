@@ -85,6 +85,20 @@ export default function CreatorMgmt() {
     setBusy(false);
   };
 
+  const delTask = async (r) => {
+    if (r.kind === 'referral') return;
+    if (!window.confirm('Delete "' + r.title + '"? If it has entries it will be archived instead.')) return;
+    setBusy(true);
+    try { const x = await call('admin_creator_task_delete', { p_id: r.id }); setErr(''); if (x && x.archived) window.alert('Task has entries, so it was archived (hidden from creators).'); await load(); }
+    catch (e) { setErr(e.message); }
+    setBusy(false);
+  };
+  const delSub = async (r) => {
+    if (!window.confirm('Delete this rejected submission permanently?')) return;
+    setBusy(true);
+    try { await call('admin_creator_submission_delete', { p_id: r.id }); await load(); } catch (e) { setErr(e.message); }
+    setBusy(false);
+  };
   const saveTask = async (e) => {
     e.preventDefault(); setBusy(true);
     try {
@@ -153,7 +167,7 @@ export default function CreatorMgmt() {
         </div>
       </>)}
 
-      {tab === 'submissions' && table(subCols, rows, r => r.status === 'pending' && (
+      {tab === 'submissions' && table(subCols, rows, r => r.status === 'rejected' ? (<button disabled={busy} className="neu-btn" style={{ padding: '4px 9px', fontSize: 11, color: '#DC2626' }} onClick={() => delSub(r)}>delete</button>) : r.status === 'pending' && (
         <div style={{ display: 'flex', gap: 4 }}>
           <button disabled={busy} className="neu-btn" style={{ padding: '4px 9px', fontSize: 11 }} onClick={() => review(r, 'approved')}>approve</button>
           <button disabled={busy} className="neu-btn" style={{ padding: '4px 9px', fontSize: 11, color: '#DC2626' }} onClick={() => review(r, 'rejected')}>reject</button>
@@ -177,7 +191,7 @@ export default function CreatorMgmt() {
             {form.id && <button className="neu-btn" type="button" onClick={() => setForm(EMPTY)} style={{ padding: '8px 14px' }}>Cancel</button>}
           </div>
         </form>
-        {table(taskCols, rows, r => <button className="neu-btn" style={{ padding: '4px 9px', fontSize: 11 }} onClick={() => setForm({ id: r.id, title: r.title, description: r.description || '', requirements: r.requirements || '', notes: r.notes || '', deadline: r.deadline ? toLocal(r.deadline) : '', reward: r.reward, active: r.active })}>edit</button>)}
+        {table(taskCols, rows, r => <div style={{ display: 'flex', gap: 4 }}><button className="neu-btn" style={{ padding: '4px 9px', fontSize: 11 }} onClick={() => setForm({ id: r.id, title: r.title, description: r.description || '', requirements: r.requirements || '', notes: r.notes || '', deadline: r.deadline ? toLocal(r.deadline) : '', reward: r.reward, active: r.active })}>edit</button>{r.kind !== 'referral' && <button disabled={busy} className="neu-btn" style={{ padding: '4px 9px', fontSize: 11, color: '#DC2626' }} onClick={() => delTask(r)}>delete</button>}</div>)}
       </>)}
     </div>
   );
