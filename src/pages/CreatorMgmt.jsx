@@ -10,7 +10,7 @@ const call = async (fn, args = {}) => {
   if (error) throw error;
   return data;
 };
-const EMPTY = { id: null, title: '', description: '', requirements: '', notes: '', deadline: '', reward: '', active: true };
+const EMPTY = { id: null, title: '', description: '', requirements: '', notes: '', deadline: '', reward: '', active: true, max_entries: 5 };
 const toLocal = (d) => { const x = new Date(d); x.setMinutes(x.getMinutes() - x.getTimezoneOffset()); return x.toISOString().slice(0, 16); };
 const COLORS = { pending: '#F59E0B', approved: '#10B981', rejected: '#DC2626', suspended: '#6B7280', successful: '#10B981', earned: '#10B981', reversed: '#DC2626' };
 const card = { background: 'var(--bg, #e0e5ec)', borderRadius: 16, padding: 14, boxShadow: '6px 6px 12px rgba(163,177,198,.5), -6px -6px 12px rgba(255,255,255,.7)' };
@@ -102,7 +102,7 @@ export default function CreatorMgmt() {
   const saveTask = async (e) => {
     e.preventDefault(); setBusy(true);
     try {
-      await call('admin_creator_task_save', { p_id: form.id, p_title: form.title, p_description: form.description, p_reward: Number(form.reward) || 0, p_active: form.active, p_requirements: form.requirements, p_notes: form.notes, p_deadline: form.deadline ? new Date(form.deadline).toISOString() : null });
+      await call('admin_creator_task_save', { p_id: form.id, p_title: form.title, p_description: form.description, p_reward: Number(form.reward) || 0, p_active: form.active, p_requirements: form.requirements, p_notes: form.notes, p_deadline: form.deadline ? new Date(form.deadline).toISOString() : null, p_max_entries: Number(form.max_entries) || 5 });
       setForm(EMPTY); await load();
     } catch (x) { setErr(x.message); }
     setBusy(false);
@@ -185,13 +185,14 @@ export default function CreatorMgmt() {
           <textarea placeholder="Notes for creators" value={form.notes || ''} onChange={e => setForm({ ...form, notes: e.target.value })} style={{ padding: 8, borderRadius: 10 }} />
           <label style={{ fontSize: 13 }}>Deadline (optional) <input type="datetime-local" value={form.deadline || ''} onChange={e => setForm({ ...form, deadline: e.target.value })} style={{ padding: 8, borderRadius: 10, marginLeft: 6 }} /></label>
           <input type="number" min="0" step="0.01" placeholder="Reward (₱)" value={form.reward} onChange={e => setForm({ ...form, reward: e.target.value })} style={{ padding: 8, borderRadius: 10 }} />
+          <label style={{ fontSize: 13 }}>Max entries per creator <input type="number" min="1" max="50" value={form.max_entries} onChange={e => setForm({ ...form, max_entries: e.target.value })} style={{ padding: 8, borderRadius: 10, marginLeft: 6, width: 80 }} /></label>
           <label style={{ fontSize: 13 }}><input type="checkbox" checked={form.active} onChange={e => setForm({ ...form, active: e.target.checked })} /> Active</label>
           <div style={{ display: 'flex', gap: 8 }}>
             <button className="neu-btn" disabled={busy} type="submit" style={{ padding: '8px 14px' }}>Save</button>
             {form.id && <button className="neu-btn" type="button" onClick={() => setForm(EMPTY)} style={{ padding: '8px 14px' }}>Cancel</button>}
           </div>
         </form>
-        {table(taskCols, rows, r => <div style={{ display: 'flex', gap: 4 }}><button className="neu-btn" style={{ padding: '4px 9px', fontSize: 11 }} onClick={() => setForm({ id: r.id, title: r.title, description: r.description || '', requirements: r.requirements || '', notes: r.notes || '', deadline: r.deadline ? toLocal(r.deadline) : '', reward: r.reward, active: r.active })}>edit</button>{r.kind !== 'referral' && <button disabled={busy} className="neu-btn" style={{ padding: '4px 9px', fontSize: 11, color: '#DC2626' }} onClick={() => delTask(r)}>delete</button>}</div>)}
+        {table(taskCols, rows, r => <div style={{ display: 'flex', gap: 4 }}><button className="neu-btn" style={{ padding: '4px 9px', fontSize: 11 }} onClick={() => setForm({ id: r.id, title: r.title, description: r.description || '', requirements: r.requirements || '', notes: r.notes || '', deadline: r.deadline ? toLocal(r.deadline) : '', reward: r.reward, active: r.active, max_entries: r.max_entries || 5 })}>edit</button>{r.kind !== 'referral' && <button disabled={busy} className="neu-btn" style={{ padding: '4px 9px', fontSize: 11, color: '#DC2626' }} onClick={() => delTask(r)}>delete</button>}</div>)}
       </>)}
     </div>
   );
