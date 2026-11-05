@@ -21,6 +21,7 @@ const XMARKET_ITEMS = [
   ['/wallet', 'Wallet', Wallet],
   ['/payouts', 'Withdrawals & Interest', Wallet],
   ['/creators', 'Creators', Crown],
+  ['/creator-mgmt', 'Creator Management', Crown],
   ['/returns', 'Returns', RotateCcw],
   ['/quotations', 'Quotations', FileText],
   ['/reviews', 'Reviews', Star],
