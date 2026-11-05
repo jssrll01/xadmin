@@ -19,6 +19,7 @@ import BulkProducts from './pages/BulkProducts.jsx';
 import Users from './pages/Users.jsx';
 import TopUps from './pages/TopUps.jsx';
 import Wallet from './pages/Wallet.jsx';
+import WalletPayouts from './pages/WalletPayouts.jsx';
 import Reports from './pages/Reports.jsx';
 import Returns from './pages/Returns.jsx';
 import Quotations from './pages/Quotations.jsx';
@@ -124,6 +125,7 @@ export default function App() {
           <Route path="/orders"    element={<Orders />} />
           <Route path="/topups"    element={<TopUps />} />
           <Route path="/wallet"    element={<Wallet />} />
+          <Route path="/payouts"   element={<WalletPayouts />} />
           <Route path="/returns"   element={<Returns />} />
           <Route path="/reports"   element={<Reports />} />
           <Route path="/shops"     element={<Shops />} />

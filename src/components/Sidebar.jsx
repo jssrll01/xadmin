@@ -19,6 +19,7 @@ const XMARKET_ITEMS = [
   ['/orders', 'Orders', ShoppingBag],
   ['/topups', 'Top-ups', Wallet],
   ['/wallet', 'Wallet', Wallet],
+  ['/payouts', 'Withdrawals & Interest', Wallet],
   ['/returns', 'Returns', RotateCcw],
   ['/quotations', 'Quotations', FileText],
   ['/reviews', 'Reviews', Star],
