@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { supabase } from '../supabase.js';
 import { peso, dateTime } from '../lib/format.js';
+import ImportTasks from './ImportTasks.jsx';
 
 const CODE = import.meta.env.VITE_XADMIN_PIN;
 const call = async (fn, args = {}) => {
@@ -161,6 +162,7 @@ export default function CreatorMgmt() {
       {COLS[tab] && table(COLS[tab], rows)}
 
       {tab === 'tasks' && (<>
+        <ImportTasks call={call} onDone={load} />
         <form onSubmit={saveTask} style={{ ...card, marginBottom: 12, display: 'grid', gap: 8 }}>
           <b>{form.id ? 'Edit task' : 'New content task'}</b>
           <input required placeholder="Title" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} style={{ padding: 8, borderRadius: 10 }} />
