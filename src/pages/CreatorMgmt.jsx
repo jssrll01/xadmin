@@ -9,6 +9,8 @@ const call = async (fn, args = {}) => {
   if (error) throw error;
   return data;
 };
+const EMPTY = { id: null, title: '', description: '', requirements: '', notes: '', deadline: '', reward: '', active: true };
+const toLocal = (d) => { const x = new Date(d); x.setMinutes(x.getMinutes() - x.getTimezoneOffset()); return x.toISOString().slice(0, 16); };
 const COLORS = { pending: '#F59E0B', approved: '#10B981', rejected: '#DC2626', suspended: '#6B7280', successful: '#10B981', earned: '#10B981', reversed: '#DC2626' };
 const card = { background: 'var(--bg, #e0e5ec)', borderRadius: 16, padding: 14, boxShadow: '6px 6px 12px rgba(163,177,198,.5), -6px -6px 12px rgba(255,255,255,.7)' };
 const th = { textAlign: 'left', padding: '8px 10px', fontSize: 11, textTransform: 'uppercase', color: '#8a93a3', whiteSpace: 'nowrap' };
@@ -50,16 +52,19 @@ export default function CreatorMgmt() {
   const [filter, setFilter] = useState('pending');
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
-  const [form, setForm] = useState({ id: null, title: '', description: '', reward: '', active: true });
+  const [loading, setLoading] = useState(true);
+  const [form, setForm] = useState(EMPTY);
 
   const load = useCallback(async () => {
     const fn = TABS.find(t => t[0] === tab)[2];
+    setLoading(true);
     try {
       const args = tab === 'submissions' ? { p_status: filter || null } : {};
       const d = await call(fn, args);
       if (tab === 'overview') setOv(d); else setRows(Array.isArray(d) ? d : []);
       setErr('');
     } catch (e) { setRows([]); setErr(e.message); }
+    setLoading(false);
   }, [tab, filter]);
   useEffect(() => { load(); }, [load]);
 
@@ -82,8 +87,8 @@ export default function CreatorMgmt() {
   const saveTask = async (e) => {
     e.preventDefault(); setBusy(true);
     try {
-      await call('admin_creator_task_save', { p_id: form.id, p_title: form.title, p_description: form.description, p_reward: Number(form.reward) || 0, p_active: form.active });
-      setForm({ id: null, title: '', description: '', reward: '', active: true }); await load();
+      await call('admin_creator_task_save', { p_id: form.id, p_title: form.title, p_description: form.description, p_reward: Number(form.reward) || 0, p_active: form.active, p_requirements: form.requirements, p_notes: form.notes, p_deadline: form.deadline ? new Date(form.deadline).toISOString() : null });
+      setForm(EMPTY); await load();
     } catch (x) { setErr(x.message); }
     setBusy(false);
   };
@@ -93,8 +98,9 @@ export default function CreatorMgmt() {
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead><tr>{cols.map(c => <th key={c[0]} style={th}>{c[0]}</th>)}{extra && <th style={th}>Actions</th>}</tr></thead>
         <tbody>
-          {data.length === 0 && <tr><td style={{ ...td, textAlign: 'center', color: '#8a93a3' }} colSpan={cols.length + 1}>No records.</td></tr>}
-          {data.map((r, i) => <tr key={r.id || r.user_id || i}>{cols.map(c => <td key={c[0]} style={td}>{c[1](r)}</td>)}{extra && <td style={td}>{extra(r)}</td>}</tr>)}
+          {loading && [0, 1, 2, 3, 4].map(i => <tr key={'sk'+i}><td style={td} colSpan={9}><div style={{ height: 16, borderRadius: 8, background: 'rgba(148,163,184,.3)', animation: 'xsk 1.2s ease-in-out infinite' }} /></td></tr>)}
+          {!loading && data.length === 0 && <tr><td style={{ ...td, textAlign: 'center', color: '#8a93a3' }} colSpan={cols.length + 1}>No records.</td></tr>}
+          {!loading && data.map((r, i) => <tr key={r.id || r.user_id || i}>{cols.map(c => <td key={c[0]} style={td}>{c[1](r)}</td>)}{extra && <td style={td}>{extra(r)}</td>}</tr>)}
         </tbody>
       </table>
     </div>
@@ -108,6 +114,7 @@ export default function CreatorMgmt() {
   return (
     <div style={{ padding: 16 }}>
       <h2 style={{ fontSize: 22, fontWeight: 800, margin: '0 0 12px' }}>Creator Management</h2>
+      <style>{'@keyframes xsk{0%,100%{opacity:.4}50%{opacity:1}}'}</style>
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
         {TABS.map(([id, label]) => (
           <button key={id} className="neu-btn" onClick={() => setTab(id)} style={{ padding: '8px 14px', fontWeight: 700, fontSize: 13, opacity: tab === id ? 1 : .6, outline: tab === id ? '2px solid #2563EB' : 'none' }}>{label}</button>
@@ -120,6 +127,7 @@ export default function CreatorMgmt() {
       </div>
       {err && <p style={{ color: '#DC2626' }}>{err}</p>}
 
+      {tab === 'overview' && !ov && loading && <div style={{ height: 220, borderRadius: 16, background: 'rgba(148,163,184,.3)', animation: 'xsk 1.2s ease-in-out infinite' }} />}
       {tab === 'overview' && ov && (<>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(170px,1fr))', gap: 12, marginBottom: 14 }}>
           <Stat label="Approved creators" value={ov.creators} sub={`${ov.apps_pending} applications pending`} />
@@ -157,15 +165,20 @@ export default function CreatorMgmt() {
           <b>{form.id ? 'Edit task' : 'New content task'}</b>
           <input required placeholder="Title" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} style={{ padding: 8, borderRadius: 10 }} />
           <textarea placeholder="Description" value={form.description || ''} onChange={e => setForm({ ...form, description: e.target.value })} style={{ padding: 8, borderRadius: 10 }} />
+          <textarea placeholder="Requirements (one per line)" value={form.requirements || ''} onChange={e => setForm({ ...form, requirements: e.target.value })} style={{ padding: 8, borderRadius: 10, minHeight: 80 }} />
+          <textarea placeholder="Notes for creators" value={form.notes || ''} onChange={e => setForm({ ...form, notes: e.target.value })} style={{ padding: 8, borderRadius: 10 }} />
+          <label style={{ fontSize: 13 }}>Deadline (optional) <input type="datetime-local" value={form.deadline || ''} onChange={e => setForm({ ...form, deadline: e.target.value })} style={{ padding: 8, borderRadius: 10, marginLeft: 6 }} /></label>
           <input type="number" min="0" step="0.01" placeholder="Reward (₱)" value={form.reward} onChange={e => setForm({ ...form, reward: e.target.value })} style={{ padding: 8, borderRadius: 10 }} />
           <label style={{ fontSize: 13 }}><input type="checkbox" checked={form.active} onChange={e => setForm({ ...form, active: e.target.checked })} /> Active</label>
           <div style={{ display: 'flex', gap: 8 }}>
             <button className="neu-btn" disabled={busy} type="submit" style={{ padding: '8px 14px' }}>Save</button>
-            {form.id && <button className="neu-btn" type="button" onClick={() => setForm({ id: null, title: '', description: '', reward: '', active: true })} style={{ padding: '8px 14px' }}>Cancel</button>}
+            {form.id && <button className="neu-btn" type="button" onClick={() => setForm(EMPTY)} style={{ padding: '8px 14px' }}>Cancel</button>}
           </div>
         </form>
-        {table(taskCols, rows, r => <button className="neu-btn" style={{ padding: '4px 9px', fontSize: 11 }} onClick={() => setForm({ id: r.id, title: r.title, description: r.description, reward: r.reward, active: r.active })}>edit</button>)}
+        {table(taskCols, rows, r => <button className="neu-btn" style={{ padding: '4px 9px', fontSize: 11 }} onClick={() => setForm({ id: r.id, title: r.title, description: r.description || '', requirements: r.requirements || '', notes: r.notes || '', deadline: r.deadline ? toLocal(r.deadline) : '', reward: r.reward, active: r.active })}>edit</button>)}
       </>)}
     </div>
   );
 }
+
+// SKELETON_DONE

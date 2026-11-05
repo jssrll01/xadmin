@@ -17,10 +17,13 @@ export default function CreatorApps() {
   const [filter, setFilter] = useState('');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
+  const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
+    setLoading(true);
     try { const d = await call('admin_creator_apps_list', { p_status: filter || null }); setRows(Array.isArray(d) ? d : []); setErr(''); }
     catch (e) { setRows([]); setErr(e.message); }
+    setLoading(false);
   }, [filter]);
   useEffect(() => { load(); }, [load]);
 
@@ -38,6 +41,7 @@ export default function CreatorApps() {
   return (
     <div style={{ padding: 16 }}>
       <h2 style={{ fontSize: 22, fontWeight: 800, margin: '0 0 12px' }}>Creator Applications</h2>
+      <style>{'@keyframes xsk{0%,100%{opacity:.4}50%{opacity:1}}'}</style>
       <select value={filter} onChange={e => setFilter(e.target.value)} style={{ padding: 8, borderRadius: 10, marginBottom: 12 }}>
         <option value="">All</option>
         {Object.keys(COLORS).map(s => <option key={s} value={s}>{s}</option>)}
@@ -47,8 +51,9 @@ export default function CreatorApps() {
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead><tr>{['Submitted', 'Creator', 'Contact', 'Code', 'Status', 'Actions'].map(h => <th key={h} style={th}>{h}</th>)}</tr></thead>
           <tbody>
-            {rows.length === 0 && <tr><td style={{ ...td, textAlign: 'center' }} colSpan={6}>No applications.</td></tr>}
-            {rows.map(r => (
+            {loading && [0, 1, 2, 3].map(i => <tr key={'sk'+i}><td style={td} colSpan={6}><div style={{ height: 16, borderRadius: 8, background: 'rgba(148,163,184,.3)', animation: 'xsk 1.2s ease-in-out infinite' }} /></td></tr>)}
+            {!loading && rows.length === 0 && <tr><td style={{ ...td, textAlign: 'center' }} colSpan={6}>No applications.</td></tr>}
+            {!loading && rows.map(r => (
               <tr key={r.id}>
                 <td style={td}>{dateTime(r.submitted_at)}</td>
                 <td style={td}><b>{r.username}</b><br />{r.first_name} {r.last_name}</td>
@@ -64,3 +69,5 @@ export default function CreatorApps() {
     </div>
   );
 }
+
+// SKELETON_DONE
