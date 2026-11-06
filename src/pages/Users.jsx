@@ -31,12 +31,6 @@ const viewPhoto = async (row) => {
   if (await adminCall('admin_avatar_set', { p_code: CODE, p_user: row.id, p_url: v.trim() })) { alert('Photo updated'); window.location.reload(); }
 };
 
-const viewPhoto = async (row) => {
-  const v = prompt('Profile photo URL for ' + (row.email || row.id) + ' (edit to change, clear to remove):', row.avatar_url || '');
-  if (v === null || v === (row.avatar_url || '')) return;
-  if (await adminCall('admin_avatar_set', { p_code: CODE, p_user: row.id, p_url: v.trim() })) { alert('Photo updated'); window.location.reload(); }
-};
-
 const STATUS_OPTS = ['active', 'frozen', 'banned'];
 
 export default function Users() {
@@ -64,7 +58,6 @@ export default function Users() {
               <div>
                 <div style={{ fontWeight: 700 }}>{name}</div>
                 <div style={{ fontSize: 11, color: 'var(--text-dim)' }}>{(r.id || '').slice(0, 8)}</div>
-                {r.avatar_url && <a href={r.avatar_url} target='_blank' rel='noreferrer' onClick={(e) => e.stopPropagation()} style={{ fontSize: 10, color: '#2563EB', display: 'block', maxWidth: 190, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.avatar_url}</a>}
                 {r.avatar_url && <a href={r.avatar_url} target='_blank' rel='noreferrer' onClick={(e) => e.stopPropagation()} style={{ fontSize: 10, color: '#2563EB', display: 'block', maxWidth: 190, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.avatar_url}</a>}
               </div>
             </div>
@@ -104,7 +97,6 @@ export default function Users() {
             <option value="banned">Banned</option>
           </select>
           <button className="neu-btn" style={{ padding: 7 }} title="Adjust wallet" onClick={() => adjustWallet(row)}>₱</button>
-          <button className="neu-btn" style={{ padding: 7 }} title="Profile photo URL" onClick={() => viewPhoto(row)}>🖼</button>
           <button className="neu-btn" style={{ padding: 7 }} title="Profile photo URL" onClick={() => viewPhoto(row)}>🖼</button>
           <button className="neu-btn" style={{ padding: 7 }} title="Set points" onClick={() => setPoints(row)}>P</button>
         </>
