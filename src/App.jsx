@@ -35,6 +35,8 @@ import Airdrop from './pages/Airdrop.jsx';
 import Banners from './pages/Banners.jsx';
 import Bundles from './pages/Bundles.jsx';
 import Xcards from './pages/Xcards.jsx';
+import XmChat from './pages/XmChat.jsx';
+import XmVip from './pages/XmVip.jsx';
 import Promos from './pages/Promos.jsx';
 import Settings from './pages/Settings.jsx';
 import AuditLog from './pages/AuditLog.jsx';
@@ -138,6 +140,8 @@ export default function App() {
           <Route path="/airdrop" element={<Airdrop />} />
           <Route path="/banners" element={<Banners />} />
           <Route path="/xcards"    element={<Xcards />} />
+        <Route path="/xm-chat" element={<XmChat />} />
+        <Route path="/xm-vip" element={<XmVip />} />
           <Route path="/bundles"   element={<Bundles />} />
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/supplier" element={<Supplier />} />

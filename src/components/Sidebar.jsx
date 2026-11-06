@@ -5,7 +5,7 @@ import { useAdminContext } from '../context/AdminContext';
 import { ACCESS_TABS, accessPath } from '../xaccess/App.jsx';
 import {
   LayoutDashboard, Home as HomeIcon, FolderOpen, Trash2, Users, Package, ShoppingBag, Wallet, RotateCcw,
-  AlertTriangle, Store, CreditCard, Gift, Boxes, Settings as Cog, ScrollText, Bell, BarChart3, FileText, Star, Gamepad2, Image as ImageIcon, Percent, Radio, ClipboardList, QrCode, Truck, Crown, Database,
+  AlertTriangle, Store, CreditCard, Gift, Boxes, Settings as Cog, ScrollText, Bell, BarChart3, FileText, Star, Gamepad2, Image as ImageIcon, Percent, Radio, ClipboardList, QrCode, Truck, Crown, Database, MessageSquare,
 } from 'lucide-react';
 
 const XMARKET_ITEMS = [
@@ -32,6 +32,8 @@ const XMARKET_ITEMS = [
   ['/airdrop', 'Airdrop 88', Gamepad2],
   ['/banners', 'Banner', ImageIcon],
   ['/xcards', 'Xcards', CreditCard],
+  ['/xm-chat', 'Global Chat', MessageSquare],
+  ['/xm-vip', 'VIP Members', Crown],
   ['/bundles', 'Bundles', Boxes],
   ['/notifications', 'Notifications', Bell],
   ['/supplier', 'Supplier', Boxes],
