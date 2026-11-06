@@ -138,7 +138,6 @@ export default function App() {
           <Route path="/airdrop" element={<Airdrop />} />
           <Route path="/banners" element={<Banners />} />
           <Route path="/xcards"    element={<Xcards />} />
-          <Route path="/promos"    element={<Promos />} />
           <Route path="/bundles"   element={<Bundles />} />
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/supplier" element={<Supplier />} />

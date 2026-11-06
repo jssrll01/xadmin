@@ -32,7 +32,6 @@ const XMARKET_ITEMS = [
   ['/airdrop', 'Airdrop 88', Gamepad2],
   ['/banners', 'Banner', ImageIcon],
   ['/xcards', 'Xcards', CreditCard],
-  ['/promos', 'Promos', Gift],
   ['/bundles', 'Bundles', Boxes],
   ['/notifications', 'Notifications', Bell],
   ['/supplier', 'Supplier', Boxes],
@@ -52,7 +51,6 @@ const YUELIN_ITEMS = [
   ['/', 'Dashboard', LayoutDashboard],
 
   ['/products', 'Products', Package],
-  ['/promos', 'Offers', Gift],
   ['/qr-portal', 'Redeem Codes', QrCode],
   ['/vip', 'VIP Applications', Crown],
   ['/settings', 'Settings', Cog],
