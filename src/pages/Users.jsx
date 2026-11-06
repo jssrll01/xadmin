@@ -73,11 +73,6 @@ export default function Users() {
         { key: 'first_name', label: 'First name' },
         { key: 'last_name', label: 'Last name' },
         { key: 'phone', label: 'Phone' },
-        { key: 'nearest_landmark', label: 'Landmark', required: true },
-        { key: 'barangay', label: 'Barangay', required: true },
-        { key: 'province', label: 'Province' },
-        { key: 'city', label: 'City' },
-        { key: 'delivery_address', label: 'Address', type: 'textarea' },
       ]}
       onCreate={userCrud.create}
       onUpdate={userCrud.update}
