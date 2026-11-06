@@ -22,6 +22,7 @@ import Wallet from './pages/Wallet.jsx';
 import WalletPayouts from './pages/WalletPayouts.jsx';
 import CreatorApps from './pages/CreatorApps.jsx';
 import CreatorMgmt from './pages/CreatorMgmt.jsx';
+import SocialMod from './pages/SocialMod.jsx';
 import Reports from './pages/Reports.jsx';
 import Returns from './pages/Returns.jsx';
 import Quotations from './pages/Quotations.jsx';
@@ -132,6 +133,7 @@ export default function App() {
           <Route path="/payouts"   element={<WalletPayouts />} />
           <Route path="/creators"  element={<CreatorApps />} />
           <Route path="/creator-mgmt" element={<CreatorMgmt />} />
+          <Route path="/social-mod" element={<SocialMod />} />
           <Route path="/returns"   element={<Returns />} />
           <Route path="/reports"   element={<Reports />} />
           <Route path="/shops"     element={<Shops />} />
