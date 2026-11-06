@@ -23,6 +23,7 @@ const XMARKET_ITEMS = [
   ['/creators', 'Creators', Crown],
   ['/creator-mgmt', 'Creator Management', Crown],
   ['/social-mod', 'Socials Management', ImageIcon],
+  ['/members-data', 'Members Data', Database],
   ['/returns', 'Returns', RotateCcw],
   ['/quotations', 'Quotations', FileText],
   ['/reviews', 'Reviews', Star],
