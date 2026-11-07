@@ -249,6 +249,12 @@ export default function BulkProducts() {
             XLSX.utils.book_append_sheet(wb, help, 'Instructions');
             XLSX.writeFile(wb, 'xmarket-template.xlsx');
           }}>Download Excel template</Btn>
+          <Btn onClick={() => {
+            const t = JSON.stringify([
+              { product_name: 'Sample Instant Noodles 60g', selling_price: 25, category: 'Groceries & Pantry', description: 'Quick-cook noodles.', image_urls: ['https://example.com/noodles.jpg'], variants: '', stock_status: 'in_stock' },
+              { product_name: 'Sample Phone Case', selling_price: 199, category: 'Electronics', description: '', image_urls: ['https://example.com/a.jpg', 'https://example.com/b.jpg'], variants: 'Color:Black|White', stock_status: 'in_stock' }], null, 2);
+            const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([t], { type: 'application/json' })); a.download = 'xmarket-template.json'; a.click();
+          }}>Download JSON template</Btn>
           <label className="neu-btn neu-btn-primary" style={{ cursor: 'pointer' }}>Upload CSV<input type="file" accept=".csv,text/csv" onChange={onFile} style={{ display: 'none' }} /></label>
         </div>
       </Card>
