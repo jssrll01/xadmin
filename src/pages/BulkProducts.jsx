@@ -25,6 +25,7 @@ const download = (name, text) => { const a = document.createElement('a'); a.href
 const SAMPLE = [HEADERS.join(','),
   [q('Sample Instant Noodles 60g'), '25', q('Groceries & Pantry'), q('Quick-cook noodles.'), q('https://example.com/noodles.jpg'), q(''), 'in_stock'].join(','),
   [q('Sample Phone Case'), '199', q('Electronics'), q(''), q('https://example.com/a.jpg|https://example.com/b.jpg'), q('[{"name":"Color","options":["Black","White"]}]'), 'in_stock'].join(',')].join('\n');
+const ws2c = (w) => { w['!cols'] = [{ wch: 18 }, { wch: 70 }]; };
 const Badge = ({ s }) => <span style={{ background: COLORS[s] || '#999', color: '#fff', borderRadius: 8, padding: '2px 8px', fontSize: 11, fontWeight: 800 }}>{s}</span>;
 const FLAG_LIST = [['save_more','Save More'],['flash_sale','Flash Sale'],['show_fashion','Fashion'],['show_groceries','Groceries & Pantry'],['show_sports','Sports & Outdoors'],['show_books','Books & Stationery'],['show_payday','Payday Sale'],['show_preloved','Pre-loved'],['verified','Verified'],['preorder','Preorder'],['instant','Instant']];
 const L = { fontSize: 12, fontWeight: 700, margin: '6px 0 2px', display: 'block' };
@@ -226,6 +227,28 @@ export default function BulkProducts() {
         <div style={{ fontSize: 12, marginBottom: 8 }}>CSV columns: {HEADERS.join(', ')}. Variants: leave empty, or <code>Size: S|M|L</code>, or JSON with one variant type.</div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           <Btn onClick={() => download('xmarket-template.csv', SAMPLE)}>Download template</Btn>
+          <Btn onClick={() => {
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet([HEADERS,
+              ['Sample Instant Noodles 60g', 25, 'Groceries & Pantry', 'Quick-cook noodles.', 'https://example.com/noodles.jpg', '', 'in_stock'],
+              ['Sample Phone Case', 199, 'Electronics', '', 'https://example.com/a.jpg|https://example.com/b.jpg', 'Color:Black|White', 'in_stock']]);
+            ws['!cols'] = HEADERS.map(() => ({ wch: 28 }));
+            XLSX.utils.book_append_sheet(wb, ws, 'Products');
+            const help = XLSX.utils.aoa_to_sheet([
+              ['Column', 'How to fill it'],
+              ['product_name', 'Required. Product title.'],
+              ['selling_price', 'Required. Numbers only, up to 2 decimals, e.g. 199 or 199.50.'],
+              ['category', 'Pick from the list below, or leave a new name.'],
+              ['description', 'Optional text.'],
+              ['image_urls', 'Image links separated by the | character.'],
+              ['variants', 'Optional. Example: Color:Black|White. One variant type only.'],
+              ['stock_status', 'in_stock or out_of_stock.'],
+              [],
+              ['Valid categories'], ...CATEGORIES.map((c) => [c])]);
+            ws2c(help);
+            XLSX.utils.book_append_sheet(wb, help, 'Instructions');
+            XLSX.writeFile(wb, 'xmarket-template.xlsx');
+          }}>Download Excel template</Btn>
           <label className="neu-btn neu-btn-primary" style={{ cursor: 'pointer' }}>Upload CSV<input type="file" accept=".csv,text/csv" onChange={onFile} style={{ display: 'none' }} /></label>
         </div>
       </Card>
