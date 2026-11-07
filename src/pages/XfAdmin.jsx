@@ -45,6 +45,13 @@ const CFG = {
   },
 };
 
+const EX = {
+  price_drop: [{ title: 'Sample drop', description: 'Details here', price: 99, stock: 1, status: 'active', images: ['https://example.com/1.jpg'] }],
+  digital: [{ name: 'Sample product', description: 'Details here', price: 49, stock: 10, category: 'Software', delivery_note: 'Sent by message', active: true, images: ['https://example.com/1.jpg'] }],
+  poll: [{ question: 'What should we add next?', description: 'Pick one', options: ['Option A', 'Option B', 'Option C'], reward: 0.1, active: true }],
+  fund: [{ title: 'Server upgrade', project: 'Project name', purpose: 'Why we need it', details: 'Where the funds go', target: 2000, active: true, images: ['https://example.com/1.jpg'] }],
+};
+
 function XfAdmin({ kind }) {
   const cfg = CFG[kind];
   const { show } = useToast();
@@ -54,6 +61,8 @@ function XfAdmin({ kind }) {
   const [edit, setEdit] = useState(null);
   const [busy, setBusy] = useState(false);
   const [drafts, setDrafts] = useState({});
+  const [bulk, setBulk] = useState(null);
+  const [bulkErr, setBulkErr] = useState('');
 
   const load = useCallback(async () => {
     try { setRows(await rpc('admin_xf_list', { p_kind: kind })); } catch (e) { show?.(String(e.message || e), 'error'); setRows([]); }
@@ -100,6 +109,30 @@ function XfAdmin({ kind }) {
       show?.('Order updated', 'success'); loadOrders();
     } catch (e) { show?.(String(e.message || e), 'error'); }
   };
+  const runBulk = async () => {
+    setBulkErr('');
+    let data;
+    try { data = JSON.parse(bulk); } catch (e) { setBulkErr('Invalid JSON: ' + e.message); return; }
+    if (data && !Array.isArray(data) && Array.isArray(data.items)) data = data.items;
+    if (!Array.isArray(data)) data = [data];
+    if (!data.length || data.length > 100) { setBulkErr('Add between 1 and 100 items.'); return; }
+    setBusy(true);
+    let ok = 0; const failed = []; const msgs = [];
+    for (let i = 0; i < data.length; i++) {
+      const it = { ...(data[i] || {}) };
+      delete it.id;
+      if (typeof it.images === 'string') it.images = lines(it.images);
+      if (typeof it.options === 'string') it.options = lines(it.options);
+      if (Array.isArray(it.images)) it.images = it.images.slice(0, cfg.max);
+      try { await rpc('admin_xf_save', { p_kind: kind, p: it }); ok++; }
+      catch (e) { failed.push(data[i]); msgs.push('#' + (i + 1) + ': ' + String(e.message || e)); }
+    }
+    setBusy(false);
+    load();
+    if (!failed.length) { show?.(ok + ' added', 'success'); setBulk(null); return; }
+    setBulk(JSON.stringify(failed, null, 2));
+    setBulkErr(ok + ' added. ' + failed.length + ' failed and are kept below, fix them and run again. ' + msgs.join(' | '));
+  };
   const upd = (k, v) => setEdit((p) => ({ ...p, [k]: v }));
   const dr = (id, k, v) => setDrafts((p) => ({ ...p, [id]: { ...(p[id] || {}), [k]: v } }));
 
@@ -107,7 +140,12 @@ function XfAdmin({ kind }) {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14, gap: 10, flexWrap: 'wrap' }}>
         <h1 style={{ fontSize: 22, fontWeight: 700 }}>{cfg.title}</h1>
-        {tab === 'items' && <Btn variant="primary" onClick={() => openEdit(null)}><Plus size={16} /> New</Btn>}
+        {tab === 'items' && (
+          <div style={{ display: 'flex', gap: 8 }}>
+            <Btn onClick={() => { setBulkErr(''); setBulk(JSON.stringify(EX[kind], null, 2)); }}>Bulk add (JSON)</Btn>
+            <Btn variant="primary" onClick={() => openEdit(null)}><Plus size={16} /> New</Btn>
+          </div>
+        )}
       </div>
       {cfg.orders && (
         <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
@@ -169,6 +207,21 @@ function XfAdmin({ kind }) {
             </>)}
           </Card>
         )))}
+
+      <Modal open={bulk !== null} onClose={() => setBulk(null)} title={'Bulk add: ' + cfg.title}>
+        {bulk !== null && (<div>
+          <div style={{ fontSize: 12.5, color: 'var(--text-dim)', lineHeight: 1.5 }}>
+            Paste a JSON array, one object per item (up to 100). Use the same field names as the form. Images and options are arrays of text.{cfg.max ? ' Images are limited to ' + cfg.max + ' per item.' : ''}
+          </div>
+          <textarea style={{ ...inp, minHeight: 260, marginTop: 10, fontFamily: 'monospace', fontSize: 12.5 }} value={bulk} onChange={(e) => setBulk(e.target.value)} spellCheck={false} />
+          {bulkErr && <div style={{ marginTop: 10, fontSize: 12.5, color: 'var(--danger)', lineHeight: 1.5 }}>{bulkErr}</div>}
+          <div style={{ display: 'flex', gap: 8, marginTop: 14 }}>
+            <Btn onClick={() => setBulk(null)}>Cancel</Btn>
+            <Btn onClick={() => setBulk(JSON.stringify(EX[kind], null, 2))}>Reset example</Btn>
+            <Btn variant="primary" onClick={runBulk} disabled={busy}>{busy ? 'Adding…' : 'Add all'}</Btn>
+          </div>
+        </div>)}
+      </Modal>
 
       <Modal open={!!edit} onClose={() => setEdit(null)} title={edit && edit.id ? 'Edit' : 'New'}>
         {edit && (<div>
