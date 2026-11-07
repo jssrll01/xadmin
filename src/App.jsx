@@ -33,6 +33,7 @@ import Reviews from './pages/Reviews.jsx';
 import Shops from './pages/Shops.jsx';
 import Stores from './pages/Stores.jsx';
 import PlayTime from './pages/PlayTime.jsx';
+import { PriceDropsAdmin, DigitalProductsAdmin, DemandPollsAdmin, SponsorshipsAdmin } from './pages/XfAdmin.jsx';
 import Airdrop from './pages/Airdrop.jsx';
 import Banners from './pages/Banners.jsx';
 import Bundles from './pages/Bundles.jsx';
@@ -141,6 +142,10 @@ export default function App() {
           <Route path="/shops"     element={<Shops />} />
           <Route path="/stores"    element={<Stores />} />
           <Route path="/play-time" element={<PlayTime />} />
+          <Route path="/xf-price-drops" element={<PriceDropsAdmin />} />
+          <Route path="/xf-digital" element={<DigitalProductsAdmin />} />
+          <Route path="/xf-polls" element={<DemandPollsAdmin />} />
+          <Route path="/xf-sponsor" element={<SponsorshipsAdmin />} />
           <Route path="/airdrop" element={<Airdrop />} />
           <Route path="/banners" element={<Banners />} />
           <Route path="/xcards"    element={<Xcards />} />
