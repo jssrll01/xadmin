@@ -41,6 +41,7 @@ const XMARKET_ITEMS = [
   ['/xf-digital', 'Digital Products', Gamepad2],
   ['/xf-polls', 'Demand Polls', Gamepad2],
   ['/xf-sponsor', 'Sponsorships', Gamepad2],
+  ['/xf-popups', 'Launch Popups', Gamepad2],
   ['/points-shop', 'Points Shop', Gift],
   ['/airdrop', 'Airdrop 88', Gamepad2],
   ['/banners', 'Banner', ImageIcon],
