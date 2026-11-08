@@ -7,6 +7,8 @@ import { AdminProvider } from './context/AdminContext.jsx';
 import { ToastProvider } from './components/Toast.jsx';
 import './styles/neu.css';
 import './styles/futuristic.css';
+import './xa/xa.css';
+import { XaToasts } from './xa/Kit.jsx';
 
 // The app (and every page) loads only after the PIN has been checked by the server.
 const App = React.lazy(() => import('./App.jsx'));
@@ -28,7 +30,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
       <ToastProvider>
-        <AdminProvider><Boot /></AdminProvider>
+        <XaToasts><AdminProvider><Boot /></AdminProvider></XaToasts>
       </ToastProvider>
     </BrowserRouter>
   </React.StrictMode>

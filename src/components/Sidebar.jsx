@@ -1,133 +1,85 @@
-import React from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { ChevronDown, ChevronLeft, ChevronRight, Search, LayoutDashboard, Home as HomeIcon, FolderOpen, Trash2, Settings as Cog, Database, Package, QrCode, Crown } from 'lucide-react';
 import { useYlTables } from '../yuelin/useYlTables.js';
 import { useAdminContext } from '../context/AdminContext';
 import { ACCESS_TABS, accessPath } from '../xaccess/App.jsx';
-import {
-  LayoutDashboard, Home as HomeIcon, FolderOpen, Trash2, Users, Package, ShoppingBag, Wallet, RotateCcw,
-  AlertTriangle, Store, CreditCard, Gift, Boxes, Settings as Cog, ScrollText, Bell, BarChart3, FileText, Star, Gamepad2, Image as ImageIcon, Percent, Radio, ClipboardList, QrCode, Truck, Crown, Database, MessageSquare,
-} from 'lucide-react';
+import { XMARKET_GROUPS, locate } from '../xa/shellNav.js';
 
-const XMARKET_ITEMS = [
-  ['/', 'Dashboard', LayoutDashboard],
-
-  ['/daily', 'Daily Tasks & Notes', ClipboardList],
-  ['/xcoin', 'XCOIN', BarChart3],
-  ['/buy-load', 'Buy Load', Wallet],
-  ['/users', 'Users', Users],
-  ['/products', 'Products', Package],
-  ['/orders', 'Orders', ShoppingBag],
-  ['/topups', 'Top-ups', Wallet],
-  ['/wallet', 'Wallet', Wallet],
-  ['/payouts', 'Withdrawals & Interest', Wallet],
-  ['/creators', 'Creators', Crown],
-  ['/creator-mgmt', 'Creator Management', Crown],
-  ['/social-mod', 'Socials Management', ImageIcon],
-  ['/video-mod', 'Socials Videos', ImageIcon],
-  ['/wallet-security', 'Wallet Security', Wallet],
-  ['/market-qa', 'Market & Q&A', Gift],
-  ['/gifts', 'Creator Gifts', Gift],
-  ['/dm-mod', 'DM Moderation', Gift],
-  ['/product-views', 'Product Views', Gift],
-  ['/members-data', 'Members Data', Database],
-  ['/returns', 'Returns', RotateCcw],
-  ['/quotations', 'Quotations', FileText],
-  ['/reviews', 'Reviews', Star],
-  ['/reports', 'Reports', AlertTriangle],
-  ['/shops', 'Shops', Store],
-  ['/stores', 'Stores', Store],
-  ['/play-time', 'Play Time', Gamepad2],
-  ['/xf-price-drops', 'Price Drops', Gamepad2],
-  ['/xf-digital', 'Digital Products', Gamepad2],
-  ['/xf-polls', 'Demand Polls', Gamepad2],
-  ['/xf-sponsor', 'Sponsorships', Gamepad2],
-  ['/xf-popups', 'Launch Popups', Gamepad2],
-  ['/points-shop', 'Points Shop', Gift],
-  ['/airdrop', 'Airdrop 88', Gamepad2],
-  ['/banners', 'Banner', ImageIcon],
-  ['/xcards', 'Xcards', CreditCard],
-  ['/xm-chat', 'Global Chat', MessageSquare],
-  ['/xm-vip', 'VIP Members', Crown],
-  ['/bundles', 'Bundles', Boxes],
-  ['/notifications', 'Notifications', Bell],
-  ['/supplier', 'Supplier', Boxes],
-  ['/notify', 'Notify', Bell],
-  ['/airdrop-mod', 'Airdrop Mod', Gamepad2],
-  ['/audit', 'Audit log', ScrollText],
-  ['/pricing', 'Pricing', Percent],
-  ['/cashback', 'Cashback & Costs', Percent],
-  ['/bulk-products', 'Bulk Product Manager', Percent],
-  ['/nfc', 'NFC Studio', Radio],
-  ['/qr-portal', 'QR Portal', QrCode],
-  ['/logistics', 'Logistics', Truck],
-  ['/settings', 'Settings', Cog],
-];
-
-const YUELIN_ITEMS = [
-  ['/', 'Dashboard', LayoutDashboard],
-
-  ['/products', 'Products', Package],
-  ['/qr-portal', 'Redeem Codes', QrCode],
-  ['/vip', 'VIP Applications', Crown],
-  ['/settings', 'Settings', Cog],
-];
-
-const seg = (on, color) => ({
-  flex: 1, padding: '8px 10px', border: 'none', borderRadius: 12, fontSize: 12, fontWeight: 700,
-  cursor: 'pointer', color: on ? color : '#8a93a3', background: on ? 'var(--bg, #e0e5ec)' : 'transparent',
-  boxShadow: on ? '4px 4px 8px rgba(163,177,198,0.6), -4px -4px 8px rgba(255,255,255,0.7)' : 'none',
-  transition: 'all 0.25s ease',
-});
+const read = (k, d) => { try { const v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } };
+const write = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* storage blocked */ } };
 
 export default function Sidebar() {
   const { activeSystem, setActiveSystem } = useAdminContext();
   const nav = useNavigate();
+  const loc = useLocation();
   const yl = useYlTables(activeSystem === 'YUELIN');
-  const items = activeSystem === 'ACCESS'
-    ? ACCESS_TABS.map(([k, label]) => [accessPath(k), label, { home: HomeIcon, drive: FolderOpen, revoke: Trash2, settings: Cog }[k]])
+  const [collapsed, setCollapsed] = useState(() => read('xs_collapsed', false));
+  const [shut, setShut] = useState(() => read('xs_shut', {}));
+  const [mobile, setMobile] = useState(false);
+  const [q, setQ] = useState('');
+
+  useEffect(() => { const h = () => setMobile((o) => !o); window.addEventListener('xs:menu', h); return () => window.removeEventListener('xs:menu', h); }, []);
+  useEffect(() => { setMobile(false); }, [loc.pathname, activeSystem]);
+  useEffect(() => {
+    if (activeSystem !== 'XMARKET') return;
+    const here = locate(loc.pathname);
+    if (here && shut[here.groupId]) { const n = { ...shut }; delete n[here.groupId]; setShut(n); write('xs_shut', n); }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loc.pathname, activeSystem]);
+
+  const flat = activeSystem === 'ACCESS'
+    ? ACCESS_TABS.map(([k, label]) => [accessPath(k), label, { home: HomeIcon, drive: FolderOpen, revoke: Trash2, settings: Cog }[k] || Cog])
     : activeSystem === 'YUELIN'
-    ? [['/', 'Dashboard', LayoutDashboard],
- ['/yl-ops', 'Operations', Cog], ...yl.tables.map((t) => ['/yl/' + encodeURIComponent(t.name), t.label, Database])]
-    : XMARKET_ITEMS;
+    ? [['/', 'Dashboard', LayoutDashboard], ['/yl-ops', 'Operations', Cog], ...yl.tables.map((t) => ['/yl/' + encodeURIComponent(t.name), t.label, Database])]
+    : null;
+  const groups = flat ? [{ id: 'all', label: '', items: flat }] : XMARKET_GROUPS;
+  const ql = q.trim().toLowerCase();
+  const shown = groups.map((g) => ({ ...g, items: ql ? g.items.filter((i) => i[1].toLowerCase().includes(ql)) : g.items })).filter((g) => g.items.length);
+
+  const toggleGroup = (id) => { const n = { ...shut, [id]: !shut[id] }; setShut(n); write('xs_shut', n); };
+  const toggleCollapse = () => { const n = !collapsed; setCollapsed(n); write('xs_collapsed', n); };
+  const sw = (sys) => { setActiveSystem(sys); nav('/'); };
+
   return (
-    <aside className="sidebar">
-      <div className="sidebar-brand">
-        <div className="sidebar-brand-icon" style={{
-          background: 'linear-gradient(135deg,#3B82F6,#7C3AED)',
-          color: '#fff',
-          fontSize: 18,
-          fontWeight: 900,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          borderRadius: 11,
-          boxShadow: '4px 4px 10px rgba(37,99,235,0.35), -3px -3px 8px rgba(255,255,255,0.9)',
-        }}>
-          X
+    <>
+      <div className={'xs-scrim' + (mobile ? ' show' : '')} onClick={() => setMobile(false)} />
+      <aside className={'xs-side' + (collapsed ? ' col' : '') + (mobile ? ' open' : '')} aria-label="Main navigation">
+        <div className="xs-brand">
+          <div className="xs-logo">X</div>
+          <div><b>XADMIN</b><small>{activeSystem}</small></div>
+          <button type="button" className="xs-collapse" onClick={toggleCollapse} aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}>
+            {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+          </button>
         </div>
-        <div>
-          <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: -0.3 }}>XADMIN</div>
-          <div style={{ fontSize: 10, color: 'var(--text-dim)', fontWeight: 600 }}>{activeSystem}</div>
+        <div className="xs-sys" role="tablist" aria-label="System">
+          {['XMARKET', 'YUELIN', 'ACCESS'].map((s) => (
+            <button key={s} type="button" role="tab" aria-selected={activeSystem === s} className={activeSystem === s ? 'on' : ''} onClick={() => sw(s)}>{s}</button>
+          ))}
         </div>
-      </div>
-      <div style={{ display: 'flex', padding: 5, margin: '0 0 14px', borderRadius: 16, background: 'var(--bg, #e0e5ec)', boxShadow: 'inset 4px 4px 8px rgba(163,177,198,0.6), inset -4px -4px 8px rgba(255,255,255,0.7)' }}>
-        <button type="button" onClick={() => { setActiveSystem('XMARKET'); nav('/'); }} style={seg(activeSystem === 'XMARKET', '#2563EB')}>XMARKET</button>
-        <button type="button" onClick={() => { setActiveSystem('YUELIN'); nav('/'); }} style={seg(activeSystem === 'YUELIN', '#b8860b')}>YUELIN</button>
-        <button type="button" onClick={() => { setActiveSystem('ACCESS'); nav('/'); }} style={seg(activeSystem === 'ACCESS', '#059669')}>ACCESS</button>
-      </div>
-      <nav key={activeSystem} className={'sidebar-nav' + (activeSystem === 'YUELIN' ? ' yl-nav' : '')}>
-        {items.map(([to, label, Icon]) => (
-          <NavLink
-            key={to}
-            to={to}
-            end={to === '/'}
-            className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')}
-          >
-            <Icon size={16} />
-            <span>{label}</span>
-          </NavLink>
-        ))}
-      </nav>
-    </aside>
+        <label className="xs-find"><Search size={14} /><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Filter menu" aria-label="Filter menu" /></label>
+        <nav className="xs-nav" key={activeSystem}>
+          {shown.map((g, gi) => {
+            const isShut = !ql && !!shut[g.id];
+            return (
+              <div key={g.id}>
+                {gi > 0 && <div className="xs-gdiv" />}
+                {g.label && (
+                  <button type="button" className={'xs-ghead' + (isShut ? ' shut' : '')} onClick={() => toggleGroup(g.id)} aria-expanded={!isShut}>
+                    {g.label}<ChevronDown size={14} />
+                  </button>
+                )}
+                {!isShut && g.items.map(([to, label, Icon]) => (
+                  <NavLink key={to} to={to} end={to === '/'} title={collapsed ? label : undefined} className={({ isActive }) => 'xs-item' + (isActive ? ' on' : '')}>
+                    <Icon size={17} /><span>{label}</span>
+                  </NavLink>
+                ))}
+              </div>
+            );
+          })}
+          {shown.length === 0 && <div style={{ padding: 16, fontSize: 13, color: 'var(--text-dim)' }}>No menu match.</div>}
+        </nav>
+      </aside>
+    </>
   );
 }

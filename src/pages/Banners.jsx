@@ -1,6 +1,7 @@
 import { getAdminPin } from '../lib/pin.js';
 import { useAdminContext } from "../context/AdminContext";
 import { uploadToCloudinary } from '../lib/cloud.js';
+import ImageUpload from '../xa/ImageUpload.jsx';
 import React, { useState, useCallback } from 'react';
 import Card from '../components/Card.jsx';
 import Modal from '../components/Modal.jsx';
@@ -124,19 +125,7 @@ export default function Banners() {
             {edit.image_url && <img src={edit.image_url} alt="" style={{ width: '100%', borderRadius: 10 }} />}
             <div>
               <label style={{ fontSize: 12, fontWeight: 700, display: 'block', marginBottom: 4 }}>Banner Image (Upload or URL)</label>
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 8 }}>
-                <label className="neu-btn" style={{ padding: '8px 14px', fontSize: 12, cursor: 'pointer', display: 'inline-block', background: 'var(--surface)', border: '1px solid var(--border)' }}>
-                  📁 Choose Banner File...
-                  <input type="file" accept="image/*" onChange={async (e) => {
-                    const f = e.target.files?.[0];
-                    if (!f) return;
-                    try {
-                      const url = await uploadToCloudinary(f, 'xmarket_banners');
-                      setEdit({ ...edit, image_url: url });
-                    } catch (err) { alert('Upload failed: ' + err.message); }
-                  }} style={{ display: 'none' }} />
-                </label>
-              </div>
+              <div style={{ marginBottom: 8 }}><ImageUpload preset="xmarket_banners" label="Drop a banner image here or click to choose" onUrl={(url) => setEdit({ ...edit, image_url: url })} /></div>
               {field('', 'image_url', { placeholder: 'https://res.cloudinary.com/...' })}
             </div>
             {field('Title', 'title')}
