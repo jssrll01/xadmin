@@ -1,23 +1,16 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
-export default function Modal({ open, onClose, title, children }) {
+import useOverlay from '../xa/ui/useOverlay.js';
+
+export default function Modal({ open, onClose, title, children, wide, closeOnEsc = true }) {
+  const box = useRef(null);
+  useOverlay(open, onClose, closeOnEsc);
+  useEffect(() => { if (open && box.current) box.current.focus(); }, [open]);
   if (!open) return null;
   return (
-    <div onClick={onClose} style={{
-      position: 'fixed', inset: 0, background: 'rgba(20,25,40,0.55)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      zIndex: 1000, padding: 16,
-    }}>
-      <div onClick={(e) => e.stopPropagation()} style={{
-        background: 'var(--surface)', borderRadius: 20,
-        padding: 22, width: '100%', maxWidth: 480,
-        boxShadow: 'var(--neu-float)', maxHeight: '90vh', overflowY: 'auto',
-      }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between',
-          alignItems: 'center', marginBottom: 16 }}>
-          <div style={{ fontSize: 16, fontWeight: 900 }}>{title}</div>
-          <button onClick={onClose} style={{ padding: 6 }}><X size={18} /></button>
-        </div>
+    <div className="ui-ov" onMouseDown={(e) => { if (e.target === e.currentTarget && onClose) onClose(); }}>
+      <div className={'ui-modal' + (wide ? ' wide' : '')} role="dialog" aria-modal="true" aria-label={title} ref={box} tabIndex={-1}>
+        <div className="ui-mh"><h3>{title}</h3><button type="button" className="ui-x" onClick={onClose} aria-label="Close"><X size={18} /></button></div>
         {children}
       </div>
     </div>

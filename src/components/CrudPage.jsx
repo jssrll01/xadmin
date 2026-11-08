@@ -1,17 +1,17 @@
+import React, { useState, useCallback, useMemo } from 'react';
+import { Plus, Edit2, Trash2 } from 'lucide-react';
 import ProductPicker from './ProductPicker.jsx';
 import ImageUrlsField from './ImageUrlsField.jsx';
-import React, { useState, useCallback, useMemo, useEffect } from 'react';
-import Card from './Card.jsx';
-import Modal from './Modal.jsx';
 import VariantEditor from './VariantEditor.jsx';
 import Btn from './Btn.jsx';
-import AnimatedNumber from './AnimatedNumber.jsx';
 import { useToast } from './Toast.jsx';
 import useAutoRefresh from '../lib/useAutoRefresh.js';
 import { logAudit } from '../lib/api.js';
-import { Plus, Edit2, Trash2, Search, ChevronLeft, ChevronRight } from 'lucide-react';
-
-const PAGE_SIZE = 25;
+import PageHeader from '../xa/ui/PageHeader.jsx';
+import DataTable from '../xa/ui/DataTable.jsx';
+import Drawer from '../xa/ui/Drawer.jsx';
+import Switch from '../xa/ui/Switch.jsx';
+import { ConfirmDialog } from '../xa/Kit.jsx';
 
 export default function CrudPage({
   title, subtitle,
@@ -27,15 +27,15 @@ export default function CrudPage({
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
-  const [search, setSearch] = useState('');
-  const [dq, setDq] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [sortKey, setSortKey] = useState('');
-  const [sortDir, setSortDir] = useState('asc');
-  const [page, setPage] = useState(1);
   const [editing, setEditing] = useState(null);
   const [orig, setOrig] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [discard, setDiscard] = useState(false);
+  const [del, setDel] = useState(null);
+  const [bulk, setBulk] = useState(null);
+  const [busy, setBusy] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -52,9 +52,6 @@ export default function CrudPage({
 
   useAutoRefresh(load, 1000);
 
-  useEffect(() => { const t = setTimeout(() => { setDq(search.trim().toLowerCase()); setPage(1); }, 200); return () => clearTimeout(t); }, [search]);
-  useEffect(() => { setPage(1); }, [statusFilter, sortKey, sortDir]);
-
   const openNew = () => {
     const blank = { __isNew: true };
     formFields.forEach((f) => {
@@ -64,6 +61,7 @@ export default function CrudPage({
       else if (f.type === 'boolean') blank[f.key] = !!f.default;
       else blank[f.key] = f.default ?? '';
     });
+    setErrors({});
     setEditing(blank);
     setOrig({ ...blank });
   };
@@ -83,36 +81,36 @@ export default function CrudPage({
         copy[f.key] = Array.isArray(row[f.key]) ? row[f.key].join('\n') : (row[f.key] || '');
       }
     });
+    setErrors({});
     setEditing(copy);
     setOrig({ ...copy });
   };
 
-  const closeModal = () => {
-    if (editing && orig) {
-      const dirty = formFields.some((f) => {
-        const a = editing[f.key], b = orig[f.key];
-        if (f.type === 'variant-editor') {
-          return JSON.stringify(a) !== JSON.stringify(b);
-        }
-        if (f.type === 'product-picker' || f.type === 'array') {
-          return JSON.stringify(a) !== JSON.stringify(b);
-        }
-        return String(a ?? '') !== String(b ?? '');
-      });
-      if (dirty && !confirm('Discard unsaved changes?')) return;
-    }
-    setEditing(null);
-    setOrig(null);
+  const isDirty = () => {
+    if (!editing || !orig) return false;
+    return formFields.some((f) => {
+      const a = editing[f.key], b = orig[f.key];
+      if (f.type === 'variant-editor' || f.type === 'product-picker' || f.type === 'array') return JSON.stringify(a) !== JSON.stringify(b);
+      return String(a ?? '') !== String(b ?? '');
+    });
+  };
+  const closeNow = () => { setEditing(null); setOrig(null); setDiscard(false); setErrors({}); };
+  const closeDrawer = () => { if (isDirty()) setDiscard(true); else closeNow(); };
+
+  const setField = (k, v) => {
+    setEditing((e) => ({ ...e, [k]: v }));
+    setErrors((er) => { if (!er[k]) return er; const n = { ...er }; delete n[k]; return n; });
   };
 
   const save = async () => {
     if (!editing) return;
+    const errs = {};
     for (const f of formFields) {
-      if (f.required && (editing[f.key] === undefined || editing[f.key] === '' || editing[f.key] === null)) {
-        show?.(`${f.label} is required`, 'error');
-        return;
-      }
+      const v = editing[f.key];
+      if (f.required && (v === undefined || v === '' || v === null)) errs[f.key] = f.label + ' is required';
+      else if (f.type === 'number' && v !== '' && v != null && Number.isNaN(Number(v))) errs[f.key] = 'Enter a number';
     }
+    if (Object.keys(errs).length) { setErrors(errs); show?.('Fix the highlighted fields', 'error'); return; }
     setSaving(true);
     try {
       const isNew = !editing[primaryKey] || editing.__isNew;
@@ -129,10 +127,9 @@ export default function CrudPage({
             payload.variant_stock = obj.variant_stock || {};
           }
           return;
-        }
-        else if (f.type === 'array') {
+        } else if (f.type === 'array') {
           v = typeof v === 'string'
-            ? v.split('\n').map(s => s.trim()).filter(Boolean)
+            ? v.split('\n').map((s) => s.trim()).filter(Boolean)
             : Array.isArray(v) ? v : [];
         }
         if ((v === '' || v == null) && !f.required) return;
@@ -150,8 +147,7 @@ export default function CrudPage({
         payload
       );
       show?.(isNew ? 'Created' : 'Updated', 'success');
-      setEditing(null);
-      setOrig(null);
+      closeNow();
       load();
     } catch (e) {
       show?.(String(e.message || e), 'error');
@@ -160,18 +156,38 @@ export default function CrudPage({
     }
   };
 
-  const remove = async (row) => {
-    const label = row.name || row.title || row.email || row.code || row.order_code || String(row[primaryKey]).slice(0, 8);
-    if (!confirm(`Delete "${label}"?`)) return;
+  const labelOf = (row) => row.name || row.title || row.email || row.code || row.order_code || String(row[primaryKey]).slice(0, 8);
+
+  const doDelete = async () => {
+    setBusy(true);
     try {
-      const res = await onDelete(row[primaryKey]);
+      const res = await onDelete(del[primaryKey]);
       if (res?.error) throw res.error;
-      await logAudit('delete', title.toLowerCase(), row[primaryKey], row, null);
+      await logAudit('delete', title.toLowerCase(), del[primaryKey], del, null);
       show?.('Deleted', 'success');
+      setDel(null);
       load();
     } catch (e) {
       show?.(String(e.message || e), 'error');
     }
+    setBusy(false);
+  };
+
+  const doBulkDelete = async () => {
+    setBusy(true);
+    let ok = 0, bad = 0;
+    for (const row of bulk) {
+      try {
+        const res = await onDelete(row[primaryKey]);
+        if (res?.error) throw res.error;
+        await logAudit('delete', title.toLowerCase(), row[primaryKey], row, null);
+        ok += 1;
+      } catch (e) { bad += 1; }
+    }
+    show?.(ok + ' deleted' + (bad ? ', ' + bad + ' failed' : ''), bad ? 'error' : 'success');
+    setBulk(null);
+    setBusy(false);
+    load();
   };
 
   const quickUpdate = async (id, patch) => {
@@ -185,220 +201,97 @@ export default function CrudPage({
     }
   };
 
-  const filtered = useMemo(() => {
-    let out = items;
-    if (dq) {
-      out = out.filter((it) => searchKeys.some((k) => String(it[k] ?? '').toLowerCase().includes(dq)));
-    }
-    if (statusKey && statusFilter !== 'all') {
-      out = out.filter((it) => String(it[statusKey] ?? '').toLowerCase() === statusFilter);
-    }
-    if (sortKey) {
-      const sign = sortDir === 'asc' ? 1 : -1;
-      out = [...out].sort((a, b) => {
-        const av = a[sortKey], bv = b[sortKey];
-        if (av == null && bv == null) return 0;
-        if (av == null) return 1;
-        if (bv == null) return -1;
-        if (typeof av === 'number' && typeof bv === 'number') return (av - bv) * sign;
-        return String(av).localeCompare(String(bv)) * sign;
-      });
-    }
-    return out;
-  }, [items, dq, searchKeys, statusFilter, statusKey, sortKey, sortDir]);
+  const rows = useMemo(() => (
+    statusKey && statusFilter !== 'all'
+      ? items.filter((it) => String(it[statusKey] ?? '').toLowerCase() === statusFilter)
+      : items
+  ), [items, statusKey, statusFilter]);
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const curPage = Math.min(page, totalPages);
-  const pageRows = filtered.slice((curPage - 1) * PAGE_SIZE, curPage * PAGE_SIZE);
-
-  const toggleSort = (key) => {
-    if (sortKey === key) setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
-    else { setSortKey(key); setSortDir('asc'); }
+  const field = (f) => {
+    const v = editing[f.key];
+    const bad = errors[f.key] ? ' bad' : '';
+    if (f.type === 'textarea') return <textarea className={'neu-input' + bad} rows={3} value={v ?? ''} onChange={(e) => setField(f.key, e.target.value)} />;
+    if (f.type === 'variant-editor') return <VariantEditor value={v} onChange={(next) => setField(f.key, next)} />;
+    if (f.type === 'product-picker') return <ProductPicker value={v} onChange={(next) => setField(f.key, next)} />;
+    if (f.type === 'array' && f.upload) return <ImageUrlsField value={v ?? ''} placeholder={f.placeholder} onChange={(next) => setField(f.key, next)} />;
+    if (f.type === 'array') return <textarea className={'neu-input' + bad} rows={3} placeholder={f.placeholder || 'One per line'} value={v ?? ''} onChange={(e) => setField(f.key, e.target.value)} />;
+    if (f.type === 'select') {
+      return (
+        <select className={'neu-input' + bad} value={v ?? ''} onChange={(e) => setField(f.key, e.target.value)}>
+          <option value="">Select</option>
+          {(f.options || []).map((o) => <option key={o} value={o}>{o}</option>)}
+        </select>
+      );
+    }
+    if (f.type === 'boolean') {
+      return <div className="ui-swrow"><span>{f.label}</span><Switch checked={!!v} label={f.label} onChange={(n) => setField(f.key, n)} /></div>;
+    }
+    return <input className={'neu-input' + bad} type={f.type || 'text'} value={v ?? ''} aria-invalid={!!errors[f.key]} onChange={(e) => setField(f.key, e.target.value)} />;
   };
 
   return (
     <>
-      <div className="page-head">
-        <div>
-          <h1>{title}</h1>
-          <p>{subtitle || `${items.length} items`}{filtered.length !== items.length ? ` · ${filtered.length} shown` : ''}</p>
-        </div>
-        <Btn variant="primary" onClick={openNew}>
-          <Plus size={16} /> New
-        </Btn>
-      </div>
+      <PageHeader
+        title={title}
+        subtitle={(subtitle || items.length + ' items') + (rows.length !== items.length ? ' · ' + rows.length + ' shown' : '')}
+        actions={<Btn variant="primary" onClick={openNew}><Plus size={16} /> New</Btn>}
+      />
 
-      {(searchKeys.length > 0 || statusKey) && (
-        <Card style={{ marginBottom: 12, padding: 10 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-            {searchKeys.length > 0 && (
-              <label style={{ position: 'relative', flex: '1 1 220px' }}>
-                <Search size={15} style={{ position: 'absolute', left: 11, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-dim)' }} />
-                <input className="neu-input" style={{ paddingLeft: 34 }}
-                  placeholder="Search…" value={search} onChange={(e) => setSearch(e.target.value)} />
-              </label>
-            )}
-            {statusKey && statusOptions && (
-              <select className="neu-input" style={{ flex: '0 1 170px' }}
-                value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
-                <option value="all">All statuses</option>
-                {statusOptions.map((s) => <option key={s} value={s}>{s}</option>)}
-              </select>
-            )}
-          </div>
-        </Card>
-      )}
+      <DataTable
+        columns={columns}
+        rows={rows}
+        rowKey={primaryKey}
+        loading={loading}
+        error={failed}
+        onRetry={() => { setLoading(true); load(); }}
+        searchKeys={searchKeys}
+        exportName={title.toLowerCase().replace(/\s+/g, '-')}
+        selectable
+        bulkActions={[{ label: 'Delete', danger: true, onClick: (r) => setBulk(r) }]}
+        emptyHint='Tap "New" to add the first entry.'
+        toolbar={statusKey && statusOptions ? (
+          <select className="neu-input" style={{ flex: '0 1 170px' }} value={statusFilter} aria-label="Filter by status" onChange={(e) => setStatusFilter(e.target.value)}>
+            <option value="all">All statuses</option>
+            {statusOptions.map((s) => <option key={s} value={s}>{s}</option>)}
+          </select>
+        ) : null}
+        rowActions={(row) => (
+          <>
+            {extraRowActions && extraRowActions(row, { update: quickUpdate })}
+            <button type="button" className="ui-ic" onClick={() => openEdit(row)} data-tip="Edit" aria-label="Edit"><Edit2 size={14} /></button>
+            <button type="button" className="ui-ic danger" onClick={() => setDel(row)} data-tip="Delete" aria-label="Delete"><Trash2 size={14} /></button>
+          </>
+        )}
+      />
 
-      {loading && items.length === 0 ? (
-        <div className="stat-grid">
-          {[0, 1, 2, 3].map((k) => (
-            <div className="stat" key={k}><div><div className="stat-label">&nbsp;</div><div className="stat-value"><span className="xa-skel" /></div></div></div>
-          ))}
-        </div>
-      ) : failed ? (
-        <Card>
-          <div style={{ padding: 24, textAlign: 'center', color: 'var(--danger)' }}>
-            Could not load data. <Btn onClick={() => { setLoading(true); load(); }}>Retry</Btn>
-          </div>
-        </Card>
-      ) : filtered.length === 0 ? (
-        <Card>
-          <div style={{ padding: 30, textAlign: 'center', color: 'var(--text-dim)' }}>
-            <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 4 }}>
-              {items.length === 0 ? 'No data yet' : 'No matches'}
-            </div>
-            <div style={{ fontSize: 12 }}>
-              {items.length === 0 ? 'Tap "New" to add the first entry.' : 'Try a different search or filter.'}
-            </div>
-          </div>
-        </Card>
-      ) : (
-        <>
-          <div className="table-wrap">
-            <table className="neu-table">
-              <thead>
-                <tr>
-                  {columns.map((c) => (
-                    <th key={c.key} onClick={() => toggleSort(c.key)}
-                      style={{ cursor: 'pointer', userSelect: 'none' }}
-                      title={`Sort by ${c.label}`}>
-                      {c.label}{sortKey === c.key ? (sortDir === 'asc' ? ' ▲' : ' ▼') : ''}
-                    </th>
-                  ))}
-                  <th style={{ textAlign: 'right', width: 1 }}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {pageRows.map((row, i) => (
-                  <tr key={row[primaryKey] ?? i}>
-                    {columns.map((c) => (
-                      <td key={c.key} className={c.wrap ? 'cell-wrap' : undefined}>
-                        {c.render ? c.render(row) : String(row[c.key] ?? '—')}
-                      </td>
-                    ))}
-                    <td style={{ textAlign: 'right' }}>
-                      <div style={{ display: 'inline-flex', gap: 6, alignItems: 'center' }}>
-                        {extraRowActions && extraRowActions(row, { update: quickUpdate })}
-                        <button className="neu-btn" style={{ padding: 7 }}
-                          onClick={() => openEdit(row)} title="Edit">
-                          <Edit2 size={14} />
-                        </button>
-                        <button className="neu-btn" style={{ padding: 7, color: 'var(--danger)', borderColor: 'var(--danger-soft)' }}
-                          onClick={() => remove(row)} title="Delete">
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {totalPages > 1 && (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 10, marginTop: 12 }}>
-              <Btn disabled={curPage <= 1} onClick={() => setPage(curPage - 1)} aria-label="Previous page"><ChevronLeft size={16} /></Btn>
-              <span style={{ fontSize: 12.5, color: 'var(--text-dim)' }}>
-                Page {curPage} of {totalPages} · <AnimatedNumber value={filtered.length} /> rows
-              </span>
-              <Btn disabled={curPage >= totalPages} onClick={() => setPage(curPage + 1)} aria-label="Next page"><ChevronRight size={16} /></Btn>
-            </div>
-          )}
-        </>
-      )}
-
-      <Modal
+      <Drawer
         open={!!editing}
-        onClose={closeModal}
-        title={editing?.__isNew ? `New ${title}` : `Edit ${title}`}
+        onClose={closeDrawer}
+        closeOnEsc={!discard}
+        title={editing?.__isNew ? 'New ' + title : 'Edit ' + title}
+        footer={editing ? (
+          <>
+            <Btn variant="primary" onClick={save} loading={saving}>{saving ? 'Saving…' : 'Save'}</Btn>
+            <Btn onClick={closeDrawer} disabled={saving}>Cancel</Btn>
+          </>
+        ) : null}
       >
         {editing && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             {formFields.map((f) => (
               <div key={f.key}>
-                <div style={{
-                  fontSize: 11, fontWeight: 700, color: 'var(--text-dim)',
-                  marginBottom: 5, textTransform: 'uppercase', letterSpacing: 0.4,
-                }}>
-                  {f.label}{f.required ? ' *' : ''}
-                </div>
-                {f.type === 'textarea' ? (
-                  <textarea className="neu-input" rows={3}
-                    value={editing[f.key] ?? ''}
-                    onChange={(e) => setEditing({ ...editing, [f.key]: e.target.value })} />
-                ) : f.type === 'variant-editor' ? (
-                  <VariantEditor
-                    value={editing[f.key]}
-                    onChange={(next) => setEditing({ ...editing, [f.key]: next })}
-                  />
-                ) : f.type === 'product-picker' ? (
-                  <ProductPicker value={editing[f.key]} onChange={(next) => setEditing({ ...editing, [f.key]: next })} />
-                ) : f.type === 'array' && f.upload ? (
-                  <ImageUrlsField value={editing[f.key] ?? ''} placeholder={f.placeholder}
-                    onChange={(next) => setEditing({ ...editing, [f.key]: next })} />
-                ) : f.type === 'array' ? (
-                  <textarea className="neu-input" rows={3}
-                    placeholder={f.placeholder || 'One per line'}
-                    value={editing[f.key] ?? ''}
-                    onChange={(e) => setEditing({ ...editing, [f.key]: e.target.value })} />
-                ) : f.type === 'select' ? (
-                  <select className="neu-input"
-                    value={editing[f.key] ?? ''}
-                    onChange={(e) => setEditing({ ...editing, [f.key]: e.target.value })}>
-                    <option value="">— select —</option>
-                    {(f.options || []).map((o) => (
-                      <option key={o} value={o}>{o}</option>
-                    ))}
-                  </select>
-                ) : f.type === 'boolean' ? (
-                  <label style={{
-                    display: 'flex', alignItems: 'center', gap: 10,
-                    padding: '10px 12px', border: '1.5px solid var(--border-strong)',
-                    borderRadius: 10, cursor: 'pointer',
-                  }}>
-                    <input type="checkbox"
-                      checked={!!editing[f.key]}
-                      onChange={(e) => setEditing({ ...editing, [f.key]: e.target.checked })}
-                      style={{ width: 18, height: 18 }} />
-                    <span style={{ fontSize: 14 }}>{f.label}</span>
-                  </label>
-                ) : (
-                  <input className="neu-input"
-                    type={f.type || 'text'}
-                    value={editing[f.key] ?? ''}
-                    onChange={(e) => setEditing({ ...editing, [f.key]: e.target.value })} />
-                )}
+                {f.type !== 'boolean' && <div className="ui-lbl">{f.label}{f.required ? ' *' : ''}</div>}
+                {field(f)}
+                {errors[f.key] && <div className="ui-err" role="alert">{errors[f.key]}</div>}
               </div>
             ))}
-            <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
-              <Btn variant="primary" onClick={save} disabled={saving} style={{ flex: 1 }}>
-                {saving ? 'Saving…' : 'Save'}
-              </Btn>
-              <Btn onClick={closeModal} style={{ flex: 1 }}>Cancel</Btn>
-            </div>
           </div>
         )}
-      </Modal>
+      </Drawer>
+
+      <ConfirmDialog open={discard} title="Discard changes?" message="You have unsaved changes. They will be lost." confirmText="Discard" danger onConfirm={closeNow} onCancel={() => setDiscard(false)} />
+      <ConfirmDialog open={!!del} title={'Delete "' + (del ? labelOf(del) : '') + '"?'} message="This cannot be undone." confirmText="Delete" danger busy={busy} onConfirm={doDelete} onCancel={() => setDel(null)} />
+      <ConfirmDialog open={!!bulk} title={'Delete ' + (bulk ? bulk.length : 0) + ' records?'} message="Every selected record is deleted and logged in the audit log. This cannot be undone." confirmText="Delete all" danger typeToConfirm="DELETE" busy={busy} onConfirm={doBulkDelete} onCancel={() => setBulk(null)} />
     </>
   );
 }

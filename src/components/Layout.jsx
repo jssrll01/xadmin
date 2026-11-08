@@ -5,8 +5,19 @@ import Sidebar from './Sidebar.jsx';
 import Topbar from './Topbar.jsx';
 import CommandPalette from '../xa/CommandPalette.jsx';
 import { PALETTE_ITEMS } from '../xa/nav.js';
+import { XMARKET_GROUPS } from '../xa/shellNav.js';
 import { InsightsBlock, panelsForPath } from '../analytics/TabInsights.jsx';
 import '../xa/shell.css';
+import '../xa/ui.css';
+
+// every sidebar page, plus anything DbHome adds to PALETTE_ITEMS at runtime
+function paletteItems() {
+  const seen = new Set();
+  const out = [];
+  XMARKET_GROUPS.forEach((g) => g.items.forEach(([p, l, I]) => { if (!seen.has(p)) { seen.add(p); out.push([p, l, I, g.label]); } }));
+  PALETTE_ITEMS.forEach((it) => { if (!seen.has(it[0])) { seen.add(it[0]); out.push(it); } });
+  return out;
+}
 
 export default function Layout({ children }) {
   const { activeSystem } = useAdminContext();
@@ -16,7 +27,7 @@ export default function Layout({ children }) {
   return (
     <div className="xs-shell">
       <Sidebar />
-      <CommandPalette items={PALETTE_ITEMS} />
+      <CommandPalette items={paletteItems()} />
       <div className="xs-main">
         <Topbar />
         <main className="xs-content" key={activeSystem}>

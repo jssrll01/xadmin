@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Bell, Lock, Sun, Moon, Menu, Search } from 'lucide-react';
 import InstallButton from './InstallButton.jsx';
@@ -21,6 +21,11 @@ export default function Topbar() {
   const lastLabel = here ? here.label : (segs.length ? pretty(segs[segs.length - 1]) : 'Dashboard');
   const extra = here && here.to !== '/' ? segs.slice(here.to.split('/').filter(Boolean).length) : [];
 
+  useEffect(() => {
+    const h = () => setTheme(document.documentElement.dataset.theme || 'light');
+    window.addEventListener('xs:theme', h);
+    return () => window.removeEventListener('xs:theme', h);
+  }, []);
   const toggle = () => {
     const next = theme === 'dark' ? 'light' : 'dark';
     document.documentElement.dataset.theme = next;
