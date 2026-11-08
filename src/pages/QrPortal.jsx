@@ -11,7 +11,6 @@ import { logAudit } from '../lib/api.js';
 import { uploadToCloudinary } from '../lib/cloud.js';
 import { Plus, Edit2, Trash2, ArrowUp, ArrowDown, RefreshCw, ExternalLink } from 'lucide-react';
 
-const CODE = getAdminPin();
 const PRESET = 'xmarket_qrportal';
 const MAX_MB = 5;
 const OK_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
@@ -69,7 +68,7 @@ const TABS = {
 const KEYS = Object.keys(TABS);
 
 async function rpc(fn, args) {
-  const { data, error } = await supabase.rpc(fn, { code: CODE, ...args });
+  const { data, error } = await supabase.rpc(fn, { code: getAdminPin(), ...args });
   if (error) throw error;
   return data;
 }

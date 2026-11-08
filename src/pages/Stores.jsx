@@ -5,6 +5,7 @@ import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import Card from '../components/Card.jsx';
 import Modal from '../components/Modal.jsx';
 import Btn from '../components/Btn.jsx';
+import ImageUpload from '../xa/ImageUpload.jsx';
 import AnimatedNumber from '../components/AnimatedNumber.jsx';
 import { useToast } from '../components/Toast.jsx';
 import useAutoRefresh from '../lib/useAutoRefresh.js';
@@ -12,7 +13,6 @@ import { getDb, supabase } from '../supabase.js';
 import { logAudit } from '../lib/api.js';
 import { Plus, Edit2, Trash2, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 
-const CODE = getAdminPin();
 const BLANK = { name: '', description: '', logo_url: '', banner_url: '', location: '', contact_phone: '', contact_email: '', verified: false };
 const VBLANK = { code: '', title: '', discount_type: 'fixed', discount_value: '', min_spend: '', expires_at: '', active: true };
 const lab = { fontSize: 11, fontWeight: 700, color: 'var(--text-dim)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: 0.4 };
@@ -79,7 +79,7 @@ export default function Stores() {
         logo_url: editing.logo_url, banner_url: editing.banner_url, location: editing.location,
         contact_phone: editing.contact_phone, contact_email: editing.contact_email, verified: !!editing.verified,
       };
-      const { data, error } = await supabase.rpc('admin_save_store', { code: CODE, payload });
+      const { data, error } = await supabase.rpc('admin_save_store', { code: getAdminPin(), payload });
       if (error) throw error;
       await logAudit(editing.__isNew ? 'create' : 'update', 'stores', data?.id, editing.__isNew ? null : editing.__orig, payload);
       show?.(editing.__isNew ? 'Store created' : 'Store updated', 'success');
@@ -91,7 +91,7 @@ export default function Stores() {
 
   const remove = async (r) => {
     if (!confirm(`Delete store "${r.name}"? Its products are kept.`)) return;
-    const { error } = await supabase.rpc('admin_delete_store', { code: CODE, sid: r.id });
+    const { error } = await supabase.rpc('admin_delete_store', { code: getAdminPin(), sid: r.id });
     if (error) { show?.(error.message, 'error'); return; }
     await logAudit('delete', 'stores', r.id, r, null);
     show?.('Deleted', 'success'); load();
@@ -101,14 +101,14 @@ export default function Stores() {
     if (!vform.code.trim() || !vform.discount_value) { show?.('Code and discount value are required', 'error'); return; }
     const payload = { ...vform, store_id: editing.id, id: vform.id || null,
       expires_at: vform.expires_at ? new Date(vform.expires_at).toISOString() : '' };
-    const { error } = await supabase.rpc('admin_save_voucher', { code: CODE, payload });
+    const { error } = await supabase.rpc('admin_save_voucher', { code: getAdminPin(), payload });
     if (error) { show?.(error.message, 'error'); return; }
     show?.('Voucher saved', 'success'); setVform(VBLANK); loadVouchers(editing.id);
   };
 
   const removeVoucher = async (v) => {
     if (!confirm(`Delete voucher ${v.code}?`)) return;
-    const { error } = await supabase.rpc('admin_delete_voucher', { code: CODE, vid: v.id });
+    const { error } = await supabase.rpc('admin_delete_voucher', { code: getAdminPin(), vid: v.id });
     if (error) { show?.(error.message, 'error'); return; }
     loadVouchers(editing.id);
   };
@@ -230,7 +230,9 @@ export default function Stores() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {editing.banner_url && <img src={editing.banner_url} alt="" loading="lazy" style={{ width: '100%', height: 90, objectFit: 'cover', borderRadius: 10 }} />}
             {field('Store name *', 'name')}
+            <ImageUpload preset="xmarket_products" label="Drop the store profile image or tap to choose" onUrl={(u) => set('logo_url', u)} />
             {field('Store profile (Cloudinary URL)', 'logo_url', { placeholder: 'https://res.cloudinary.com/...' })}
+            <ImageUpload preset="xmarket_products" label="Drop the store banner or tap to choose" onUrl={(u) => set('banner_url', u)} />
             {field('Store banner (Cloudinary URL)', 'banner_url', { placeholder: 'https://res.cloudinary.com/...' })}
             <div><div style={lab}>Information / description</div>
               <textarea className="neu-input" rows={3} value={editing.description ?? ''} onChange={e => set('description', e.target.value)} /></div>

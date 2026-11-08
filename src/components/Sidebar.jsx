@@ -1,3 +1,4 @@
+import { LayoutDashboard as XI_LayoutDashboard } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { ChevronDown, ChevronLeft, ChevronRight, Search, LayoutDashboard, Home as HomeIcon, FolderOpen, Trash2, Settings as Cog, Database, Package, QrCode, Crown } from 'lucide-react';
@@ -31,7 +32,7 @@ export default function Sidebar() {
   const flat = activeSystem === 'ACCESS'
     ? ACCESS_TABS.map(([k, label]) => [accessPath(k), label, { home: HomeIcon, drive: FolderOpen, revoke: Trash2, settings: Cog }[k] || Cog])
     : activeSystem === 'YUELIN'
-    ? [['/', 'Dashboard', LayoutDashboard], ['/yl-ops', 'Operations', Cog], ...yl.tables.map((t) => ['/yl/' + encodeURIComponent(t.name), t.label, Database])]
+    ? [['/', 'Dashboard', XI_LayoutDashboard], ['/yl-ops', 'Operations', Cog], ...yl.tables.map((t) => ['/yl/' + encodeURIComponent(t.name), t.label, Database])]
     : null;
   const groups = flat ? [{ id: 'all', label: '', items: flat }] : XMARKET_GROUPS;
   const ql = q.trim().toLowerCase();

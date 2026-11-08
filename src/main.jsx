@@ -8,6 +8,7 @@ import { ToastProvider } from './components/Toast.jsx';
 import './styles/neu.css';
 import './styles/futuristic.css';
 import './xa/xa.css';
+import { startAutoIcons } from './xa/autoIcons.js';
 import { XaToasts } from './xa/Kit.jsx';
 
 // The app (and every page) loads only after the PIN has been checked by the server.
@@ -41,3 +42,4 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(() => {});
   });
 }
+startAutoIcons();

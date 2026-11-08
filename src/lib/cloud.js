@@ -40,3 +40,27 @@ export function uploadImageWithProgress(file, onProgress, preset = 'xmarket_prod
     xhr.send(fd);
   });
 }
+
+// Managed upload: progress (loaded, total), cancel, timeout. Returns { promise, abort }.
+export function uploadManaged(file, { preset = 'xmarket_products', onProgress } = {}) {
+  const xhr = new XMLHttpRequest();
+  const promise = new Promise((resolve, reject) => {
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('upload_preset', preset);
+    xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUD}/image/upload`);
+    xhr.timeout = 120000;
+    xhr.upload.onprogress = (e) => { if (e.lengthComputable && onProgress) onProgress(e.loaded, e.total); };
+    xhr.onload = () => {
+      let data = {};
+      try { data = JSON.parse(xhr.responseText); } catch (err) { /* non-JSON reply */ }
+      if (xhr.status >= 200 && xhr.status < 300 && data.secure_url) resolve(data.secure_url);
+      else reject(new Error((data.error && data.error.message) || 'Upload failed (' + xhr.status + ')'));
+    };
+    xhr.onerror = () => reject(new Error('Network error. Check your connection and retry.'));
+    xhr.ontimeout = () => reject(new Error('Upload timed out. Retry.'));
+    xhr.onabort = () => reject(Object.assign(new Error('Canceled'), { canceled: true }));
+    xhr.send(fd);
+  });
+  return { promise, abort: () => xhr.abort() };
+}

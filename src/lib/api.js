@@ -12,9 +12,8 @@ const T = {
 
 const PK = { promo_codes: 'code' };
 
-const CODE = getAdminPin();
 async function db(action, tbl, extra = {}) {
-  const { data, error } = await supabase.rpc('admin_db', { code: CODE, action, tbl, ...extra });
+  const { data, error } = await supabase.rpc('admin_db', { code: getAdminPin(), action, tbl, ...extra });
   return { data, error };
 }
 const rows = (r) => (Array.isArray(r.data) ? r.data : []);
@@ -138,7 +137,7 @@ export const shopCrud    = crud(T.shops);
 // Approve topup — explicit server-side function (via trigger) still fires,
 // but we ALSO call the RPC to guarantee credit even if trigger isn't installed.
 export async function approveTopUp(id) {
-  return supabase.rpc('admin_topup_set', { code: CODE, p_id: id, p_status: 'approved' });
+  return supabase.rpc('admin_topup_set', { code: getAdminPin(), p_id: id, p_status: 'approved' });
 }
 
 

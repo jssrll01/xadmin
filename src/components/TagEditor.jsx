@@ -2,7 +2,6 @@ import { getAdminPin } from '../lib/pin.js';
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabase.js';
 
-const CODE = getAdminPin();
 
 export default function TagEditor({ title, fn, id, initial, onClose, onSaved }) {
   const [list, setList] = useState(initial || []);
@@ -23,7 +22,7 @@ export default function TagEditor({ title, fn, id, initial, onClose, onSaved }) 
 
   const save = async () => {
     setBusy(true);
-    const { data, error } = await supabase.rpc(fn, { p_code: CODE, p_id: id, p_products: list.map((x) => x.id) });
+    const { data, error } = await supabase.rpc(fn, { p_code: getAdminPin(), p_id: id, p_products: list.map((x) => x.id) });
     setBusy(false);
     if (error) return setErr(error.message);
     if (data && data.ok === false) return setErr(data.error);

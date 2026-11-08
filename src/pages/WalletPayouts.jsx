@@ -5,9 +5,8 @@ import { supabase } from '../supabase.js';
 import { peso, dateTime } from '../lib/format.js';
 import { useToast } from '../components/Toast.jsx';
 
-const CODE = getAdminPin();
 const call = async (fn, args = {}) => {
-  const { data, error } = await supabase.rpc(fn, { p_code: CODE, ...args });
+  const { data, error } = await supabase.rpc(fn, { p_code: getAdminPin(), ...args });
   if (error) throw error;
   return data;
 };

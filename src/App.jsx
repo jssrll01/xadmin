@@ -1,3 +1,4 @@
+import ManageData from './xa/ManageData.jsx';
 import React, { useEffect, useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import PinLock from './components/PinLock.jsx';
@@ -137,6 +138,7 @@ export default function App() {
   return (
     <ErrorBoundary>
       <Layout>
+        <ManageData />
         <Routes>
           <Route path="/" element={<HomeSwitch />} />
           <Route path="/users"     element={<Users />} />

@@ -3,7 +3,6 @@ import { useAdminContext } from "../context/AdminContext";
 import React, { useState, useEffect, useCallback } from 'react';
 import { getDb, supabase } from '../supabase.js';
 
-const CODE = getAdminPin();
 const PAD = 16;
 const TABS = [['tiers', 'Tiers'], ['draws', 'Draws'], ['bets', 'Bets']];
 const when = (d) => (d ? new Date(d).toLocaleString() : '');
@@ -16,7 +15,7 @@ const inp = { width: '100%', padding: '10px 12px', border: '1.5px solid var(--bo
 const BLANK = { isNew: true, key: '', label: '', max_n: '', win_count: '', payout: '', sort: '' };
 
 async function rpc(fn, args) {
-  const { data, error } = await supabase.rpc(fn, { code: CODE, ...args });
+  const { data, error } = await supabase.rpc(fn, { code: getAdminPin(), ...args });
   if (error) throw error;
   return data;
 }

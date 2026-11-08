@@ -7,14 +7,13 @@ import { useToast } from '../components/Toast.jsx';
 import useAutoRefresh from '../lib/useAutoRefresh.js';
 import { getDb, supabase } from '../supabase.js';
 
-const CODE = getAdminPin();
 const TABS = [['tiers', 'Tiers'], ['draws', 'Draws'], ['bets', 'Bets']];
 const when = (d) => (d ? new Date(d).toLocaleString() : '');
 const th = { textAlign: 'left', fontSize: 11, padding: '6px 8px', color: 'var(--text-dim)', textTransform: 'uppercase' };
 const td = { padding: '6px 8px', fontSize: 13, whiteSpace: 'nowrap' };
 
 async function rpc(fn, args) {
-  const { data, error } = await supabase.rpc(fn, { code: CODE, ...args });
+  const { data, error } = await supabase.rpc(fn, { code: getAdminPin(), ...args });
   if (error) throw error;
   return data;
 }

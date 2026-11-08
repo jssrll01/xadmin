@@ -10,7 +10,6 @@ import { logAudit, orderCrud } from '../lib/api.js';
 import { peso, dateTime } from '../lib/format.js';
 import { RefreshCw } from 'lucide-react';
 
-const CODE = getAdminPin();
 const PAGE = 20;
 const CARRIERS = ['J&T Express', 'LBC', 'Flash Express', 'Ninja Van', '2GO', 'JRS Express', 'Grab Express', 'Lalamove', 'GoGo Xpress'];
 const FILTERS = [['all', 'All'], ['awaiting', 'Awaiting tracking'], ['tracked', 'Has tracking'], ['shipped', 'Shipped'], ['delivered', 'Delivered'], ['cancelled', 'Cancelled']];
@@ -22,7 +21,7 @@ const sub = { fontSize: 12, color: 'var(--text-dim)', marginTop: 3 };
 const orderTotal = (r) => Math.max(0, (Number(r.subtotal) || 0) - (Number(r.discount) || 0)) + (Number(r.shipping_fee) || 0);
 
 async function rpc(fn, args) {
-  const { data, error } = await supabase.rpc(fn, { code: CODE, ...args });
+  const { data, error } = await supabase.rpc(fn, { code: getAdminPin(), ...args });
   if (error) throw error;
   return data;
 }

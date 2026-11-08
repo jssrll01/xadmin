@@ -11,14 +11,13 @@ import { getDb, supabase } from '../supabase.js';
 import { logAudit } from '../lib/api.js';
 import { Plus, Edit2, Trash2 } from 'lucide-react';
 
-const CODE = getAdminPin();
 const CORE = ['limits', 'spin', 'boxes', 'exchange', 'mini'];
 const TABS = [['settings', 'Settings'], ['players', 'Players'], ['txns', 'Transactions'], ['log', 'Alerts']];
 const lab = { fontSize: 11, fontWeight: 700, color: 'var(--text-dim)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: 0.4 };
 const when = (d) => new Date(d).toLocaleString();
 
 async function rpc(fn, args) {
-  const { data, error } = await supabase.rpc(fn, { code: CODE, ...args });
+  const { data, error } = await supabase.rpc(fn, { code: getAdminPin(), ...args });
   if (error) throw error;
   return data;
 }

@@ -7,14 +7,13 @@ import { useToast } from '../components/Toast.jsx';
 import { supabase } from '../supabase.js';
 import { Plus, Edit2, Trash2 } from 'lucide-react';
 
-const CODE = getAdminPin();
 const lab = { fontSize: 11, fontWeight: 700, color: 'var(--text-dim)', margin: '12px 0 5px', textTransform: 'uppercase', letterSpacing: 0.4 };
 const inp = { width: '100%', padding: '10px 12px', borderRadius: 10, border: '1px solid rgba(120,130,150,.35)', background: 'var(--surface)', color: 'inherit', fontSize: 14 };
 const BLANK = { title: '', description: '', cost: 100, wallet_amount: 1, stock: '' };
 const EXAMPLE = [{ title: 'P10 Xwallet credit', description: 'Added to your Xwallet', cost: 100, wallet_amount: 10, stock: null }];
 
 async function rpc(fn, args) {
-  const { data, error } = await supabase.rpc(fn, { p_code: CODE, ...args });
+  const { data, error } = await supabase.rpc(fn, { p_code: getAdminPin(), ...args });
   if (error) throw error;
   return data;
 }

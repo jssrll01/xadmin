@@ -10,7 +10,6 @@ import { peso, dateOnly, initials } from '../lib/format.js';
 import { getAdminPin } from '../lib/pin.js';
 import { supabase } from '../supabase.js';
 
-const CODE = getAdminPin();
 const TITLES = { wallet: 'Adjust wallet', points: 'Set loyalty points', photo: 'Profile photo' };
 const who = (r) => r.email || r.username || String(r.id || '').slice(0, 8);
 
@@ -23,7 +22,7 @@ export default function Users() {
   const [stat, setStat] = useState(null);
 
   const call = async (fn, args) => {
-    const { error } = await supabase.rpc(fn, { code: CODE, ...args });
+    const { error } = await supabase.rpc(fn, { code: getAdminPin(), ...args });
     return error ? error.message : '';
   };
   const open = (kind, row) => {
@@ -50,7 +49,7 @@ export default function Users() {
       const url = (f.url || '').trim();
       if (url && !/^https:\/\/\S+$/i.test(url)) return setErr('The photo link must start with https://');
       fn = 'admin_avatar_set'; ok = url ? 'Photo updated' : 'Photo removed';
-      args = { p_code: CODE, p_user: row.id, p_url: url };
+      args = { p_code: getAdminPin(), p_user: row.id, p_url: url };
     }
     setBusy(true);
     const m = await call(fn, args);

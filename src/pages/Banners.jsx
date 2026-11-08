@@ -12,13 +12,12 @@ import { getDb, supabase } from '../supabase.js';
 import { logAudit } from '../lib/api.js';
 import { Plus, Edit2, Trash2, ArrowUp, ArrowDown } from 'lucide-react';
 
-const CODE = getAdminPin();
 const BLANK = { title: '', subtitle: '', image_url: '', cta_text: '', cta_link: '', sort_order: 0, active: true, starts_at: '', ends_at: '' };
 const lab = { fontSize: 11, fontWeight: 700, color: 'var(--text-dim)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: 0.4 };
 const day = (d) => (d ? String(d).slice(0, 10) : '');
 
 async function rpc(fn, args) {
-  const { data, error } = await supabase.rpc(fn, { code: CODE, ...args });
+  const { data, error } = await supabase.rpc(fn, { code: getAdminPin(), ...args });
   if (error) throw error;
   return data;
 }

@@ -1,0 +1,26 @@
+// Page path -> the tables behind it. ManageData only shows tables that really exist.
+export const PAGE_TABLES = {
+  '/users': ['profiles', 'user_addresses'], '/members-data': ['profiles', 'user_addresses', 'loyalty_ledger'],
+  '/products': ['products', 'product_costs', 'product_stats'], '/bulk-products': ['import_jobs', 'import_rows', 'products'],
+  '/orders': ['orders', 'order_items', 'order_shipments', 'order_shipment_internal'], '/logistics': ['order_shipments', 'order_shipment_internal', 'shipping_rate_rules'],
+  '/topups': ['xwallet_topups'], '/wallet': ['xwallet_txns', 'xwallet_loads', 'xwallet_topups'], '/payouts': ['xwallet_withdrawals', 'xwallet_interest_log'],
+  '/wallet-security': ['xwallet_txns', 'xwallet_topups', 'xwallet_withdrawals'], '/buy-load': ['xwallet_loads'],
+  '/creators': ['creator_applications'], '/creator-mgmt': ['creator_tasks', 'creator_submissions', 'creator_commissions', 'creator_withdrawals', 'creator_referrals'],
+  '/social-mod': ['creator_posts', 'post_comments', 'post_likes', 'creator_follows'], '/video-mod': ['creator_videos', 'video_comments', 'video_likes'],
+  '/gifts': ['creator_gifts'], '/dm-mod': ['dm_threads', 'dm_messages', 'dm_red_packets'], '/xm-chat': ['global_messages', 'reactions'], '/xm-vip': ['vip_memberships'],
+  '/market-qa': ['product_questions', 'product_answers', 'market_items', 'market_purchases'], '/product-views': ['product_views'],
+  '/returns': ['return_requests'], '/reports': ['report_tickets'], '/reviews': ['reviews', 'review_votes', 'review_rewards'],
+  '/shops': ['shops'], '/stores': ['stores', 'store_vouchers', 'store_voucher_claims'], '/supplier': ['supplier_products'],
+  '/banners': ['banners'], '/bundles': ['bundles'], '/xcards': ['xcards'], '/quotations': ['xquote_receipts'],
+  '/notifications': ['notifications', 'push_tokens'], '/notify': ['notifications', 'push_tokens'],
+  '/play-time': ['playtime_config', 'playtime_txns', 'playtime_log'], '/airdrop': ['airdrop_tiers', 'airdrop_draws', 'airdrop_bets', 'airdrop_settings', 'airdrop_claims'],
+  '/airdrop-mod': ['airdrop_tiers', 'airdrop_draws', 'airdrop_bets', 'airdrop_settings'],
+  '/xf-price-drops': ['price_drops', 'price_drop_orders'], '/xf-digital': ['digital_products', 'digital_orders'], '/xf-polls': ['demand_polls', 'demand_poll_votes'],
+  '/xf-sponsor': ['sponsor_funds', 'sponsor_contributions'], '/xf-popups': ['app_popups'], '/points-shop': ['points_rewards'],
+  '/xcoin': ['xcoin_settings', 'xcoin_market_state', 'xcoin_wallets', 'xcoin_positions', 'xcoin_ledger'],
+  '/daily': ['daily_tasks', 'daily_task_completions', 'xadmin_notes'], '/audit': ['audit_log', 'admin_audit_logs'],
+  '/pricing': ['discount_tiers', 'discount_rules', 'shipping_rate_rules', 'cashback_rules'], '/cashback': ['cashback_rules', 'product_costs'],
+  '/qr-portal': ['qrp_projects', 'qrp_links', 'qrp_media', 'qrp_content', 'qrp_service_categories', 'qrp_service_packages'],
+  '/settings': ['settings', 'platform_settings'],
+};
+export const READ_ONLY = ['xwallet_txns', 'audit_log', 'admin_audit_logs', 'xcoin_ledger', 'xwallet_interest_log', 'playtime_txns'];
