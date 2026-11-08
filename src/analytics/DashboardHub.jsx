@@ -4,6 +4,8 @@ import Panel, { RangeSeg } from './Panel.jsx';
 import { CSS } from './styles.js';
 import { HUB, P } from './config.js';
 import DashboardMain from '../pages/DashboardMain.jsx';
+import PageHeader from '../xa/ui/PageHeader.jsx';
+import Tabs from '../xa/ui/Tabs.jsx';
 
 const ICONS = { overview: LayoutDashboard, sales: BarChart3, orders: ShoppingBag, products: Package, financial: DollarSign, customers: Users, marketing: Megaphone, support: LifeBuoy, loyalty: Gift, traffic: Globe };
 const LABEL = { overview: 'Overview' };
@@ -35,11 +37,8 @@ export default function DashboardHub() {
   return (
     <div>
       <style>{CSS}</style>
-      <div className="an-tabs" role="tablist" aria-label="Dashboard sections">
-        {tabs.map(([k, label]) => { const I = ICONS[k] || BarChart3; return (
-          <button key={k} type="button" role="tab" aria-selected={tab === k} className={'an-tab' + (tab === k ? ' on' : '')} onClick={() => pick(k)}><I size={15} />{LABEL[k] || label}</button>
-        ); })}
-      </div>
+      <PageHeader title="Dashboard" subtitle="Live numbers from your own data" />
+      <Tabs tabs={tabs.map(([k, label]) => [k, LABEL[k] || label])} value={tab} onChange={pick} label="Dashboard sections" />
       {cur[0] === 'overview' ? <DashboardMain /> : (
         <>
           <div className="an-head"><div className="an-h">{cur[1]} analytics</div><RangeSeg days={days} onChange={setDays} /></div>
