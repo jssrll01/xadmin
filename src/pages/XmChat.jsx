@@ -82,10 +82,11 @@ export default function XmChat() {
                 <span style={{ fontWeight: 600, opacity: 0.55, marginLeft: 8 }}>{r.email}</span>
               </div>
               <div style={{ fontSize: 14, margin: '3px 0', wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}>{r.body}</div>
+              {r.kind === 'share' && r.share && <div style={{ fontSize: 12, opacity: 0.75 }}>🔗 {r.share.type}: {r.share.title || r.share.id} (by @{r.share.username})</div>}
               <div style={{ fontSize: 11, opacity: 0.5 }}>{fdt(r.created_at)}</div>
             </div>
             <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
-              <Btn onClick={() => setEdit({ id: r.id, body: r.body })}><Edit2 size={13} /></Btn>
+              {r.kind !== 'share' && <Btn onClick={() => setEdit({ id: r.id, body: r.body })}><Edit2 size={13} /></Btn>}
               <Btn variant="danger" onClick={() => del(r)} disabled={busy}><Trash2 size={13} /></Btn>
             </div>
           </div>
