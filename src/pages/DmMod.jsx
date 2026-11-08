@@ -32,7 +32,7 @@ export default function DmMod() {
   return (
     <div style={{ padding: 16 }}>
       <h2 style={{ fontSize: 22, fontWeight: 800, margin: '0 0 4px' }}>DM Moderation</h2>
-      <div style={{ fontSize: 12, opacity: .6, marginBottom: 12 }}>Red packet thank-you messages. DMs are deleted automatically after 24 hours.</div>
+      <div style={{ fontSize: 12, opacity: .6, marginBottom: 12 }}>Red packet thank-you messages. DMs are deleted automatically after 24 hours. Typing and Seen status need no moderation and are cleared by the same 24 hour cleanup.</div>
       {err && <div style={{ color: '#DC2626', fontSize: 13, marginBottom: 10 }}>{err}</div>}
       {rows === null && <div>Loading…</div>}
       {rows && rows.length === 0 && <div style={{ opacity: .6, padding: 20 }}>No thank-you messages.</div>}
