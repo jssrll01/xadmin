@@ -84,12 +84,13 @@ export default function SocialMod() {
           <div style={{ display: 'flex', gap: 12 }}>
             <a href={p.image_url} target="_blank" rel="noreferrer"><img src={p.image_url} alt="" style={{ width: 96, height: 96, objectFit: 'cover', borderRadius: 12 }} /></a>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontWeight: 800 }}>@{p.creator}{p.status !== 'active' && <span style={{ marginLeft: 6, fontSize: 10, color: '#DC2626' }}>REMOVED</span>}</div>
+              <div style={{ fontWeight: 800 }}>@{p.creator}{p.status !== 'active' && <span style={{ marginLeft: 6, fontSize: 10, color: '#DC2626' }}>REMOVED</span>}{p.pinned_at && <span style={{ marginLeft: 6, fontSize: 10, color: '#2563EB' }}>PINNED</span>}</div>
               <div style={{ fontSize: 11, color: '#8a93a3' }}>{dateTime(p.created_at)} · {p.likes} likes · {p.comments} comments</div>
               <div style={{ fontSize: 13, margin: '4px 0 8px', maxHeight: 54, overflow: 'hidden', wordBreak: 'break-word' }}>{p.description}</div>
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                 <button className="neu-btn" style={sm} disabled={busy} onClick={() => toggle(p.id, 'post')}>comments & likes</button>
                 <button className="neu-btn" style={sm} disabled={busy} onClick={() => edit(p)}>edit</button>
+                {(p.status === 'active' || p.pinned_at) && <button className="neu-btn" style={sm} disabled={busy} onClick={() => act('admin_social_post_pin', { p_id: p.id, p_pin: !p.pinned_at })}>{p.pinned_at ? 'unpin' : 'pin'}</button>}
                 {p.status === 'active'
                   ? <button className="neu-btn" style={sm} disabled={busy} onClick={() => act('admin_social_post_remove', { p_id: p.id }, 'Remove this post from Socials?')}>remove</button>
                   : <button className="neu-btn" style={sm} disabled={busy} onClick={() => act('admin_social_post_restore', { p_id: p.id })}>restore</button>}
