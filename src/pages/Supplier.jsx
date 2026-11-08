@@ -1,23 +1,30 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { Plus, Search, Edit3, Trash2, ExternalLink } from 'lucide-react';
 import { xrpc } from '../lib/xrpc.js';
+import { useToast } from '../components/Toast.jsx';
+import Btn from '../components/Btn.jsx';
+import PageHeader from '../xa/ui/PageHeader.jsx';
+import Drawer from '../xa/ui/Drawer.jsx';
+import { ConfirmDialog, EmptyState, SkRows } from '../xa/Kit.jsx';
 
 const BLANK = { id: null, name: '', url: '' };
-const inp = { width: '100%', padding: '10px 12px', border: '1.5px solid var(--border)', borderRadius: 10, background: 'var(--surface)', marginBottom: 10, fontSize: 15 };
-const btn = { padding: '8px 14px', borderRadius: 10, border: '1px solid var(--border)', background: 'var(--surface)', cursor: 'pointer', fontWeight: 600 };
-const card = { padding: 12, borderRadius: 14, background: 'var(--surface)', border: '1px solid var(--border)' };
 
 export default function Supplier() {
+  const { show } = useToast();
   const [rows, setRows] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [loadErr, setLoadErr] = useState('');
   const [q, setQ] = useState('');
-  const [err, setErr] = useState('');
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState(BLANK);
-  const [toast, setToast] = useState('');
-  const say = (m) => { setToast(m); setTimeout(() => setToast(''), 2200); };
+  const [errs, setErrs] = useState({});
+  const [busy, setBusy] = useState(false);
+  const [del, setDel] = useState(null);
 
   const load = useCallback(async () => {
-    try { setRows((await xrpc('admin_sup_list')) || []); setErr(''); }
-    catch (e) { setErr(e.message || String(e)); }
+    try { setRows((await xrpc('admin_sup_list')) || []); setLoadErr(''); }
+    catch (e) { setLoadErr(e.message || String(e)); }
+    finally { setLoading(false); }
   }, []);
   useEffect(() => { load(); }, [load]);
 
@@ -27,53 +34,68 @@ export default function Supplier() {
   }, [rows, q]);
 
   const save = async () => {
-    if (!form.name.trim()) return setErr('Product name is required');
-    if (!/^https?:\/\//i.test(form.url.trim())) return setErr('Link must start with http:// or https://');
+    const e = {};
+    if (!form.name.trim()) e.name = 'Product name is required';
+    if (!/^https?:\/\//i.test(form.url.trim())) e.url = 'Link must start with http:// or https://';
+    setErrs(e);
+    if (Object.keys(e).length) return;
+    setBusy(true);
     try {
-      await xrpc('admin_sup_save', { p_id: form.id, p_name: form.name, p_url: form.url });
-      setOpen(false); setErr(''); say(form.id ? 'Updated' : 'Added'); load();
-    } catch (e) { setErr(e.message || String(e)); }
+      await xrpc('admin_sup_save', { p_id: form.id, p_name: form.name.trim(), p_url: form.url.trim() });
+      show(form.id ? 'Updated' : 'Added', 'success');
+      setOpen(false); load();
+    } catch (x) { show(x.message || String(x), 'error'); }
+    finally { setBusy(false); }
   };
-  const del = async (r) => {
-    if (!window.confirm('Delete "' + r.name + '"?')) return;
-    try { await xrpc('admin_sup_delete', { p_id: r.id }); say('Deleted'); load(); }
-    catch (e) { setErr(e.message || String(e)); }
+
+  const doDelete = async () => {
+    setBusy(true);
+    try { await xrpc('admin_sup_delete', { p_id: del.id }); show('Deleted', 'success'); load(); }
+    catch (x) { show(x.message || String(x), 'error'); }
+    finally { setBusy(false); setDel(null); }
   };
 
   return (
-    <div style={{ padding: 16, display: 'grid', gap: 12, maxWidth: 800 }}>
-      <h2 style={{ margin: 0 }}>Supplier</h2>
-      <div style={card}>
-        <input style={inp} placeholder="Search product names" value={q} onChange={(e) => setQ(e.target.value)} />
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <button style={btn} onClick={() => { setForm(BLANK); setErr(''); setOpen(true); }}>+ Add product</button>
-          <span style={{ fontSize: 12.5, color: 'var(--text-dim)' }}>{list.length} of {rows.length}</span>
-        </div>
+    <>
+      <PageHeader title="Supplier" subtitle={list.length + ' of ' + rows.length}
+        actions={<Btn variant="primary" onClick={() => { setForm(BLANK); setErrs({}); setOpen(true); }}><Plus size={15} /> Add</Btn>} />
+
+      <div className="ui-tools">
+        <label className="ui-search">
+          <Search size={15} />
+          <input className="neu-input" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search product names…" aria-label="Search products" />
+        </label>
       </div>
-      {err && !open && <div style={{ color: 'var(--danger)', fontSize: 13 }}>{err}</div>}
-      {!list.length && <div style={{ ...card, textAlign: 'center', color: 'var(--text-dim)' }}>No products found.</div>}
-      {list.map((r) => (
-        <div key={r.id} style={{ ...card, display: 'flex', alignItems: 'center', gap: 8 }}>
-          <a href={r.url} target="_blank" rel="noreferrer" style={{ flex: 1, minWidth: 0, fontWeight: 700, wordBreak: 'break-word', color: 'var(--primary)' }}>{r.name} ↗</a>
-          <button style={btn} onClick={() => { setForm(r); setErr(''); setOpen(true); }}>Edit</button>
-          <button style={{ ...btn, color: 'var(--danger)' }} onClick={() => del(r)}>Delete</button>
-        </div>
-      ))}
-      {open && (
-        <div onClick={() => setOpen(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1500 }}>
-          <div onClick={(e) => e.stopPropagation()} style={{ ...card, width: 'min(420px, 92vw)', padding: 18 }}>
-            <h3 style={{ marginTop: 0 }}>{form.id ? 'Edit product' : 'Add product'}</h3>
-            <input style={inp} placeholder="Product name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-            <input style={inp} placeholder="Link (https://...)" value={form.url} onChange={(e) => setForm({ ...form, url: e.target.value })} />
-            {err && <div style={{ color: 'var(--danger)', fontSize: 13, marginBottom: 8 }}>{err}</div>}
-            <div style={{ display: 'flex', gap: 8 }}>
-              <button style={btn} onClick={save}>{form.id ? 'Save' : 'Add'}</button>
-              <button style={btn} onClick={() => setOpen(false)}>Cancel</button>
-            </div>
+
+      {loading && <div className="table-wrap" style={{ padding: 8 }}><SkRows rows={5} cols={2} /></div>}
+      {!loading && loadErr && <div className="table-wrap"><EmptyState title="Could not load" hint={loadErr} /><div style={{ textAlign: 'center', paddingBottom: 14 }}><Btn onClick={load}>Retry</Btn></div></div>}
+      {!loading && !loadErr && !list.length && <div className="table-wrap"><EmptyState title={rows.length ? 'No matches' : 'No products yet'} hint={rows.length ? 'Try a different search.' : 'Tap Add to create one.'} /></div>}
+
+      <div style={{ display: 'grid', gap: 10 }}>
+        {list.map((r) => (
+          <div key={r.id} className="neu-card" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <a href={r.url} target="_blank" rel="noreferrer" style={{ flex: 1, minWidth: 0, fontWeight: 700, wordBreak: 'break-word', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              {r.name} <ExternalLink size={13} />
+            </a>
+            <button type="button" className="ui-ic" style={{ width: 38, height: 36 }} onClick={() => { setForm(r); setErrs({}); setOpen(true); }} aria-label={'Edit ' + r.name}><Edit3 size={14} /></button>
+            <button type="button" className="ui-ic danger" style={{ width: 38, height: 36 }} onClick={() => setDel(r)} aria-label={'Delete ' + r.name}><Trash2 size={14} /></button>
           </div>
+        ))}
+      </div>
+
+      <Drawer open={open} onClose={() => !busy && setOpen(false)} title={form.id ? 'Edit product' : 'Add product'}
+        footer={<><Btn variant="primary" loading={busy} onClick={save}>{busy ? 'Saving…' : form.id ? 'Save' : 'Add'}</Btn><Btn onClick={() => setOpen(false)} disabled={busy}>Cancel</Btn></>}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div><div className="ui-lbl">Product name *</div>
+            <input className={'neu-input' + (errs.name ? ' bad' : '')} value={form.name} onChange={(e) => { setForm({ ...form, name: e.target.value }); setErrs({ ...errs, name: '' }); }} />
+            {errs.name && <div className="ui-err" role="alert">{errs.name}</div>}</div>
+          <div><div className="ui-lbl">Link *</div>
+            <input className={'neu-input' + (errs.url ? ' bad' : '')} inputMode="url" placeholder="https://…" value={form.url} onChange={(e) => { setForm({ ...form, url: e.target.value }); setErrs({ ...errs, url: '' }); }} />
+            {errs.url && <div className="ui-err" role="alert">{errs.url}</div>}</div>
         </div>
-      )}
-      {toast && <div style={{ position: 'fixed', left: '50%', bottom: 24, transform: 'translateX(-50%)', background: '#0F172A', color: '#fff', padding: '10px 16px', borderRadius: 99, fontSize: 14, zIndex: 2000 }}>{toast}</div>}
-    </div>
+      </Drawer>
+
+      <ConfirmDialog open={!!del} title="Delete this product?" message={del ? '"' + del.name + '" will be removed.' : ''} confirmText="Delete" danger busy={busy} onConfirm={doDelete} onCancel={() => setDel(null)} />
+    </>
   );
 }

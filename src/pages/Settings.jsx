@@ -3,90 +3,84 @@ import Card from '../components/Card.jsx';
 import Btn from '../components/Btn.jsx';
 import { useToast } from '../components/Toast.jsx';
 import { fetchSettings, upsertSetting, logAudit } from '../lib/api.js';
+import PageHeader from '../xa/ui/PageHeader.jsx';
+import { SkRows } from '../xa/Kit.jsx';
+
+const DEFAULT = { enabled: true, percent: 1, min_fee: 0, max_fee: null, apply_to: 'topup' };
 
 export default function Settings() {
   const { show } = useToast();
-  const [fee, setFee] = useState({ enabled: true, percent: 1, min_fee: 0, max_fee: null, apply_to: 'topup' });
+  const [fee, setFee] = useState(DEFAULT);
+  const [saved, setSaved] = useState(DEFAULT);
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [errs, setErrs] = useState({});
 
   useEffect(() => {
     fetchSettings().then(({ items }) => {
       const found = (items || []).find((s) => s.key === 'transaction_fee');
-      if (found?.value) setFee({ ...fee, ...found.value });
-    });
-    // eslint-disable-next-line
+      const next = found?.value ? { ...DEFAULT, ...found.value } : DEFAULT;
+      setFee(next); setSaved(next);
+    }).finally(() => setLoading(false));
   }, []);
 
+  const dirty = JSON.stringify(fee) !== JSON.stringify(saved);
+  const set = (k, v) => { setFee({ ...fee, [k]: v }); setErrs({ ...errs, [k]: '' }); };
+
   const save = async () => {
+    const e = {};
+    if (!(fee.percent >= 0 && fee.percent <= 100)) e.percent = 'Enter 0 to 100';
+    if (!(fee.min_fee >= 0)) e.min_fee = 'Cannot be negative';
+    if (fee.max_fee !== null && !(fee.max_fee >= fee.min_fee)) e.max_fee = 'Must be at least the minimum fee';
+    setErrs(e);
+    if (Object.keys(e).length) return;
     setSaving(true);
-    const before = fee;
     const { error } = await upsertSetting('transaction_fee', fee);
     setSaving(false);
     if (error) return show(error.message, 'error');
-    await logAudit('update', 'settings', 'transaction_fee', before, fee);
+    await logAudit('update', 'settings', 'transaction_fee', saved, fee);
+    setSaved(fee);
     show('Saved', 'success');
   };
 
+  const num = (k, extra = {}) => (
+    <div style={{ marginBottom: 14 }}>
+      <div className="ui-lbl">{extra.label}</div>
+      <input className={'neu-input' + (errs[k] ? ' bad' : '')} type="number" inputMode="decimal" step={extra.step}
+        value={fee[k] ?? ''}
+        onChange={(e) => set(k, e.target.value === '' ? (extra.nullable ? null : 0) : Number(e.target.value))} />
+      {errs[k] && <div className="ui-err" role="alert">{errs[k]}</div>}
+    </div>
+  );
+
   return (
     <>
-      <div className="page-head">
-        <div>
-          <h1>Settings</h1>
-          <p>Console & application configuration</p>
-        </div>
-      </div>
+      <PageHeader title="Settings" subtitle="Console and application configuration" />
 
       <Card style={{ marginBottom: 14 }}>
         <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 12 }}>Transaction fee</div>
-
-        <label style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-          <input type="checkbox" checked={!!fee.enabled}
-            onChange={(e) => setFee({ ...fee, enabled: e.target.checked })} />
-          <span style={{ fontSize: 13 }}>Enabled</span>
-        </label>
-
-        <div style={{ marginBottom: 12 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase', marginBottom: 5 }}>
-            Fee percentage (%)
-          </div>
-          <input className="neu-input" type="number" step="0.1"
-            value={fee.percent ?? 0}
-            onChange={(e) => setFee({ ...fee, percent: Number(e.target.value) })} />
-        </div>
-
-        <div style={{ marginBottom: 12 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase', marginBottom: 5 }}>
-            Minimum fee (₱)
-          </div>
-          <input className="neu-input" type="number"
-            value={fee.min_fee ?? 0}
-            onChange={(e) => setFee({ ...fee, min_fee: Number(e.target.value) })} />
-        </div>
-
-        <div style={{ marginBottom: 12 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase', marginBottom: 5 }}>
-            Maximum fee (₱) — blank = no cap
-          </div>
-          <input className="neu-input" type="number"
-            value={fee.max_fee ?? ''}
-            onChange={(e) => setFee({ ...fee, max_fee: e.target.value === '' ? null : Number(e.target.value) })} />
-        </div>
-
-        <div style={{ marginBottom: 12 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase', marginBottom: 5 }}>
-            Apply to
-          </div>
-          <select className="neu-input" value={fee.apply_to || 'topup'}
-            onChange={(e) => setFee({ ...fee, apply_to: e.target.value })}>
-            <option value="topup">Top-ups only</option>
-            <option value="checkout">Checkout only</option>
-            <option value="both">Both</option>
-          </select>
-        </div>
-
-        <Btn variant="primary" onClick={save} disabled={saving} style={{ width: '100%' }}>
-          {saving ? 'Saving…' : 'Save fee configuration'}
-        </Btn>
+        {loading ? <SkRows rows={4} cols={2} /> : (
+          <>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14, minHeight: 36 }}>
+              <input type="checkbox" style={{ width: 18, height: 18 }} checked={!!fee.enabled} onChange={(e) => set('enabled', e.target.checked)} />
+              <span style={{ fontSize: 14 }}>Enabled</span>
+            </label>
+            {num('percent', { label: 'Fee percentage (%)', step: '0.1' })}
+            {num('min_fee', { label: 'Minimum fee (₱)' })}
+            {num('max_fee', { label: 'Maximum fee (₱), blank = no cap', nullable: true })}
+            <div style={{ marginBottom: 14 }}>
+              <div className="ui-lbl">Apply to</div>
+              <select className="neu-input" value={fee.apply_to || 'topup'} onChange={(e) => set('apply_to', e.target.value)}>
+                <option value="topup">Top-ups only</option>
+                <option value="checkout">Checkout only</option>
+                <option value="both">Both</option>
+              </select>
+            </div>
+            <Btn variant="primary" loading={saving} onClick={save} disabled={saving || !dirty} style={{ width: '100%' }}>
+              {saving ? 'Saving…' : dirty ? 'Save fee configuration' : 'No changes'}
+            </Btn>
+          </>
+        )}
       </Card>
 
       <Card>
