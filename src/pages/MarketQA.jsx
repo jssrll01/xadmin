@@ -9,7 +9,7 @@ const call = async (fn, args = {}) => {
 };
 const card = { background: 'var(--bg, #e0e5ec)', borderRadius: 16, padding: 12, marginBottom: 10, boxShadow: '6px 6px 12px rgba(163,177,198,.5), -6px -6px 12px rgba(255,255,255,.7)' };
 const sm = { padding: '4px 10px', fontSize: 11 };
-const BLANK = { name: '', description: '', image_url: '', price: '', stock: '', sort: 0, active: true };
+const BLANK = { name: '', description: '', image_url: '', price: '', stock: '', sort: 0, vip_days: '', active: true };
 
 export default function MarketQA() {
   const [tab, setTab] = useState('qa');
@@ -33,7 +33,7 @@ export default function MarketQA() {
   };
   const edit = (kind, id, old) => { const b = window.prompt('Edit text:', old); if (b !== null) run('admin_qa_update', { p_kind: kind, p_id: id, p_body: b }); };
   const answer = (q) => { const b = window.prompt('Answer as XMARKET:'); if (b) run('admin_qa_answer', { p_question: q, p_body: b }); };
-  const saveItem = () => run('admin_market_save', { p_id: form.id || null, p_data: { ...form, price: String(form.price), stock: String(form.stock ?? ''), sort: Number(form.sort) || 0 } });
+  const saveItem = () => run('admin_market_save', { p_id: form.id || null, p_data: { ...form, price: String(form.price), stock: String(form.stock ?? ''), sort: Number(form.sort) || 0, vip_days: String(form.vip_days ?? '') } });
 
   return (
     <div style={{ padding: 16 }}>
@@ -73,8 +73,8 @@ export default function MarketQA() {
       {tab === 'items' && rows && rows.map((i) => (
         <div key={i.id} style={{ ...card, display: 'flex', gap: 10, alignItems: 'center', opacity: i.active ? 1 : .55 }}>
           {i.image_url && <img src={i.image_url} alt="" style={{ width: 50, height: 50, borderRadius: 10, objectFit: 'cover' }} />}
-          <div style={{ flex: 1, minWidth: 0 }}><b>{i.name}</b> · ₱{Number(i.price).toFixed(2)}<div style={{ fontSize: 12, opacity: .7 }}>stock: {i.stock ?? 'unlimited'} · {i.active ? 'live' : 'hidden'}</div></div>
-          <button className="neu-btn" style={sm} onClick={() => setForm({ ...i, stock: i.stock ?? '' })}>Edit</button>
+          <div style={{ flex: 1, minWidth: 0 }}><b>{i.name}</b> · ₱{Number(i.price).toFixed(2)}<div style={{ fontSize: 12, opacity: .7 }}>stock: {i.stock ?? 'unlimited'} · {i.active ? 'live' : 'hidden'}{i.vip_days ? ' · VIP ' + i.vip_days + ' days' : ''}</div></div>
+          <button className="neu-btn" style={sm} onClick={() => setForm({ ...i, stock: i.stock ?? '', vip_days: i.vip_days ?? '' })}>Edit</button>
           <button className="neu-btn" style={{ ...sm, color: '#DC2626' }} onClick={() => run('admin_market_delete', { p_id: i.id }, 'Delete this item?')}>Del</button>
         </div>
       ))}
@@ -103,7 +103,7 @@ export default function MarketQA() {
         <div onClick={() => setForm(null)} style={{ position: 'fixed', inset: 0, zIndex: 9000, background: 'rgba(0,0,0,.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
           <div onClick={(e) => e.stopPropagation()} style={{ ...card, background: '#fff', width: '100%', maxWidth: 420 }}>
             <b>{form.id ? 'Edit item' : 'New item'}</b>
-            {[['name', 'Name'], ['description', 'Description'], ['image_url', 'Image URL'], ['price', 'Price (₱)'], ['stock', 'Stock (empty = unlimited)'], ['sort', 'Sort order']].map(([k, l]) => (
+            {[['name', 'Name'], ['description', 'Description'], ['image_url', 'Image URL'], ['price', 'Price (₱)'], ['stock', 'Stock (empty = unlimited)'], ['sort', 'Sort order'], ['vip_days', 'VIP days (empty = normal item)']].map(([k, l]) => (
               <input key={k} className="neu-input" placeholder={l} value={form[k] ?? ''} onChange={(e) => setForm({ ...form, [k]: e.target.value })} style={{ width: '100%', margin: '8px 0 0' }} />
             ))}
             <label style={{ display: 'block', marginTop: 10 }}><input type="checkbox" checked={!!form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} /> Live in shop</label>
