@@ -144,3 +144,27 @@
   .neu-table.stack tbody tr:hover td { background: transparent; }
   .rv-grid { grid-template-columns: 1fr !important; }
 }
+
+/* date picker + context menu (round 6) */
+.dp { position: relative; display: inline-block; width: 100%; }
+.dp-btn { display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; cursor: pointer; }
+.dp-btn .ph { color: var(--text-dim); }
+.dp-pop { position: absolute; z-index: 60; top: calc(100% + 6px); left: 0; width: 280px; max-width: 92vw; padding: 12px; border-radius: 14px; background: var(--surface-2, var(--bg)); border: 1px solid var(--border); box-shadow: 0 12px 32px rgba(0,0,0,.25); }
+.dp-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; font-weight: 700; font-size: 14px; }
+.dp-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.dp-dow { font-size: 10.5px; font-weight: 800; text-transform: uppercase; color: var(--text-dim); text-align: center; padding: 4px 0; }
+.dp-day { height: 34px; border: none; border-radius: 8px; background: transparent; color: var(--text); cursor: pointer; font-size: 13px; }
+.dp-day:hover:not(:disabled) { background: var(--border); }
+.dp-day.today { outline: 1px solid var(--border-strong); }
+.dp-day.sel { background: #4F46E5; color: #fff; font-weight: 700; }
+.dp-day:disabled { opacity: .35; cursor: not-allowed; }
+.dp-day:focus-visible, .dp-nav:focus-visible, .cm-item:focus-visible { outline: 2px solid #4F46E5; outline-offset: 1px; }
+.dp-nav { width: 32px; height: 32px; border: none; border-radius: 8px; background: transparent; color: var(--text); cursor: pointer; display: grid; place-items: center; }
+.dp-nav:hover { background: var(--border); }
+.dp-foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 8px; }
+.cm { position: fixed; z-index: 100; min-width: 180px; padding: 6px; border-radius: 12px; background: var(--surface-2, var(--bg)); border: 1px solid var(--border); box-shadow: 0 12px 32px rgba(0,0,0,.28); }
+.cm-item { display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 10px; border: none; border-radius: 8px; background: transparent; color: var(--text); font-size: 13.5px; cursor: pointer; text-align: left; }
+.cm-item:hover:not(:disabled) { background: var(--border); }
+.cm-item.danger { color: #EF4444; }
+.cm-item:disabled { opacity: .4; cursor: not-allowed; }
+.cm-sep { height: 1px; margin: 4px 6px; background: var(--border); }
