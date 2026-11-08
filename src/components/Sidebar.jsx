@@ -28,6 +28,7 @@ const XMARKET_ITEMS = [
   ['/market-qa', 'Market & Q&A', Gift],
   ['/gifts', 'Creator Gifts', Gift],
   ['/dm-mod', 'DM Moderation', Gift],
+  ['/product-views', 'Product Views', Gift],
   ['/members-data', 'Members Data', Database],
   ['/returns', 'Returns', RotateCcw],
   ['/quotations', 'Quotations', FileText],

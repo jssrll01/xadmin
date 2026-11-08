@@ -94,6 +94,7 @@ export default function MarketQA() {
         <div key={o.id} style={card}>
           <b>{o.order_code}</b> · ₱{Number(o.total).toFixed(2)} · {o.status}
           <div style={{ fontSize: 12, opacity: .7 }}>From @{o.buyer} → {o.name}, {o.address}{o.gift_recipient_email ? ' (' + o.gift_recipient_email + ')' : ''}</div>
+          <div style={{ fontSize: 12, opacity: .8 }}>{[o.mobile && 'Mobile ' + o.mobile, o.barangay, o.city, o.province, o.postal_code && 'ZIP ' + o.postal_code].filter(Boolean).join(' · ')}</div>
           {o.gift_message && <div style={{ fontSize: 12 }}>💬 {o.gift_message}</div>}
         </div>
       ))}

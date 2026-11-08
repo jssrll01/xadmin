@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { supabase } from '../supabase.js';
+import { Link } from 'react-router-dom';
 
 const CODE = import.meta.env.VITE_XADMIN_PIN;
 const call = async (fn, args = {}) => {
@@ -40,6 +41,7 @@ export default function WalletSecurity() {
           <button key={id} className="neu-btn" onClick={() => setTab(id)} style={{ padding: '8px 14px', fontWeight: 700, opacity: tab === id ? 1 : .6 }}>{l}</button>
         ))}
       </div>
+      <Link to="/market-qa" className="neu-btn" style={{ ...sm, display: 'inline-block', textDecoration: 'none', marginBottom: 12 }}>Market purchases ›</Link>
       {err && <div style={{ color: '#DC2626', fontSize: 13, marginBottom: 10 }}>{err}</div>}
       {rows === null && <div>Loading…</div>}
       {rows && rows.length === 0 && <div style={{ opacity: .6, padding: 20 }}>Nothing here yet.</div>}
