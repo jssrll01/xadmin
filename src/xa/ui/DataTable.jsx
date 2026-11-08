@@ -28,10 +28,14 @@ export default function DataTable({
   const [sort, setSort] = useState({ key: '', dir: 'asc' });
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(pageSize);
-  const [hidden, setHidden] = useState({});
+  const [hidden, setHidden] = useState(() => {
+    try { const s = JSON.parse(localStorage.getItem('xs_cols_' + exportName)); if (s && typeof s === 'object') return s; } catch (e) { /* storage blocked */ }
+    return Object.fromEntries(columns.filter((c) => c.hidden).map((c) => [c.key, true]));
+  });
   const [sel, setSel] = useState({});
 
   useEffect(() => { const t = setTimeout(() => { setDq(q.trim().toLowerCase()); setPage(1); }, 200); return () => clearTimeout(t); }, [q]);
+  useEffect(() => { try { localStorage.setItem('xs_cols_' + exportName, JSON.stringify(hidden)); } catch (e) { /* storage blocked */ } }, [hidden, exportName]);
 
   const shown = columns.filter((c) => !hidden[c.key]);
   const list = useMemo(() => {

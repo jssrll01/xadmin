@@ -22,27 +22,27 @@ export default function Orders() { // XMARKET_RECEIPT_VIEW_COLUMN
       columns={[
         { key: 'order_code', label: 'Code', render: (r) => <b>{r.order_code}</b> },
         { key: 'name', label: 'Buyer', render: (r) => r.name || '—' },
-        { key: 'email', label: 'Email', render: (r) => r.email || '—' },
-        { key: 'mobile', label: 'Mobile', render: (r) => r.mobile || '—' },
+        { key: 'email', label: 'Email', hidden: true, render: (r) => r.email || '—' },
+        { key: 'mobile', label: 'Mobile', hidden: true, render: (r) => r.mobile || '—' },
         { key: 'items', label: 'Items', render: (r) => (ITEMS[r.id] || []).length === 0 ? '—' : (
           <div style={{ fontSize: 12, minWidth: 180 }}>
             {(ITEMS[r.id] || []).map((it) => (
               <div key={it.id}>{it.name}{it.variant ? ' (' + it.variant + ')' : ''} × {it.quantity} · {peso(Number(it.price) * Number(it.quantity))}</div>
             ))}
           </div>) },
-        { key: 'subtotal', label: 'Subtotal', render: (r) => peso(r.subtotal) },
-        { key: 'discount', label: 'Discount', render: (r) => peso(r.discount) },
-        { key: 'shipping_fee', label: 'Shipping', render: (r) => peso(r.shipping_fee) },
+        { key: 'subtotal', label: 'Subtotal', hidden: true, render: (r) => peso(r.subtotal) },
+        { key: 'discount', label: 'Discount', hidden: true, render: (r) => peso(r.discount) },
+        { key: 'shipping_fee', label: 'Shipping', hidden: true, render: (r) => peso(r.shipping_fee) },
         { key: 'total', label: 'Total', render: (r) => <b>{peso(Math.max(0, (Number(r.subtotal) || 0) - (Number(r.discount) || 0)) + (Number(r.shipping_fee) || 0))}</b> },
         { key: 'payment_method', label: 'Payment', render: (r) => r.payment_method || '—' },
-        { key: 'delivery_method', label: 'Delivery', render: (r) => r.delivery_method || '—' },
+        { key: 'delivery_method', label: 'Delivery', hidden: true, render: (r) => r.delivery_method || '—' },
         { key: 'status', label: 'Status', render: (r) => {
           const s = (r.status || 'pending').toLowerCase();
           return <span className={`neu-badge badge-${s}`}>{s}</span>;
         } },
-        { key: 'province', label: 'Province', render: (r) => r.province || '—' },
-        { key: 'city', label: 'City', render: (r) => r.city || '—' },
-        { key: 'barangay', label: 'Barangay', render: (r) => r.barangay || '—' },
+        { key: 'province', label: 'Province', hidden: true, render: (r) => r.province || '—' },
+        { key: 'city', label: 'City', hidden: true, render: (r) => r.city || '—' },
+        { key: 'barangay', label: 'Barangay', hidden: true, render: (r) => r.barangay || '—' },
         { key: 'receipt_url', label: 'Receipt', render: (r) => r.receipt_url ? <a href={r.receipt_url} target="_blank" rel="noreferrer"><img src={r.receipt_url} alt="receipt" style={{ width: 56, height: 56, objectFit: 'cover', borderRadius: 8 }} /></a> : '—' },
         { key: 'created_at', label: 'Date', render: (r) => dateTime(r.created_at) },
       ]}
@@ -69,6 +69,16 @@ export default function Orders() { // XMARKET_RECEIPT_VIEW_COLUMN
           options: ['pending', 'paid', 'shipped', 'delivered', 'completed', 'cancelled'],
           default: 'pending' },
       ]}
+      extraRowActions={(row, { update }) => (
+        <select className="neu-input-sm" aria-label="Change order status" value={(row.status || 'pending').toLowerCase()}
+          onChange={(e) => {
+            const v = e.target.value;
+            if (v === 'cancelled' && !window.confirm('Cancel this order?')) return;
+            update(row.id, { status: v });
+          }}>
+          {['pending', 'paid', 'shipped', 'delivered', 'completed', 'cancelled'].map((s) => <option key={s} value={s}>{s}</option>)}
+        </select>
+      )}
       statusKey="status"
       statusOptions={['pending', 'paid', 'shipped', 'delivered', 'completed', 'cancelled']}
       onCreate={orderCrud.create}

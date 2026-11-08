@@ -28,6 +28,12 @@ export default function Returns() {
         { key: 'status', label: 'Status', type: 'select',
           options: ['pending', 'approved', 'rejected'], default: 'pending' },
       ]}
+      extraRowActions={(row, { update }) => (String(row.status || 'pending').toLowerCase() === 'pending' ? (
+        <>
+          <button type="button" className="neu-btn" onClick={() => update(row.id, { status: 'approved' })}>Approve</button>
+          <button type="button" className="neu-btn" style={{ color: 'var(--danger)' }} onClick={() => { if (window.confirm('Reject this return request?')) update(row.id, { status: 'rejected' }); }}>Reject</button>
+        </>
+      ) : null)}
       onCreate={returnCrud.create}
       onUpdate={returnCrud.update}
       onDelete={returnCrud.remove}

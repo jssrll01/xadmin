@@ -117,3 +117,17 @@
 
 .xa-pal .grp { padding: 8px 12px 4px; font-size: 10.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--text-dim); cursor: default; }
 .xa-pal li.act { font-weight: 700; }
+
+/* status badges (round 4): every status the pages use, readable in light and dark */
+.neu-badge { color: color-mix(in srgb, var(--primary) 78%, var(--text)); }
+.badge-shipped, .badge-processing, .badge-in_progress, .badge-open, .badge-frozen { background: var(--primary-soft); color: color-mix(in srgb, var(--primary) 78%, var(--text)); }
+.badge-active, .badge-approved, .badge-paid, .badge-completed, .badge-delivered, .badge-resolved, .badge-fulfilled, .badge-sent { background: var(--success-soft); color: color-mix(in srgb, var(--success) 62%, var(--text)); }
+.badge-pending, .badge-unpaid, .badge-submitted { background: var(--warn-soft); color: color-mix(in srgb, var(--warn) 62%, var(--text)); }
+.badge-banned, .badge-rejected, .badge-cancelled, .badge-refunded, .badge-overdue, .badge-failed, .badge-closed, .badge-removed { background: var(--danger-soft); color: color-mix(in srgb, var(--danger) 70%, var(--text)); }
+
+/* status badges (round 4): every status the pages use, readable in light and dark */
+.neu-badge { color: color-mix(in srgb, var(--primary) 78%, var(--text)); }
+.badge-shipped, .badge-processing, .badge-in_progress, .badge-open, .badge-frozen { background: var(--primary-soft); color: color-mix(in srgb, var(--primary) 78%, var(--text)); }
+.badge-active, .badge-approved, .badge-paid, .badge-completed, .badge-delivered, .badge-resolved, .badge-fulfilled, .badge-sent { background: var(--success-soft); color: color-mix(in srgb, var(--success) 62%, var(--text)); }
+.badge-pending, .badge-unpaid, .badge-submitted { background: var(--warn-soft); color: color-mix(in srgb, var(--warn) 62%, var(--text)); }
+.badge-banned, .badge-rejected, .badge-cancelled, .badge-refunded, .badge-overdue, .badge-failed, .badge-closed, .badge-removed { background: var(--danger-soft); color: color-mix(in srgb, var(--danger) 70%, var(--text)); }
