@@ -21,12 +21,6 @@ const url = (v) => /^https?:\/\/\S+$/i.test(v || '');
 
 // field: [key, label, type, required]
 const CFG = {
-  cinema_movies: {
-    title: 'Cinema', subtitle: 'Movies shown in the Cinema page', flag: 'active',
-    blank: { price: 10, sort: 0, active: true },
-    name: (r) => r.title, sub: (r) => '₱' + r.price + ' · ' + (r.genre || 'No genre') + (r.active ? '' : ' · hidden'),
-    fields: [['title', 'Title', 'text', true], ['youtube_url', 'YouTube link', 'url', true], ['poster_url', 'Poster image', 'image'], ['genre', 'Row name / genre', 'text'], ['description', 'Description', 'area'], ['price', 'Price (₱)', 'number', true], ['sort', 'Order (lower first)', 'number'], ['active', 'Visible to users', 'bool']],
-  },
   articles: {
     title: 'Weekly Articles', subtitle: 'Articles shown in the app', flag: 'published',
     blank: { published: true },
@@ -151,7 +145,6 @@ function ContentAdmin({ tbl }) {
   );
 }
 
-export const CinemaAdmin = () => <ContentAdmin tbl="cinema_movies" />;
 export const ArticlesAdmin = () => <ContentAdmin tbl="articles" />;
 export const ScholarshipsAdmin = () => <ContentAdmin tbl="scholarships" />;
 export const FreelanceAdmin = () => <ContentAdmin tbl="freelance_jobs" />;
