@@ -36,7 +36,7 @@
 .xs-right { margin-left: auto; display: flex; align-items: center; gap: 6px; }
 .xs-ico { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--text-dim); }
 .xs-ico:hover { background: var(--surface-2); color: var(--text); }
-.xs-content { padding: 20px 24px 80px; max-width: 1480px; margin: 0 auto; animation: xaIn .2s ease-out both; }
+.xs-content { padding: 20px 24px 80px; max-width: 1480px; margin: 0 auto; min-height: calc(100vh - var(--xs-top)); animation: xaIn .2s ease-out backwards; }
 
 @media (min-width: 901px) {
   .xs-side.col { width: var(--xs-col); }

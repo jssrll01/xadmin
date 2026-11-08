@@ -28,6 +28,7 @@ import VideoMod from './pages/VideoMod.jsx';
 import WalletSecurity from './pages/WalletSecurity.jsx';
 import MarketQA from './pages/MarketQA.jsx';
 import GiftsAdmin from './pages/GiftsAdmin.jsx';
+import DataManager from './pages/DataManager.jsx';
 import DmMod from './pages/DmMod.jsx';
 import ProductViews from './pages/ProductViews.jsx';
 import MembersData from './pages/MembersData.jsx';
@@ -154,6 +155,8 @@ export default function App() {
           <Route path="/wallet-security" element={<WalletSecurity />} />
           <Route path="/market-qa" element={<MarketQA />} />
           <Route path="/gifts" element={<GiftsAdmin />} />
+          <Route path="/data" element={<DataManager />} />
+          <Route path="/data/:table" element={<DataManager />} />
           <Route path="/dm-mod" element={<DmMod />} />
           <Route path="/product-views" element={<ProductViews />} />
           <Route path="/members-data" element={<MembersData />} />
