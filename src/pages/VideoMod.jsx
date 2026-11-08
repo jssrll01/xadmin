@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { supabase } from '../supabase.js';
+import TagEditor from '../components/TagEditor.jsx';
 
 const CODE = import.meta.env.VITE_XADMIN_PIN;
 const call = async (fn, args = {}) => {
@@ -18,6 +19,7 @@ export default function VideoMod() {
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
   const [cm, setCm] = useState(null);
+  const [tags, setTags] = useState(null);
 
   const load = useCallback(async () => {
     try { const d = await call('admin_videos_list', { p_status: status, p_limit: 100 }); setRows(Array.isArray(d) ? d : []); setErr(''); }
@@ -69,6 +71,7 @@ export default function VideoMod() {
             <div style={{ display: 'flex', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
               <a className="neu-btn" href={link(v)} target="_blank" rel="noopener noreferrer" style={{ ...sm, textDecoration: 'none' }}>Open</a>
               <button className="neu-btn" style={sm} onClick={() => openCm(v)}>Comments</button>
+              <button className="neu-btn" style={sm} onClick={() => setTags(v)}>Products ({(v.products || []).length})</button>
               {status === 'active'
                 ? <button className="neu-btn" disabled={busy} style={{ ...sm, color: '#DC2626' }} onClick={() => setSt(v, 'removed')}>Remove</button>
                 : <button className="neu-btn" disabled={busy} style={sm} onClick={() => setSt(v, 'active')}>Restore</button>}
@@ -76,6 +79,7 @@ export default function VideoMod() {
           </div>
         </div>
       ))}
+      {tags && <TagEditor title={'Products on video by @' + tags.username} fn="admin_video_set_products" id={tags.id} initial={tags.products || []} onClose={() => setTags(null)} onSaved={() => { setTags(null); load(); }} />}
       {cm && (
         <div onClick={() => setCm(null)} style={{ position: 'fixed', inset: 0, zIndex: 9000, background: 'rgba(0,0,0,.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
           <div onClick={(e) => e.stopPropagation()} style={{ ...card, display: 'block', width: '100%', maxWidth: 480, maxHeight: '75vh', overflowY: 'auto', background: '#fff' }}>

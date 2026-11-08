@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { supabase } from '../supabase.js';
 import { dateTime } from '../lib/format.js';
+import TagEditor from '../components/TagEditor.jsx';
 
 const CODE = import.meta.env.VITE_XADMIN_PIN;
 const call = async (fn, args = {}) => {
@@ -21,6 +22,7 @@ export default function SocialMod() {
   const [busy, setBusy] = useState(false);
   const [open, setOpen] = useState(null);
   const [detail, setDetail] = useState({ a: [], b: [] });
+  const [tags, setTags] = useState(null);
 
   const load = useCallback(async () => {
     try {
@@ -90,6 +92,7 @@ export default function SocialMod() {
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                 <button className="neu-btn" style={sm} disabled={busy} onClick={() => toggle(p.id, 'post')}>comments & likes</button>
                 <button className="neu-btn" style={sm} disabled={busy} onClick={() => edit(p)}>edit</button>
+                <button className="neu-btn" style={sm} disabled={busy} onClick={() => setTags(p)}>products ({(p.products || []).length})</button>
                 {(p.status === 'active' || p.pinned_at) && <button className="neu-btn" style={sm} disabled={busy} onClick={() => act('admin_social_post_pin', { p_id: p.id, p_pin: !p.pinned_at })}>{p.pinned_at ? 'unpin' : 'pin'}</button>}
                 {p.status === 'active'
                   ? <button className="neu-btn" style={sm} disabled={busy} onClick={() => act('admin_social_post_remove', { p_id: p.id }, 'Remove this post from Socials?')}>remove</button>
@@ -121,6 +124,7 @@ export default function SocialMod() {
         </div>
       ))}
 
+      {tags && <TagEditor title={'Products on post by @' + tags.creator} fn="admin_post_set_products" id={tags.id} initial={tags.products || []} onClose={() => setTags(null)} onSaved={() => { setTags(null); load(); }} />}
       {tab === 'creators' && rows && rows.map(c => (
         <div key={c.user_id} style={{ ...card, marginBottom: 12 }}>
           <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
