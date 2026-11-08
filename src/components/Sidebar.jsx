@@ -24,6 +24,7 @@ const XMARKET_ITEMS = [
   ['/creator-mgmt', 'Creator Management', Crown],
   ['/social-mod', 'Socials Management', ImageIcon],
   ['/video-mod', 'Socials Videos', ImageIcon],
+  ['/wallet-security', 'Wallet Security', Wallet],
   ['/members-data', 'Members Data', Database],
   ['/returns', 'Returns', RotateCcw],
   ['/quotations', 'Quotations', FileText],

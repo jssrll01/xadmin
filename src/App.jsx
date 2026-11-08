@@ -24,6 +24,7 @@ import CreatorApps from './pages/CreatorApps.jsx';
 import CreatorMgmt from './pages/CreatorMgmt.jsx';
 import SocialMod from './pages/SocialMod.jsx';
 import VideoMod from './pages/VideoMod.jsx';
+import WalletSecurity from './pages/WalletSecurity.jsx';
 import MembersData from './pages/MembersData.jsx';
 import Reports from './pages/Reports.jsx';
 import Returns from './pages/Returns.jsx';
@@ -139,6 +140,7 @@ export default function App() {
           <Route path="/creator-mgmt" element={<CreatorMgmt />} />
           <Route path="/social-mod" element={<SocialMod />} />
           <Route path="/video-mod" element={<VideoMod />} />
+          <Route path="/wallet-security" element={<WalletSecurity />} />
           <Route path="/members-data" element={<MembersData />} />
           <Route path="/returns"   element={<Returns />} />
           <Route path="/reports"   element={<Reports />} />
