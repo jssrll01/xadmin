@@ -26,6 +26,7 @@ export const ylSupabase = createClient(YL_URL || MISSING, YL_KEY || 'missing', {
 
 let current = 'XMARKET';
 export const setDbSystem = (s) => { current = s === 'YUELIN' ? 'YUELIN' : 'XMARKET'; };
+export const getDbSystem = () => current;
 export const getDb = (s) => (s === 'YUELIN' ? ylSupabase : xmSupabase);
 
 // Legacy `import { supabase }` follows the active system

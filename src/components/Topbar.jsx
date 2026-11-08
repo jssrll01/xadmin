@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Bell, Lock, Sun, Moon } from 'lucide-react';
 import InstallButton from './InstallButton.jsx';
+import LiveDot from './LiveDot.jsx';
 
 export default function Topbar() {
   const loc = useLocation();
@@ -19,6 +20,7 @@ export default function Topbar() {
     <div className="topbar">
       <div style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--text-dim)' }}>{title}</div>
       <div style={{ display: 'flex', gap: 14, alignItems: 'center', marginLeft: 'auto' }}>
+        <LiveDot />
         <InstallButton />
         <button type="button" className="xa-icon-btn" onClick={toggle}
           aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'} aria-pressed={theme === 'dark'}>
