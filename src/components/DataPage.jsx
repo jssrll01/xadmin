@@ -1,60 +1,41 @@
-import React, { useEffect, useState } from 'react';
-import Card from './Card.jsx';
+import React, { useCallback, useEffect, useState } from 'react';
+import PageHeader from '../xa/ui/PageHeader.jsx';
+import DataTable from '../xa/ui/DataTable.jsx';
 
-export default function DataPage({ title, subtitle, fetcher, columns }) {
+export default function DataPage({ title, subtitle, fetcher, columns, searchKeys }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [failed, setFailed] = useState(false);
 
-  useEffect(() => {
-    let alive = true;
-    (async () => {
-      try {
-        const res = await fetcher();
-        if (alive) setItems(Array.isArray(res?.items) ? res.items : []);
-      } catch {
-        if (alive) setItems([]);
-      } finally {
-        if (alive) setLoading(false);
-      }
-    })();
-    return () => { alive = false; };
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetcher();
+      setItems(Array.isArray(res?.items) ? res.items : []);
+      setFailed(false);
+    } catch {
+      setItems([]);
+      setFailed(true);
+    } finally {
+      setLoading(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  useEffect(() => { load(); }, [load]);
 
   return (
     <>
-      <div className="page-head">
-        <div>
-          <h1>{title}</h1>
-          <p>{subtitle}</p>
-        </div>
-      </div>
-      <Card>
-        {loading ? (
-          <div style={{ padding: 20, color: 'var(--text-dim)' }}>Loading…</div>
-        ) : items.length === 0 ? (
-          <div style={{ padding: 20, color: 'var(--text-dim)', textAlign: 'center' }}>
-            <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 4 }}>No data</div>
-            <div style={{ fontSize: 12 }}>This table is empty or has no readable rows.</div>
-          </div>
-        ) : (
-          <table className="neu-table">
-            <thead>
-              <tr>{columns.map((c) => <th key={c.key}>{c.label}</th>)}</tr>
-            </thead>
-            <tbody>
-              {items.map((row, i) => (
-                <tr key={row.id || i}>
-                  {columns.map((c) => (
-                    <td key={c.key}>
-                      {c.render ? c.render(row) : String(row[c.key] ?? '—')}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </Card>
+      <PageHeader title={title} subtitle={subtitle} />
+      <DataTable
+        columns={columns}
+        rows={items}
+        loading={loading}
+        error={failed}
+        onRetry={load}
+        searchKeys={searchKeys || columns.map((c) => c.key)}
+        exportName={String(title).toLowerCase().replace(/\s+/g, '-')}
+        emptyHint="This table is empty or has no readable rows."
+      />
     </>
   );
 }

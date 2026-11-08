@@ -131,3 +131,16 @@
 .badge-active, .badge-approved, .badge-paid, .badge-completed, .badge-delivered, .badge-resolved, .badge-fulfilled, .badge-sent { background: var(--success-soft); color: color-mix(in srgb, var(--success) 62%, var(--text)); }
 .badge-pending, .badge-unpaid, .badge-submitted { background: var(--warn-soft); color: color-mix(in srgb, var(--warn) 62%, var(--text)); }
 .badge-banned, .badge-rejected, .badge-cancelled, .badge-refunded, .badge-overdue, .badge-failed, .badge-closed, .badge-removed { background: var(--danger-soft); color: color-mix(in srgb, var(--danger) 70%, var(--text)); }
+
+/* phones: table rows become cards (round 5) */
+@media (max-width: 700px) {
+  .neu-table.stack, .neu-table.stack tbody, .neu-table.stack tr, .neu-table.stack td { display: block; width: 100%; }
+  .neu-table.stack thead { display: none; }
+  .neu-table.stack tr { padding: 10px 12px; border-bottom: 8px solid var(--bg); }
+  .neu-table.stack td { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 6px 0; border: none; text-align: right; }
+  .neu-table.stack td[data-label]::before { content: attr(data-label); font-size: 11px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--text-dim); text-align: left; flex-shrink: 0; }
+  .neu-table.stack td.chk { justify-content: flex-start; }
+  .neu-table.stack td .cell-wrap { white-space: normal; }
+  .neu-table.stack tbody tr:hover td { background: transparent; }
+  .rv-grid { grid-template-columns: 1fr !important; }
+}

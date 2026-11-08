@@ -8,6 +8,7 @@ import { getDb, supabase } from '../supabase.js';
 import { peso, dateTime } from '../lib/format.js';
 import { Check, X } from 'lucide-react';
 import { useToast } from '../components/Toast.jsx';
+import { ConfirmDialog } from '../xa/Kit.jsx';
 
 export default function TopUps() {
   const { activeSystem } = useAdminContext();
@@ -15,8 +16,11 @@ export default function TopUps() {
   const { show } = useToast();
   const [viewer, setViewer] = useState(null);
 
-  const decide = async (row, status) => {
+  const [ask, setAsk] = useState(null);
+  const decide = (row, status) => setAsk({ row, status });
+  const doDecide = async (row, status) => {
     const { data, error } = await supabase.rpc('admin_topup_set', { code: getAdminPin(), p_id: row.id, p_status: status });
+    setAsk(null);
     if (error) return show?.(error.message, 'error');
     show?.(status === 'approved' ? 'Approved · wallet credited' : 'Rejected', 'success');
   };
@@ -75,6 +79,10 @@ export default function TopUps() {
         </>
       )}
     />
+    <ConfirmDialog open={!!ask} title={ask && ask.status === 'approved' ? 'Approve this top-up?' : 'Reject this top-up?'}
+      message={ask ? (ask.status === 'approved' ? 'The wallet is credited ' + peso(ask.row.amount) + ' right away.' : 'The request is rejected and nothing is credited.') : ''}
+      confirmText={ask && ask.status === 'approved' ? 'Approve and credit' : 'Reject'} danger={!!ask && ask.status !== 'approved'}
+      onConfirm={() => doDecide(ask.row, ask.status)} onCancel={() => setAsk(null)} />
     <Modal open={!!viewer} onClose={() => setViewer(null)} title="Receipt">
       {viewer && <img src={viewer} alt="receipt" style={{ maxWidth: '100%', maxHeight: '80vh', borderRadius: 12 }} />}
     </Modal>

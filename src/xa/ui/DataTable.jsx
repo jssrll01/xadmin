@@ -117,7 +117,7 @@ export default function DataTable({
         : list.length === 0 ? <div className="table-wrap"><EmptyState title={(rows || []).length === 0 ? (emptyTitle || 'No data yet') : 'No matches'} hint={(rows || []).length === 0 ? emptyHint : 'Try a different search or filter.'} /></div>
         : (
           <div className="table-wrap">
-            <table className="neu-table">
+            <table className="neu-table stack">
               <thead>
                 <tr>
                   {selectable && <th className="chk"><input type="checkbox" checked={allOnPage} onChange={togglePage} aria-label="Select all on this page" /></th>}
@@ -139,7 +139,7 @@ export default function DataTable({
                 {pageRows.map((r, i) => (
                   <tr key={r[rowKey] ?? i} className={sel[r[rowKey]] ? 'sel' : undefined} style={onRowClick ? { cursor: 'pointer' } : undefined} onClick={onRowClick ? () => onRowClick(r) : undefined}>
                     {selectable && <td className="chk" onClick={(e) => e.stopPropagation()}><input type="checkbox" checked={!!sel[r[rowKey]]} onChange={() => toggleRow(r)} aria-label="Select row" /></td>}
-                    {shown.map((c) => <td key={c.key} className={c.wrap ? 'cell-wrap' : undefined}>{c.render ? c.render(r) : String(r[c.key] ?? '—')}</td>)}
+                    {shown.map((c) => <td key={c.key} data-label={c.label} className={c.wrap ? 'cell-wrap' : undefined}>{c.render ? c.render(r) : String(r[c.key] ?? '—')}</td>)}
                     {rowActions && <td style={{ textAlign: 'right' }} onClick={(e) => e.stopPropagation()}><div style={{ display: 'inline-flex', gap: 6, alignItems: 'center' }}>{rowActions(r)}</div></td>}
                   </tr>
                 ))}
