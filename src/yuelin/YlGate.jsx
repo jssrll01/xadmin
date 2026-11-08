@@ -1,3 +1,4 @@
+import { getAdminPin } from '../lib/pin.js';
 import React, { useEffect, useState } from 'react';
 import { api, getPin, setPin } from './ylApi.js';
 import { S, ACCENT } from './ui.js';
@@ -8,7 +9,7 @@ export default function YlGate({ children }) {
   const [val, setVal] = useState('');
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
-  const ENV_PIN = import.meta.env.VITE_XADMIN_PIN || '';
+  const ENV_PIN = getAdminPin() || '';
   const [auto, setAuto] = useState(!!ENV_PIN && !getPin());
 
   useEffect(() => {

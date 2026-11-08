@@ -1,5 +1,6 @@
+import { getAdminPin } from './pin.js';
 import { supabase } from '../supabase.js';
-const PIN = import.meta.env.VITE_XADMIN_PIN;
+const PIN = getAdminPin();
 const actor = () => sessionStorage.getItem('xadmin_actor') || 'admin';
 
 async function call(fn, args) {

@@ -1,3 +1,4 @@
+import { getAdminPin } from '../lib/pin.js';
 import { useAdminContext } from "../context/AdminContext";
 import React, { useState, useCallback, useMemo } from 'react';
 import Card from '../components/Card.jsx';
@@ -10,7 +11,7 @@ import { logAudit } from '../lib/api.js';
 import { uploadToCloudinary } from '../lib/cloud.js';
 import { Plus, Edit2, Trash2, ArrowUp, ArrowDown, RefreshCw, ExternalLink } from 'lucide-react';
 
-const CODE = import.meta.env.VITE_XADMIN_PIN;
+const CODE = getAdminPin();
 const PRESET = 'xmarket_qrportal';
 const MAX_MB = 5;
 const OK_TYPES = ['image/jpeg', 'image/png', 'image/webp'];

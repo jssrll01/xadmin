@@ -1,3 +1,4 @@
+import { getAdminPin } from '../lib/pin.js';
 import { useAdminContext } from "../context/AdminContext";
 import { adminDb, adminRows } from '../lib/api';
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
@@ -11,7 +12,7 @@ import { getDb, supabase } from '../supabase.js';
 import { logAudit } from '../lib/api.js';
 import { Plus, Edit2, Trash2, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 
-const CODE = import.meta.env.VITE_XADMIN_PIN;
+const CODE = getAdminPin();
 const BLANK = { name: '', description: '', logo_url: '', banner_url: '', location: '', contact_phone: '', contact_email: '', verified: false };
 const VBLANK = { code: '', title: '', discount_type: 'fixed', discount_value: '', min_spend: '', expires_at: '', active: true };
 const lab = { fontSize: 11, fontWeight: 700, color: 'var(--text-dim)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: 0.4 };

@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { Delete } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Delete, Check } from 'lucide-react';
+import { xmSupabase } from '../supabase.js';
+import { setAdminPin, verifyPin } from '../lib/pin.js';
 
-const PIN = import.meta.env.VITE_XADMIN_PIN;
-const PIN_LEN = (PIN || '').length || 4;
 const SESSION_KEY = 'xadmin_unlocked';
 const ACTOR_KEY = 'xadmin_actor';
 const SESSION_TTL_MS = Number(import.meta.env.VITE_XADMIN_SESSION_TTL_MS || 900000); // default 15 min
+const MAX_LEN = 12;
 
 // NFC card: read #pin=XXXX once at load, then wipe it from the address bar
 let CARD_PIN = '';
@@ -20,31 +21,42 @@ try {
 export default function PinLock({ onUnlock }) {
   const [digits, setDigits] = useState('');
   const [error, setError] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const working = useRef(false);
 
-  useEffect(() => {
-    if (CARD_PIN && PIN && CARD_PIN === PIN) {
-      CARD_PIN = '';
+  const submit = async (pin) => {
+    if (working.current || !pin) return;
+    working.current = true;
+    setBusy(true);
+    let ok = false;
+    try { ok = await verifyPin(xmSupabase, pin); } catch (e) { ok = false; }
+    if (ok) {
+      setAdminPin(pin);
       sessionStorage.setItem(SESSION_KEY, String(Date.now() + SESSION_TTL_MS));
       sessionStorage.setItem(ACTOR_KEY, import.meta.env.VITE_XADMIN_ACTOR || 'admin');
       onUnlock();
+      return;
     }
-  }, []);
-
-  const press = (d) => {
-    if (digits.length >= PIN_LEN) return;
-    const next = digits + d;
-    setDigits(next);
-    if (next.length === PIN_LEN) {
-      setTimeout(() => {
-        if (next === PIN) {
-          sessionStorage.setItem(SESSION_KEY, String(Date.now() + SESSION_TTL_MS));
-          sessionStorage.setItem(ACTOR_KEY, import.meta.env.VITE_XADMIN_ACTOR || 'admin');
-          onUnlock();
-        }
-        else { setError(true); setTimeout(() => { setError(false); setDigits(''); }, 500); }
-      }, 150);
-    }
+    setError(true);
+    setTimeout(() => { setError(false); setDigits(''); working.current = false; setBusy(false); }, 500);
   };
+
+  useEffect(() => {
+    if (CARD_PIN) { const p = CARD_PIN; CARD_PIN = ''; submit(p); }
+  }, []); // eslint-disable-line
+
+  const press = (d) => setDigits((cur) => (working.current || cur.length >= MAX_LEN ? cur : cur + d));
+  const back = () => setDigits((cur) => (working.current ? cur : cur.slice(0, -1)));
+
+  useEffect(() => {
+    const onKey = (e) => {
+      if (/^\d$/.test(e.key)) press(e.key);
+      else if (e.key === 'Backspace') back();
+      else if (e.key === 'Enter') submit(digits);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [digits]); // eslint-disable-line
 
   return (
     <div className="pin-lock">
@@ -56,9 +68,9 @@ export default function PinLock({ onUnlock }) {
           <span style={{ fontSize: 34, fontWeight: 900, color: "#fff" }}>X</span>
         </div>
         <h2 style={{ fontSize:22, fontWeight:900 }}>XADMIN</h2>
-        <p style={{ fontSize:12.5, color:'var(--text-dim)', marginTop:4 }}>Enter access PIN</p>
+        <p style={{ fontSize:12.5, color:'var(--text-dim)', marginTop:4 }}>{busy && !error ? 'Checking…' : 'Enter access PIN, then tap ✓'}</p>
         <div className="pin-dots">
-          {Array.from({ length: PIN_LEN }, (_, i) => i).map((i) => (
+          {Array.from({ length: Math.max(6, digits.length) }, (_, i) => i).map((i) => (
             <div key={i} className={'pin-dot' + (i < digits.length ? ' filled' : '')} />
           ))}
         </div>
@@ -67,9 +79,9 @@ export default function PinLock({ onUnlock }) {
           {[1,2,3,4,5,6,7,8,9].map((n) => (
             <button key={n} className="pin-key" onClick={() => press(String(n))}>{n}</button>
           ))}
-          <button className="pin-key action" onClick={() => setDigits(d => d.slice(0,-1))}><Delete size={20} /></button>
+          <button className="pin-key action" onClick={back} aria-label="Delete"><Delete size={20} /></button>
           <button className="pin-key" onClick={() => press('0')}>0</button>
-          <button className="pin-key action" style={{ opacity: 0 }} />
+          <button className="pin-key action" onClick={() => submit(digits)} disabled={busy || !digits} aria-label="Unlock"><Check size={20} /></button>
         </div>
       </div>
     </div>

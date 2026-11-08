@@ -93,7 +93,7 @@ export default function Settings() {
         <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 8 }}>Environment</div>
         <div style={{ fontSize: 12, color: 'var(--text-dim)', lineHeight: 1.7 }}>
           <div><b>Supabase project:</b> dmdjytkuwfudkqepkxkl</div>
-          <div><b>Admin PIN:</b> from <code>VITE_XADMIN_PIN</code> env</div>
+          <div><b>Admin PIN:</b> checked by the server, never stored in the app</div>
           <div><b>Session TTL:</b> {Math.round(Number(import.meta.env.VITE_XADMIN_SESSION_TTL_MS || 900000) / 60000)} minutes</div>
           <div><b>Actor:</b> {import.meta.env.VITE_XADMIN_ACTOR || 'admin'}</div>
         </div>

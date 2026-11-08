@@ -1,8 +1,9 @@
+import { getAdminPin } from '../lib/pin.js';
 import { useAdminContext } from "../context/AdminContext";
 import React, { useState, useEffect, useCallback } from 'react';
 import { getDb, supabase } from '../supabase.js';
 
-const CODE = import.meta.env.VITE_XADMIN_PIN;
+const CODE = getAdminPin();
 const PAD = 16;
 const TABS = [['tiers', 'Tiers'], ['draws', 'Draws'], ['bets', 'Bets']];
 const when = (d) => (d ? new Date(d).toLocaleString() : '');

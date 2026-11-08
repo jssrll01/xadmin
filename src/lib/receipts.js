@@ -1,6 +1,7 @@
+import { getAdminPin } from './pin.js';
 import { supabase } from '../supabase.js';
 
-const DB_CODE = import.meta.env.VITE_XADMIN_PIN;
+const DB_CODE = getAdminPin();
 async function db(action, tbl, extra = {}) {
   const { data, error } = await supabase.rpc('admin_db', { code: DB_CODE, action, tbl, ...extra });
   return { data, error };

@@ -1,10 +1,11 @@
+import { getAdminPin } from '../lib/pin.js';
 import React, { useCallback, useEffect, useState } from 'react';
 import { xmSupabase } from '../supabase.js';
 import Card from '../components/Card.jsx';
 import Btn from '../components/Btn.jsx';
 import { useToast } from '../components/Toast.jsx';
 
-const PIN = import.meta.env.VITE_XADMIN_PIN;
+const PIN = getAdminPin();
 const actor = () => sessionStorage.getItem('xadmin_actor') || 'admin';
 async function rpc(fn, args) {
   const { data, error } = await xmSupabase.rpc(fn, { p_pin: PIN, ...args });

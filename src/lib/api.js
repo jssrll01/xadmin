@@ -1,3 +1,4 @@
+import { getAdminPin } from './pin.js';
 import { supabase } from '../supabase.js';
 
 const T = {
@@ -11,7 +12,7 @@ const T = {
 
 const PK = { promo_codes: 'code' };
 
-const CODE = import.meta.env.VITE_XADMIN_PIN;
+const CODE = getAdminPin();
 async function db(action, tbl, extra = {}) {
   const { data, error } = await supabase.rpc('admin_db', { code: CODE, action, tbl, ...extra });
   return { data, error };

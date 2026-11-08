@@ -1,7 +1,8 @@
+import { getAdminPin } from '../lib/pin.js';
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabase.js';
 
-const CODE = import.meta.env.VITE_XADMIN_PIN;
+const CODE = getAdminPin();
 
 export default function TagEditor({ title, fn, id, initial, onClose, onSaved }) {
   const [list, setList] = useState(initial || []);

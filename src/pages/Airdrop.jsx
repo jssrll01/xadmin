@@ -1,3 +1,4 @@
+import { getAdminPin } from '../lib/pin.js';
 import { useAdminContext } from "../context/AdminContext";
 import React, { useState, useCallback } from 'react';
 import Card from '../components/Card.jsx';
@@ -6,7 +7,7 @@ import { useToast } from '../components/Toast.jsx';
 import useAutoRefresh from '../lib/useAutoRefresh.js';
 import { getDb, supabase } from '../supabase.js';
 
-const CODE = import.meta.env.VITE_XADMIN_PIN;
+const CODE = getAdminPin();
 const TABS = [['tiers', 'Tiers'], ['draws', 'Draws'], ['bets', 'Bets']];
 const when = (d) => (d ? new Date(d).toLocaleString() : '');
 const th = { textAlign: 'left', fontSize: 11, padding: '6px 8px', color: 'var(--text-dim)', textTransform: 'uppercase' };

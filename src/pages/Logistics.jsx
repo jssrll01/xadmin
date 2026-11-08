@@ -1,3 +1,4 @@
+import { getAdminPin } from '../lib/pin.js';
 import { useAdminContext } from "../context/AdminContext";
 import React, { useState, useCallback, useEffect } from 'react';
 import Card from '../components/Card.jsx';
@@ -9,7 +10,7 @@ import { logAudit, orderCrud } from '../lib/api.js';
 import { peso, dateTime } from '../lib/format.js';
 import { RefreshCw } from 'lucide-react';
 
-const CODE = import.meta.env.VITE_XADMIN_PIN;
+const CODE = getAdminPin();
 const PAGE = 20;
 const CARRIERS = ['J&T Express', 'LBC', 'Flash Express', 'Ninja Van', '2GO', 'JRS Express', 'Grab Express', 'Lalamove', 'GoGo Xpress'];
 const FILTERS = [['all', 'All'], ['awaiting', 'Awaiting tracking'], ['tracked', 'Has tracking'], ['shipped', 'Shipped'], ['delivered', 'Delivered'], ['cancelled', 'Cancelled']];

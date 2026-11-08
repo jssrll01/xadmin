@@ -1,3 +1,4 @@
+import { getAdminPin } from '../lib/pin.js';
 import { useAdminContext } from "../context/AdminContext";
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import * as XLSX from 'xlsx';
@@ -10,7 +11,7 @@ import { fetchProducts } from '../lib/api.js';
 import { uploadToCloudinary } from '../lib/cloud.js';
 import { HEADERS, CATEGORIES, normalizeRow, processImages } from '../lib/bulkImport.js';
 
-const PIN = import.meta.env.VITE_XADMIN_PIN;
+const PIN = getAdminPin();
 const PAGE = 25;
 const STATES = ['imported', 'processing', 'needs_review', 'ready', 'approved', 'published', 'failed', 'rejected'];
 const COLORS = { imported: '#2563EB', processing: '#F59E0B', needs_review: '#EF4444', ready: '#10B981', approved: '#059669', publishing: '#F59E0B', published: '#6B7280', failed: '#DC2626', rejected: '#9CA3AF' };

@@ -1,3 +1,4 @@
+import { getAdminPin } from '../lib/pin.js';
 import { useAdminContext } from "../context/AdminContext";
 import React from 'react';
 import CrudPage from '../components/CrudPage.jsx';
@@ -6,7 +7,7 @@ import { peso, dateOnly, initials } from '../lib/format.js';
 
 import { getDb, supabase } from '../supabase.js';
 
-const CODE = import.meta.env.VITE_XADMIN_PIN;
+const CODE = getAdminPin();
 async function adminCall(fn, args) {
   const { error } = await supabase.rpc(fn, { code: CODE, ...args });
   if (error) { alert(error.message); return false; }

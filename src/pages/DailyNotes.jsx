@@ -1,3 +1,4 @@
+import { getAdminPin } from '../lib/pin.js';
 import { useAdminContext } from "../context/AdminContext";
 import React, { useCallback, useEffect, useState } from 'react';
 import { Plus, Trash2, Edit3, Check, Search } from 'lucide-react';
@@ -6,7 +7,7 @@ import Card from '../components/Card.jsx';
 import Btn from '../components/Btn.jsx';
 import { useToast } from '../components/Toast.jsx';
 
-const PIN = import.meta.env.VITE_XADMIN_PIN;
+const PIN = getAdminPin();
 const actor = () => sessionStorage.getItem('xadmin_actor') || 'admin';
 async function rpc(fn, args = {}) {
   const { data, error } = await supabase.rpc(fn, { p_pin: PIN, ...args });

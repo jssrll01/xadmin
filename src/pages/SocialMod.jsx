@@ -1,9 +1,10 @@
+import { getAdminPin } from '../lib/pin.js';
 import React, { useCallback, useEffect, useState } from 'react';
 import { supabase } from '../supabase.js';
 import { dateTime } from '../lib/format.js';
 import TagEditor from '../components/TagEditor.jsx';
 
-const CODE = import.meta.env.VITE_XADMIN_PIN;
+const CODE = getAdminPin();
 const call = async (fn, args = {}) => {
   const { data, error } = await supabase.rpc(fn, { p_code: CODE, ...args });
   if (error) throw error;

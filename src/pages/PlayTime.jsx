@@ -1,3 +1,4 @@
+import { getAdminPin } from '../lib/pin.js';
 import { useAdminContext } from "../context/AdminContext";
 import { adminDb, adminRows } from '../lib/api';
 import React, { useState, useCallback } from 'react';
@@ -10,7 +11,7 @@ import { getDb, supabase } from '../supabase.js';
 import { logAudit } from '../lib/api.js';
 import { Plus, Edit2, Trash2 } from 'lucide-react';
 
-const CODE = import.meta.env.VITE_XADMIN_PIN;
+const CODE = getAdminPin();
 const CORE = ['limits', 'spin', 'boxes', 'exchange', 'mini'];
 const TABS = [['settings', 'Settings'], ['players', 'Players'], ['txns', 'Transactions'], ['log', 'Alerts']];
 const lab = { fontSize: 11, fontWeight: 700, color: 'var(--text-dim)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: 0.4 };
