@@ -21,7 +21,7 @@ export default function MarketQA() {
   const load = useCallback(async () => {
     try {
       const d = tab === 'qa' ? await call('admin_qa_list', { p_status: status })
-        : tab === 'items' ? await call('admin_market_items') : await call('admin_market_purchases');
+        : tab === 'items' ? await call('admin_market_items') : tab === 'gifts' ? await call('admin_gift_orders') : await call('admin_market_purchases');
       setRows(Array.isArray(d) ? d : []); setErr('');
     } catch (e) { setRows([]); setErr(e.message); }
   }, [tab, status]);
@@ -39,7 +39,7 @@ export default function MarketQA() {
     <div style={{ padding: 16 }}>
       <h2 style={{ fontSize: 22, fontWeight: 800, margin: '0 0 12px' }}>Market &amp; Q&amp;A</h2>
       <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
-        {[['qa', 'Product Q&A'], ['items', 'Shop items'], ['sales', 'Purchases']].map(([id, l]) => (
+        {[['qa', 'Product Q&A'], ['items', 'Shop items'], ['sales', 'Purchases'], ['gifts', 'Gift orders']].map(([id, l]) => (
           <button key={id} className="neu-btn" onClick={() => setTab(id)} style={{ padding: '8px 14px', fontWeight: 700, opacity: tab === id ? 1 : .6 }}>{l}</button>
         ))}
         {tab === 'qa' && <button className="neu-btn" onClick={() => setStatus(status === 'active' ? 'hidden' : 'active')} style={{ padding: '8px 14px' }}>Showing: {status}</button>}
@@ -87,6 +87,14 @@ export default function MarketQA() {
             {p.status === 'pending' && <button className="neu-btn" style={sm} onClick={() => run('admin_market_purchase_set', { p_id: p.id, p_status: 'fulfilled' })}>Mark fulfilled</button>}
             {p.status !== 'refunded' && <button className="neu-btn" style={{ ...sm, color: '#DC2626' }} onClick={() => run('admin_market_purchase_set', { p_id: p.id, p_status: 'refunded' }, 'Refund ₱' + p.price + ' to the buyer?')}>Refund</button>}
           </div>
+        </div>
+      ))}
+
+      {tab === 'gifts' && rows && rows.map((o) => (
+        <div key={o.id} style={card}>
+          <b>{o.order_code}</b> · ₱{Number(o.total).toFixed(2)} · {o.status}
+          <div style={{ fontSize: 12, opacity: .7 }}>From @{o.buyer} → {o.name}, {o.address}{o.gift_recipient_email ? ' (' + o.gift_recipient_email + ')' : ''}</div>
+          {o.gift_message && <div style={{ fontSize: 12 }}>💬 {o.gift_message}</div>}
         </div>
       ))}
 
