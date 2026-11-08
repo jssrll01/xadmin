@@ -2,7 +2,7 @@ import {
   LayoutDashboard, ClipboardList, Package, PackagePlus, ShoppingBag, Undo2, FileText, Star, Layers, Tag, HandCoins,
   Warehouse, Truck, Store, Building2, Eye, Coins, Smartphone, PlusCircle, Wallet, Banknote, ShieldCheck, CreditCard,
   Users, UserCog, Crown, Sparkles, BadgeCheck, LayoutGrid, Video, Gift, MessagesSquare, Globe, HelpCircle, Flag,
-  Image as ImageIcon, Bell, Megaphone, TrendingDown, Download, Vote, Handshake, Rocket, Gem, Gamepad2, Dices,
+  Image as ImageIcon, Bell, Megaphone, TrendingDown, Download, Vote, Handshake, Rocket, Gamepad2, Dices,
   SlidersHorizontal, Radio, QrCode, Table, Database, Network, Terminal, ScrollText, Settings as Cog,
 } from 'lucide-react';
 
@@ -30,7 +30,7 @@ export const XMARKET_GROUPS = [
     ['/banners', 'Banner', ImageIcon], ['/notifications', 'Notifications', Bell], ['/notify', 'Notify', Megaphone],
     ['/xf-price-drops', 'Price Drops', TrendingDown], ['/xf-digital', 'Digital Products', Download],
     ['/xf-polls', 'Demand Polls', Vote], ['/xf-sponsor', 'Sponsorships', Handshake],
-    ['/xf-popups', 'Launch Popups', Rocket], ['/points-shop', 'Points Shop', Gem], ['/play-time', 'Play Time', Gamepad2],
+    ['/xf-popups', 'Launch Popups', Rocket], ['/play-time', 'Play Time', Gamepad2],
     ['/airdrop', 'Airdrop 88', Dices], ['/airdrop-mod', 'Airdrop Mod', SlidersHorizontal]] },
   { id: 'tools', label: 'Tools', items: [['/nfc', 'NFC Studio', Radio], ['/qr-portal', 'QR Portal', QrCode]] },
   { id: 'system', label: 'Data and System', items: [
