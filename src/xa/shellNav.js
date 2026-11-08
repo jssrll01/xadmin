@@ -3,8 +3,7 @@ import {
   Warehouse, Truck, Store, Building2, Eye, Coins, Smartphone, PlusCircle, Wallet, Banknote, ShieldCheck, CreditCard,
   Users, UserCog, Crown, Sparkles, BadgeCheck, LayoutGrid, Video, Gift, MessagesSquare, Globe, HelpCircle, Flag,
   Image as ImageIcon, Bell, Megaphone, TrendingDown, Download, Vote, Handshake, Rocket, Gamepad2, Dices,
-  SlidersHorizontal, Radio, QrCode, Table, Database, Network, Terminal, ScrollText, Settings as Cog,
-} from 'lucide-react';
+  SlidersHorizontal, Radio, QrCode, Table, Database, Network, Terminal, ScrollText, Settings as Cog,, Film, Newspaper, GraduationCap, Briefcase} from 'lucide-react';
 
 export const XMARKET_GROUPS = [
   { id: 'overview', label: 'Overview', items: [
@@ -27,7 +26,7 @@ export const XMARKET_GROUPS = [
     ['/gifts', 'Creator Gifts', Gift], ['/dm-mod', 'DM Moderation', MessagesSquare], ['/xm-chat', 'Global Chat', Globe],
     ['/market-qa', 'Market & Q&A', HelpCircle], ['/reports', 'Reports', Flag]] },
   { id: 'marketing', label: 'Marketing and Games', items: [
-    ['/banners', 'Banner', ImageIcon], ['/notifications', 'Notifications', Bell], ['/notify', 'Notify', Megaphone],
+    ['/banners', 'Banner', ImageIcon], ['/cinema', 'Cinema', Film], ['/articles', 'Articles', Newspaper], ['/scholarships', 'Scholarships', GraduationCap], ['/freelance', 'Freelance', Briefcase], ['/notifications', 'Notifications', Bell], ['/notify', 'Notify', Megaphone],
     ['/xf-price-drops', 'Price Drops', TrendingDown], ['/xf-digital', 'Digital Products', Download],
     ['/xf-polls', 'Demand Polls', Vote], ['/xf-sponsor', 'Sponsorships', Handshake],
     ['/xf-popups', 'Launch Popups', Rocket], ['/play-time', 'Play Time', Gamepad2],
