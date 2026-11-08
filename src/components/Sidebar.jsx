@@ -26,6 +26,7 @@ const XMARKET_ITEMS = [
   ['/video-mod', 'Socials Videos', ImageIcon],
   ['/wallet-security', 'Wallet Security', Wallet],
   ['/market-qa', 'Market & Q&A', Gift],
+  ['/gifts', 'Creator Gifts', Gift],
   ['/members-data', 'Members Data', Database],
   ['/returns', 'Returns', RotateCcw],
   ['/quotations', 'Quotations', FileText],
