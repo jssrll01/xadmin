@@ -27,6 +27,7 @@ const XMARKET_ITEMS = [
   ['/wallet-security', 'Wallet Security', Wallet],
   ['/market-qa', 'Market & Q&A', Gift],
   ['/gifts', 'Creator Gifts', Gift],
+  ['/dm-mod', 'DM Moderation', Gift],
   ['/members-data', 'Members Data', Database],
   ['/returns', 'Returns', RotateCcw],
   ['/quotations', 'Quotations', FileText],
