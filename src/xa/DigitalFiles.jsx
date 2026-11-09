@@ -82,8 +82,17 @@ export default function DigitalFiles() {
 
   const doDelete = async () => {
     setBusy(true);
-    try { await adm('admin_digital_delete', { p_id: del.id }); push('Deleted', 'success'); setDel(null); load(); }
-    catch (er) { push(er.message, 'error', 6000); }
+    try {
+      const r = await adm('admin_digital_delete', { p_id: del.id });
+      const paths = (r && r.paths) || [];
+      let fileOk = true;
+      if (paths.length) {
+        const { error } = await xmSupabase.storage.from('digital-files').remove(paths);
+        if (error) fileOk = false; else await adm('admin_digital_trash_clear', { p_paths: paths });
+      }
+      push(fileOk ? 'Product and file deleted' : 'Product deleted, but the file could not be removed yet. It will retry on the next delete.', fileOk ? 'success' : 'error', 6000);
+      setDel(null); load();
+    } catch (er) { push(er.message, 'error', 6000); }
     setBusy(false);
   };
 
@@ -143,7 +152,7 @@ export default function DigitalFiles() {
           </div>
         )}
       </Modal>
-      <ConfirmDialog open={!!del} title={'Delete "' + (del ? del.title : '') + '"?'} message={del && del.sales > 0 ? 'This item has sales, so it cannot be deleted. Edit it and turn off "Visible in the shop" instead.' : 'The item is removed from the shop. The uploaded file stays in storage.'} confirmText="Delete" danger busy={busy} onConfirm={doDelete} onCancel={() => setDel(null)} />
+      <ConfirmDialog open={!!del} title={'Delete "' + (del ? del.title : '') + '"?'} message={del && del.sales > 0 ? 'This item has ' + del.sales + ' sale(s). Deleting it also removes those purchase records, so buyers lose their download, and nothing is refunded. The file is deleted from storage.' : 'The item and its file are deleted from storage. This cannot be undone.'} confirmText="Delete" typeToConfirm={del && del.sales > 0 ? 'DELETE' : undefined} danger busy={busy} onConfirm={doDelete} onCancel={() => setDel(null)} />
     </div>
   );
 }
