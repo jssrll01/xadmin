@@ -28,25 +28,42 @@ function TableList() {
   const [list, setList] = useState(null);
   const [err, setErr] = useState('');
   const [q, setQ] = useState('');
-  const load = useCallback(async () => {
-    try { const d = await rpc('admin_tbl_list'); setList(Array.isArray(d) ? d : []); setErr(''); }
-    catch (e) { setList([]); setErr(e.message || 'Failed'); }
+  const [fresh, setFresh] = useState([]);
+  const seen = useRef(null);
+  const load = useCallback(async (quiet) => {
+    try {
+      const d = await rpc('admin_tbl_list');
+      const arr = Array.isArray(d) ? d : [];
+      const names = arr.map((x) => x.name);
+      if (quiet && seen.current) {
+        const added = names.filter((n) => !seen.current.includes(n));
+        if (added.length) { setFresh((f) => [...new Set([...f, ...added])]); setTimeout(() => setFresh((f) => f.filter((n) => !added.includes(n))), 60000); }
+        const same = names.length === seen.current.length && added.length === 0;
+        seen.current = names;
+        if (!same) setList(arr);
+      } else { seen.current = names; setList(arr); }
+      setErr('');
+    } catch (e) { if (!quiet) { setList([]); setErr(e.message || 'Failed'); } }
   }, []);
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => { load(false); }, [load]);
+  useEffect(() => {
+    const t = setInterval(() => { if (!document.hidden) load(true); }, 10000);
+    return () => clearInterval(t);
+  }, [load]);
   const t = q.trim().toLowerCase();
   const shown = (list || []).filter((x) => !t || x.name.toLowerCase().includes(t));
   return (
     <>
-      <PageHeader title="Data Manager" subtitle={list ? list.length + ' tables. Open one to create, edit and delete rows.' : 'Loading tables'} />
+      <PageHeader title="Data Manager" subtitle={list ? list.length + ' tables · live, updates automatically. Open one to create, edit and delete rows.' : 'Loading tables'} />
       <div className="ui-tools">
         <label className="ui-search"><Search size={15} /><input className="neu-input" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Find a table" aria-label="Find a table" /></label>
       </div>
       {list === null && <SkCards n={6} />}
-      {err && <ErrorState message={err} onRetry={load} />}
+      {err && <ErrorState message={err} onRetry={() => load(false)} />}
       <div className="dm-grid">
         {shown.map((x) => (
           <button key={x.name} type="button" className="dm-tile" onClick={() => nav('/data/' + encodeURIComponent(x.name))}>
-            <b><Database size={15} />{x.name}</b>
+            <b><Database size={15} />{x.name}{fresh.includes(x.name) && <span style={{ marginLeft: 8, fontSize: 10, fontWeight: 800, background: 'var(--primary)', color: '#fff', borderRadius: 6, padding: '1px 6px' }}>New</span>}</b>
             <small>{x.columns.length} columns{x.rows > 0 ? ' · about ' + x.rows.toLocaleString() + ' rows' : ''}{x.pk.length ? '' : ' · no primary key'}</small>
           </button>
         ))}
