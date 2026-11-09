@@ -101,7 +101,7 @@ export default function XCoinAdmin() {
 
       <Card style={{ marginBottom: 14 }}>
         <h3 style={{ margin: 0 }}>Settings</h3>
-        <p style={{ fontSize: 12, color: '#8a93a3' }}>Every save is logged. Values outside the allowed ranges are rejected.</p>
+        <p style={{ fontSize: 12, color: '#8a93a3' }}>Every save is logged. All values are accepted.</p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: '0 14px' }}>
           {FIELDS.map(([k, l, h]) => (
             <div key={k}><label style={lbl}>{l}</label>
