@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Play, Plus, X, Save, Eraser, Trash2 } from 'lucide-react';
+import { Play, Plus, X, Save, Eraser, Trash2, Copy } from 'lucide-react';
 import { adm } from './db.js';
 import { ConfirmDialog, LoadingBtn, useXaToast, SkRows, Badge, EmptyState } from './Kit.jsx';
 
@@ -113,12 +113,27 @@ export default function SqlEditor() {
     try { await adm('adm_sql_meta', { p_action: 'save', p_name: name, p_sql: cur.sql }); push('Saved', 'success'); loadMeta(); } catch (e) { push(e.message, 'error'); }
   };
   const meta = async (action, id) => { try { await adm('adm_sql_meta', { p_action: action, p_id: id || null }); loadMeta(); } catch (e) { push(e.message, 'error'); } };
+  const csvText = () => {
+    const rs = (cur.res && cur.res.rows) || []; if (!rs.length) return '';
+    const hs = Object.keys(rs[0]);
+    const esc = (v) => {
+      let t = cell(v);
+      if (typeof v === 'string' && /^[=+@-]/.test(t)) t = "'" + t;
+      return /[",\n\r]/.test(t) ? '"' + t.replace(/"/g, '""') + '"' : t;
+    };
+    return [hs.map(esc).join(',')].concat(rs.map((r) => hs.map((h) => esc(r[h])).join(','))).join('\n');
+  };
   const csv = () => {
-    const rows = (cur.res && cur.res.rows) || []; if (!rows.length) return;
-    const heads = Object.keys(rows[0]); const esc = (v) => { const s = cell(v); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+    const text = csvText(); if (!text) return;
     const a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([[heads.join(',')].concat(rows.map((r) => heads.map((h) => esc(r[h])).join(','))).join('\n')], { type: 'text/csv' }));
+    a.href = URL.createObjectURL(new Blob([text], { type: 'text/csv' }));
     a.download = 'query-result.csv'; a.click(); URL.revokeObjectURL(a.href);
+  };
+  const copyCsv = async () => {
+    const text = csvText(); if (!text) return;
+    const n = ((cur.res && cur.res.rows) || []).length;
+    try { await navigator.clipboard.writeText(text); push('Copied ' + n + ' row' + (n === 1 ? '' : 's') + ' as CSV', 'success', 2500); }
+    catch (e) { csv(); push('Clipboard is blocked here, so the CSV was downloaded instead.', 'info', 4000); }
   };
 
   const res = cur.res;
@@ -163,7 +178,7 @@ export default function SqlEditor() {
         <div style={{ padding: '10px 14px', display: 'flex', gap: 10, alignItems: 'center', borderBottom: '1px solid var(--border)', minHeight: 44 }}>
           <b style={{ fontSize: 13 }}>Result</b>
           {res && res.ok && <Badge>{res.count} row{res.count === 1 ? '' : 's'} · {res.ms} ms</Badge>}
-          {res && res.ok && rows.length > 0 && <button type="button" className="neu-btn" style={{ marginLeft: 'auto' }} onClick={csv}>Export CSV</button>}
+          {res && res.ok && rows.length > 0 && <span style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}><button type="button" className="neu-btn" onClick={copyCsv}><Copy size={14} style={{ marginRight: 6, verticalAlign: -2 }} />Copy CSV</button><button type="button" className="neu-btn" onClick={csv}>Export CSV</button></span>}
         </div>
         {busy && <div style={{ padding: 8 }}><SkRows rows={5} cols={4} /></div>}
         {!busy && !res && <EmptyState title="No result yet" hint="Run a query to see rows here." />}
