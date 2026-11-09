@@ -1,3 +1,4 @@
+import AuditClear from './xa/AuditClear.jsx';
 import ManageData from './xa/ManageData.jsx';
 import React, { useEffect, useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
@@ -141,6 +142,7 @@ export default function App() {
     <ErrorBoundary>
       <Layout>
         <ManageData />
+        <AuditClear />
         <Routes>
           <Route path="/" element={<HomeSwitch />} />
           <Route path="/users"     element={<Users />} />

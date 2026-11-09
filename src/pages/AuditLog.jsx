@@ -2,7 +2,7 @@ import React, { useState, useCallback, useMemo } from 'react';
 import { Trash2, RefreshCw, Search, Eye } from 'lucide-react';
 import Btn from '../components/Btn.jsx';
 import { useToast } from '../components/Toast.jsx';
-import { fetchAuditLog, deleteAuditLog, deleteAuditLogAll } from '../lib/api.js';
+import { fetchAuditLog, deleteAuditLogAdmin as deleteAuditLog, deleteAuditLogAllAdmin as deleteAuditLogAll } from '../lib/api.js';
 import { dateTime } from '../lib/format.js';
 import useAutoRefresh from '../lib/useAutoRefresh.js';
 import PageHeader from '../xa/ui/PageHeader.jsx';

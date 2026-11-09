@@ -347,3 +347,14 @@ export async function fetchRevenueSnapshot() {
 }
 
 export { db as adminDb, rows as adminRows };
+
+// Audit log deletes go through PIN-checked server functions (the table itself is append-only).
+import { getAdminPin as __auditPin } from './pin.js';
+export async function deleteAuditLogAdmin(id) {
+  const { data, error } = await supabase.rpc('adm_audit_delete', { p_code: __auditPin(), p_id: id });
+  return { data, error: error ? { message: error.message } : null };
+}
+export async function deleteAuditLogAllAdmin() {
+  const { data, error } = await supabase.rpc('adm_audit_clear', { p_code: __auditPin(), p_scope: 'all' });
+  return { data, error: error ? { message: error.message } : null };
+}
