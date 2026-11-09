@@ -17,7 +17,7 @@ const blankCol = (o) => ({ name: '', type: 'text', dk: 'none', dv: '', notNull: 
 const payload = (c) => ({ name: c.name.trim(), type: c.type, default_kind: c.dk, default_value: c.dv, not_null: c.notNull, pk: c.pk });
 
 async function rpc(fn, args) {
-  const { data, error } = await supabase.rpc(fn, { p_code: getAdminPin() || import.meta.env.VITE_XADMIN_PIN, ...args });
+  const { data, error } = await supabase.rpc(fn, { p_code: getAdminPin(), ...args });
   if (error) throw error;
   return data;
 }

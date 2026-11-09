@@ -12,7 +12,7 @@ import Switch from '../xa/ui/Switch.jsx';
 import { ConfirmDialog, ErrorState, SkCards } from '../xa/Kit.jsx';
 
 async function rpc(fn, args) {
-  const { data, error } = await supabase.rpc(fn, { p_code: getAdminPin() || import.meta.env.VITE_XADMIN_PIN, ...args });
+  const { data, error } = await supabase.rpc(fn, { p_code: getAdminPin(), ...args });
   if (error) throw error;
   return data;
 }
