@@ -170,7 +170,7 @@ export default function App() {
           <Route path="/stores"    element={<Stores />} />
           <Route path="/play-time" element={<PlayTime />} />
           <Route path="/xf-price-drops" element={<PriceDropsAdmin />} />
-          <Route path="/xf-digital" element={<DigitalProductsAdmin />} />
+          <Route path="/xf-digital" element={<DigitalFiles />} />
           <Route path="/digital-files" element={<DigitalFiles />} />
           <Route path="/xf-polls" element={<DemandPollsAdmin />} />
           <Route path="/xf-sponsor" element={<SponsorshipsAdmin />} />
