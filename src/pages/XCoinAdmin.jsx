@@ -33,6 +33,7 @@ export default function XCoinAdmin() {
   const [f, setF] = useState({});
   const [busy, setBusy] = useState(false);
   const [adj, setAdj] = useState({ user: '', delta: '', reason: '' });
+  const [sup, setSup] = useState('');
 
   const load = useCallback(async () => {
     try {
@@ -110,6 +111,19 @@ export default function XCoinAdmin() {
           ))}
         </div>
         <div style={{ marginTop: 14 }}><Btn variant="primary" onClick={save} disabled={busy}>{busy ? 'Saving…' : 'Save settings'}</Btn></div>
+      </Card>
+
+      <Card style={{ marginBottom: 14 }}>
+        <h3 style={{ margin: 0 }}>XCOIN available for sale</h3>
+        <p style={{ fontSize: 12, color: '#8a93a3' }}>How much XCOIN users can still buy. Buys use it up and sells give it back. Unlimited means no cap. Every change is logged.</p>
+        <div style={{ fontSize: 22, fontWeight: 800, margin: '6px 0 10px' }}>{s.available_supply == null ? 'Unlimited' : n(s.available_supply, 4) + ' XCOIN'}</div>
+        <label style={lbl}>Amount (XCOIN)</label>
+        <input className="neu-input" type="number" step="any" min="0" value={sup} onChange={(ev) => setSup(ev.target.value)} />
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 12 }}>
+          <Btn variant="primary" disabled={busy || sup === '' || Number(sup) < 0} onClick={() => run('xcoin_admin_supply', { p_mode: 'set', p_amount: Number(sup) }, 'Supply set').then(() => setSup(''))}>Set to this</Btn>
+          <Btn disabled={busy || sup === '' || !(Number(sup) > 0) || s.available_supply == null} onClick={() => run('xcoin_admin_supply', { p_mode: 'add', p_amount: Number(sup) }, 'Supply added').then(() => setSup(''))}>Add this</Btn>
+          <Btn variant="danger" disabled={busy || s.available_supply == null} onClick={() => { if (window.confirm('Remove the cap? Users can then buy without a limit.')) run('xcoin_admin_supply', { p_mode: 'unlimited' }, 'Supply is now unlimited'); }}>Make unlimited</Btn>
+        </div>
       </Card>
 
       <Card style={{ marginBottom: 14 }}>
