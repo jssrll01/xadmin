@@ -54,6 +54,7 @@ import XmChat from './pages/XmChat.jsx';
 import XmVip from './pages/XmVip.jsx';
 import DbHome from './xa/DbHome.jsx';
 import DbTable from './xa/DbTable.jsx';
+import DigitalFiles from './xa/DigitalFiles.jsx';
 import SqlEditor from './xa/SqlEditor.jsx';
 import SchemaBrowser from './xa/SchemaBrowser.jsx';
 import Promos from './pages/Promos.jsx';
@@ -170,6 +171,7 @@ export default function App() {
           <Route path="/play-time" element={<PlayTime />} />
           <Route path="/xf-price-drops" element={<PriceDropsAdmin />} />
           <Route path="/xf-digital" element={<DigitalProductsAdmin />} />
+          <Route path="/digital-files" element={<DigitalFiles />} />
           <Route path="/xf-polls" element={<DemandPollsAdmin />} />
           <Route path="/xf-sponsor" element={<SponsorshipsAdmin />} />
           <Route path="/xf-popups" element={<PopupsAdmin />} />

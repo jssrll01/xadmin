@@ -81,7 +81,7 @@ export const XMARKET_GROUPS = [
     ['/market-qa', 'Market & Q&A', HelpCircle], ['/reports', 'Reports', Flag]] },
   { id: 'marketing', label: 'Marketing and Games', items: [
     ['/banners', 'Banner', ImageIcon], ['/articles', 'Articles', Newspaper], ['/scholarships', 'Scholarships', GraduationCap], ['/freelance', 'Freelance', Briefcase], ['/notifications', 'Notifications', Bell], ['/notify', 'Notify', Megaphone],
-    ['/xf-price-drops', 'Price Drops', TrendingDown], ['/xf-digital', 'Digital Products', Download],
+    ['/xf-price-drops', 'Price Drops', TrendingDown], ['/xf-digital', 'Digital Products', Download], ['/digital-files', 'Digital Files', Download],
     ['/xf-polls', 'Demand Polls', Vote], ['/xf-sponsor', 'Sponsorships', Handshake],
     ['/xf-popups', 'Launch Popups', Rocket], ['/play-time', 'Play Time', Gamepad2],
     ['/airdrop', 'Airdrop 88', Dices], ['/airdrop-mod', 'Airdrop Mod', SlidersHorizontal]] },
