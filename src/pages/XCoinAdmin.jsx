@@ -13,15 +13,15 @@ async function rpc(fn, args) {
   return data;
 }
 const FIELDS = [
-  ['fee_percentage', 'Fee (%)', 'Charged on every buy and sell. 0 to 20.'],
+  ['fee_percentage', 'Fee (%)', 'Charged on every buy and sell.'],
   ['max_buy_php', 'Max buy (PHP)', 'Largest single purchase.'],
-  ['volatility', 'Volatility', 'Typical move per tick (0.012 = 1.2%). Max 0.1.'],
+  ['volatility', 'Volatility', 'Typical move per tick (0.012 = 1.2%).'],
   ['drift', 'Base drift', 'Constant bias per tick. Keep near 0.'],
   ['anchor_price', 'Anchor price', 'Price the market is gently pulled toward.'],
   ['min_price', 'Min price', 'Hard floor.'],
   ['max_price', 'Max price', 'Hard ceiling.'],
   ['max_move_pct', 'Max move per tick', '0.12 = 12%.'],
-  ['reversion', 'Mean reversion', 'Pull toward the anchor. 0 to 0.2.'],
+  ['reversion', 'Mean reversion', 'Pull toward the anchor.'],
 ];
 const n = (v, d = 2) => Number(v || 0).toLocaleString('en-PH', { minimumFractionDigits: d, maximumFractionDigits: d });
 const lbl = { fontSize: 11, fontWeight: 700, color: '#8a93a3', textTransform: 'uppercase', margin: '10px 0 4px', display: 'block' };
