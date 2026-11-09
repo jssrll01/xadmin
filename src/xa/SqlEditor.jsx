@@ -3,6 +3,21 @@ import { useLocation } from 'react-router-dom';
 import { adm } from './db.js';
 import { ConfirmDialog, LoadingBtn, useXaToast, SkRows, Badge, EmptyState } from './Kit.jsx';
 
+function splitSql(src) {
+  const out = []; let cur = ''; let i = 0; const n = src.length;
+  while (i < n) {
+    const c = src[i]; const two = src.slice(i, i + 2);
+    if (two === '--') { const e = src.indexOf('\n', i); const t = e < 0 ? n : e; cur += src.slice(i, t); i = t; continue; }
+    if (two === '/*') { const e = src.indexOf('*/', i + 2); const t = e < 0 ? n : e + 2; cur += src.slice(i, t); i = t; continue; }
+    if (c === "'" || c === '"') { let j = i + 1; while (j < n) { if (src[j] === c) { if (src[j + 1] === c) { j += 2; continue; } break; } j++; } cur += src.slice(i, j + 1); i = j + 1; continue; }
+    if (c === '$') { const m = /^\$[A-Za-z_]*\$/.exec(src.slice(i)); if (m) { const e = src.indexOf(m[0], i + m[0].length); const t = e < 0 ? n : e + m[0].length; cur += src.slice(i, t); i = t; continue; } }
+    if (c === ';') { if (cur.trim()) out.push(cur.trim()); cur = ''; i++; continue; }
+    cur += c; i++;
+  }
+  if (cur.trim()) out.push(cur.trim());
+  return out.filter((x) => x.replace(/--[^\n]*/g, '').trim());
+}
+
 const cell = (v) => (v === null || v === undefined ? '' : typeof v === 'object' ? JSON.stringify(v) : String(v));
 
 export default function SqlEditor() {
@@ -27,8 +42,20 @@ export default function SqlEditor() {
   const run = useCallback(async () => {
     if (busy) return;
     setBusy(true); setAskWrite(false);
-    try { setRes(await adm('adm_sql', { p_sql: sql, p_write: write })); await loadMeta(); }
-    catch (e) { setRes({ ok: false, error: e.message }); }
+    const parts = splitSql(sql);
+    if (!parts.length) { setRes({ ok: false, error: 'Nothing to run.' }); setBusy(false); return; }
+    let last = null;
+    try {
+      for (let k = 0; k < parts.length; k++) {
+        let r;
+        try { r = await adm('adm_sql', { p_sql: parts[k], p_write: write }); }
+        catch (e) { r = { ok: false, error: e.message }; }
+        if (!r || r.ok === false) { last = { ok: false, error: (parts.length > 1 ? 'Statement ' + (k + 1) + ' of ' + parts.length + ' failed (earlier ones already ran):\n' : '') + ((r && r.error) || 'Failed') }; break; }
+        last = r;
+      }
+      if (last && last.ok && parts.length > 1) push('Ran ' + parts.length + ' statements. Showing the last result.', 'success', 3000);
+      setRes(last); await loadMeta();
+    } catch (e) { setRes({ ok: false, error: e.message }); }
     setBusy(false);
   }, [busy, sql, write, loadMeta]);
   const go = () => { if (write) setAskWrite(true); else run(); };
@@ -68,7 +95,7 @@ export default function SqlEditor() {
         <div style={{ display: 'flex', gap: 8, marginTop: 10, flexWrap: 'wrap', alignItems: 'center' }}>
           <LoadingBtn variant={write ? 'danger' : 'primary'} loading={busy} onClick={go}>{write ? 'Run (changes data)' : 'Run'}</LoadingBtn>
           <button type="button" className="neu-btn" onClick={save}>Save query</button>
-          <span style={{ fontSize: 11.5, color: 'var(--text-dim)' }}>Ctrl+Enter to run · one statement · 500 rows max · 8s limit</span>
+          <span style={{ fontSize: 11.5, color: 'var(--text-dim)' }}>Ctrl+Enter to run · statements run in order · 500 rows max · 8s limit</span>
         </div>
       </div>
 
