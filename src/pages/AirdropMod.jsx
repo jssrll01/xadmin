@@ -19,6 +19,8 @@ async function rpc(fn, args) {
   if (error) throw error;
   return data;
 }
+const pad2 = (n) => String(n).padStart(2, '0');
+const toLocalInput = (d) => { const x = new Date(d); return x.getFullYear() + '-' + pad2(x.getMonth() + 1) + '-' + pad2(x.getDate()) + 'T' + pad2(x.getHours()) + ':' + pad2(x.getMinutes()); };
 const delMsg = (r) => 'Deleted ' + r.deleted + (r.skipped ? ' · kept ' + r.skipped + ' protected' : '');
 
 export default function AirdropMod() {
@@ -31,6 +33,7 @@ export default function AirdropMod() {
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState(null);
   const [formErr, setFormErr] = useState('');
+  const [tf, setTf] = useState(null); // { id, tier, at, err }
   const [toast, setToast] = useState('');
   const say = (m) => { setToast(m); setTimeout(() => setToast(''), 3000); };
 
@@ -79,6 +82,15 @@ export default function AirdropMod() {
     } catch (e) { setFormErr(String(e.message || e)); }
   };
   const setF = (k) => (e) => setForm({ ...form, [k]: e.target.value });
+  const openTime = (r) => setTf({ id: r.id, tier: r.tier, at: toLocalInput(r.draw_at), err: '' });
+  const bump = (mins) => setTf((t) => ({ ...t, err: '', at: toLocalInput(new Date(Math.max(new Date(t.at).getTime() || 0, Date.now()) + mins * 60000)) }));
+  const saveTime = async () => {
+    const d = new Date(tf.at);
+    if (!tf.at || isNaN(d.getTime())) return setTf({ ...tf, err: 'Pick a date and time' });
+    if (d.getTime() < Date.now() + 60000) return setTf({ ...tf, err: 'Pick a time at least 1 minute from now' });
+    try { await rpc('admin_airdrop_draw_set_time', { p_id: tf.id, p_at: d.toISOString() }); setTf(null); say('Draw time updated'); load(); }
+    catch (e) { setTf({ ...tf, err: String(e.message || e) }); }
+  };
   const headCheck = <th style={th}><input type="checkbox" checked={allSel} onChange={() => setSel(allSel ? new Set() : new Set(rows.map((r) => r.id)))} /></th>;
   const rowCheck = (r) => <td style={td}><input type="checkbox" checked={sel.has(r.id)} onChange={() => pick(r.id)} /></td>;
 
@@ -124,7 +136,7 @@ export default function AirdropMod() {
                     <td style={td}>{when(r.draw_at)}</td><td style={td}>{r.tier}</td><td style={td}>{r.status}</td>
                     <td style={td}>{(r.winning || []).join(', ')}</td><td style={td}>{r.bets}</td>
                     <td style={td}>{r.total_in}</td><td style={td}>{r.total_out}</td>
-                    <td style={td}><button style={{ ...btn, color: 'var(--danger)' }} onClick={() => delMany('draws', [r.id])}>Delete</button></td>
+                    <td style={td}>{r.status === 'open' && <><button style={btn} onClick={() => openTime(r)}>Set time</button>{' '}</>}<button style={{ ...btn, color: 'var(--danger)' }} onClick={() => delMany('draws', [r.id])}>Delete</button></td>
                   </tr>
                 ) : (
                   <tr key={r.id}>
@@ -155,6 +167,23 @@ export default function AirdropMod() {
             <div style={{ display: 'flex', gap: 8 }}>
               <button style={{ ...btn, ...active }} onClick={saveTier}>Save</button>
               <button style={btn} onClick={() => setForm(null)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {tf && (
+        <div onClick={() => setTf(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1500 }}>
+          <div onClick={(e) => e.stopPropagation()} style={{ ...card, padding: 18, width: 'min(420px, 92vw)' }}>
+            <h3 style={{ marginTop: 0 }}>Set draw time</h3>
+            <div style={{ fontSize: 13, color: 'var(--text-dim)', marginBottom: 10 }}>{tf.tier} · your local time</div>
+            <input type="datetime-local" style={inp} value={tf.at} onChange={(e) => setTf({ ...tf, at: e.target.value, err: '' })} />
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 10 }}>
+              {[[10, '+10m'], [30, '+30m'], [60, '+1h'], [180, '+3h'], [1440, '+1d']].map(([m, l]) => <button key={m} type="button" style={btn} onClick={() => bump(m)}>{l}</button>)}
+            </div>
+            {tf.err && <div style={{ color: '#EF4444', fontSize: 13, marginBottom: 8 }}>{tf.err}</div>}
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button style={{ ...btn, ...active }} onClick={saveTime}>Save</button>
+              <button style={btn} onClick={() => setTf(null)}>Cancel</button>
             </div>
           </div>
         </div>
