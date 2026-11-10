@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Delete, Check } from 'lucide-react';
 import { xmSupabase } from '../supabase.js';
 import { setAdminPin, verifyPin } from '../lib/pin.js';
+import NfcScan from './NfcScan.jsx';
 
 const SESSION_KEY = 'xadmin_unlocked';
 const ACTOR_KEY = 'xadmin_actor';
@@ -22,10 +23,11 @@ export default function PinLock({ onUnlock }) {
   const [digits, setDigits] = useState('');
   const [error, setError] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [mode, setMode] = useState('nfc');
   const working = useRef(false);
 
   const submit = async (pin) => {
-    if (working.current || !pin) return;
+    if (working.current || !pin) return false;
     working.current = true;
     setBusy(true);
     let ok = false;
@@ -35,10 +37,11 @@ export default function PinLock({ onUnlock }) {
       sessionStorage.setItem(SESSION_KEY, String(Date.now() + SESSION_TTL_MS));
       sessionStorage.setItem(ACTOR_KEY, import.meta.env.VITE_XADMIN_ACTOR || 'admin');
       onUnlock();
-      return;
+      return true;
     }
     setError(true);
     setTimeout(() => { setError(false); setDigits(''); working.current = false; setBusy(false); }, 500);
+    return false;
   };
 
   useEffect(() => {
@@ -57,6 +60,20 @@ export default function PinLock({ onUnlock }) {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [digits]); // eslint-disable-line
+
+  if (mode === 'nfc') {
+    return (
+      <div className="pin-lock">
+        <div className="pin-box">
+          <div style={{ width:56, height:56, borderRadius:18, margin:'0 auto 10px', background:'linear-gradient(135deg,#3B82F6,#7C3AED)', display:'flex', alignItems:'center', justifyContent:'center', color:'#fff' }}>
+            <span style={{ fontSize: 26, fontWeight: 900 }}>X</span>
+          </div>
+          <h2 style={{ fontSize:18, fontWeight:900, marginBottom:6 }}>XADMIN</h2>
+          <NfcScan onPin={submit} onFallback={() => setMode('pin')} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="pin-lock">
