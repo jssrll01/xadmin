@@ -136,6 +136,27 @@ export default function SqlEditor() {
     catch (e) { csv(); push('Clipboard is blocked here, so the CSV was downloaded instead.', 'info', 4000); }
   };
 
+  const copyErr = async () => {
+    const r = cur.res || {};
+    const q = (s) => {
+      let t = String(s == null ? '' : s);
+      if (/^[=+@-]/.test(t)) t = "'" + t;
+      return '"' + t.replace(/"/g, '""') + '"';
+    };
+    const text = ['time,query,error message,detail/hint,code',
+      [new Date().toISOString(), cur.sql, r.error, [r.detail, r.hint].filter(Boolean).join(' | '), r.code].map(q).join(',')].join('\n');
+    let ok = false;
+    try { await navigator.clipboard.writeText(text); ok = true; }
+    catch (e) {
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select(); ok = document.execCommand('copy'); ta.remove();
+      } catch (e2) { ok = false; }
+    }
+    push(ok ? 'Copied' : 'Could not copy', ok ? 'success' : 'error', 2500);
+  };
+
   const res = cur.res;
   const rows = (res && res.rows) || [];
   const heads = rows.length ? Object.keys(rows[0]) : [];
@@ -170,7 +191,7 @@ export default function SqlEditor() {
           <LoadingBtn variant={write ? 'danger' : 'primary'} loading={busy} onClick={go}><Play size={14} style={{ marginRight: 6, verticalAlign: -2 }} />{write ? 'Run (changes data)' : 'Run'}</LoadingBtn>
           <button type="button" className="neu-btn" onClick={save}><Save size={14} style={{ marginRight: 6, verticalAlign: -2 }} />Save query</button>
           <button type="button" className="neu-btn" onClick={() => patch(cur.id, { sql: '', res: null })} aria-label="Clear editor"><Eraser size={14} style={{ marginRight: 6, verticalAlign: -2 }} />Clear</button>
-          <span style={{ fontSize: 11.5, color: 'var(--text-dim)' }}>Ctrl+Enter to run · statements run in order · 500 rows max</span>
+          <span style={{ fontSize: 11.5, color: 'var(--text-dim)' }}>Ctrl+Enter to run · statements run in order · 1000 rows max</span>
         </div>
       </div>
 
@@ -182,7 +203,7 @@ export default function SqlEditor() {
         </div>
         {busy && <div style={{ padding: 8 }}><SkRows rows={5} cols={4} /></div>}
         {!busy && !res && <EmptyState title="No result yet" hint="Run a query to see rows here." />}
-        {!busy && res && !res.ok && <div style={{ padding: 14, color: 'var(--danger)', fontSize: 13, fontWeight: 600, whiteSpace: 'pre-wrap' }}>{res.error}</div>}
+        {!busy && res && !res.ok && <div style={{ padding: 14 }}><div style={{ color: 'var(--danger)', fontSize: 13, fontWeight: 600, whiteSpace: 'pre-wrap' }}>{res.error}</div><button type="button" className="neu-btn" style={{ marginTop: 10 }} onClick={copyErr}><Copy size={14} style={{ marginRight: 6, verticalAlign: -2 }} />Copy as CSV</button></div>}
         {!busy && res && res.ok && rows.length === 0 && <EmptyState title={write && res.count ? res.count + ' row(s) affected' : 'Done. No rows returned'} />}
         {!busy && res && res.ok && rows.length > 0 && (
           <div style={{ overflow: 'auto', maxHeight: '55vh' }}>

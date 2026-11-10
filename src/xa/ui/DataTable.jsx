@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Search, ArrowUp, ArrowDown, SlidersHorizontal, Download, X } from 'lucide-react';
 import Dropdown from './Dropdown.jsx';
+import useAutoClear from '../useAutoClear.js';
 import Pagination from './Pagination.jsx';
 import { SkRows, EmptyState, ErrorState } from '../Kit.jsx';
 
@@ -33,6 +34,7 @@ export default function DataTable({
     return Object.fromEntries(columns.filter((c) => c.hidden).map((c) => [c.key, true]));
   });
   const [sel, setSel] = useState({});
+  useAutoClear(q, setQ);
 
   useEffect(() => { const t = setTimeout(() => { setDq(q.trim().toLowerCase()); setPage(1); }, 200); return () => clearTimeout(t); }, [q]);
   useEffect(() => { try { localStorage.setItem('xs_cols_' + exportName, JSON.stringify(hidden)); } catch (e) { /* storage blocked */ } }, [hidden, exportName]);

@@ -6,6 +6,7 @@ import { useYlTables } from '../yuelin/useYlTables.js';
 import { useAdminContext } from '../context/AdminContext';
 import { ACCESS_TABS, accessPath } from '../xaccess/App.jsx';
 import { XMARKET_GROUPS, locate } from '../xa/shellNav.js';
+import useAutoClear from '../xa/useAutoClear.js';
 
 const read = (k, d) => { try { const v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } };
 const write = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* storage blocked */ } };
@@ -19,6 +20,7 @@ export default function Sidebar() {
   const [shut, setShut] = useState(() => read('xs_shut', {}));
   const [mobile, setMobile] = useState(false);
   const [q, setQ] = useState('');
+  useAutoClear(q, setQ);
 
   useEffect(() => { const h = () => setMobile((o) => !o); window.addEventListener('xs:menu', h); return () => window.removeEventListener('xs:menu', h); }, []);
   useEffect(() => { setMobile(false); }, [loc.pathname, activeSystem]);

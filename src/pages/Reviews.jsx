@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Star, Search, Trash2, Edit3, PlusCircle, MessageCircle } from 'lucide-react';
 import { adminDb, adminRows, fetchReviews, reviewCrud } from '../lib/api.js';
 import { useToast } from '../components/Toast.jsx';
+import useAutoClear from '../xa/useAutoClear.js';
 import Btn from '../components/Btn.jsx';
 import PageHeader from '../xa/ui/PageHeader.jsx';
 import Drawer from '../xa/ui/Drawer.jsx';
@@ -25,6 +26,7 @@ export default function Reviews() {
   const [buyers, setBuyers] = useState({});
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState('');
+  useAutoClear(q, setQ);
   const [star, setStar] = useState('all');
   const [edit, setEdit] = useState(null);
   const [draft, setDraft] = useState({ rating: 5, comment: '', seller_reply: '' });
