@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Delete, Check } from 'lucide-react';
+import { Delete, Check, CreditCard } from 'lucide-react';
 import { xmSupabase } from '../supabase.js';
 import { setAdminPin, verifyPin } from '../lib/pin.js';
 import NfcScan from './NfcScan.jsx';
@@ -100,6 +100,10 @@ export default function PinLock({ onUnlock }) {
           <button className="pin-key" onClick={() => press('0')}>0</button>
           <button className="pin-key action" onClick={() => submit(digits)} disabled={busy || !digits} aria-label="Unlock"><Check size={20} /></button>
         </div>
+        <button type="button" onClick={() => { setDigits(''); setMode('nfc'); }}
+          style={{ display:'inline-flex', alignItems:'center', gap:6, marginTop:14, padding:8, border:0, background:'none', cursor:'pointer', fontSize:13, fontWeight:700, color:'var(--text-dim)' }}>
+          <CreditCard size={15} /> Use card instead
+        </button>
       </div>
     </div>
   );
