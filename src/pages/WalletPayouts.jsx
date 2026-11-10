@@ -1,5 +1,6 @@
 import { getAdminPin } from '../lib/pin.js';
 import React, { useCallback, useEffect, useState } from 'react';
+import useAutoClear from '../xa/useAutoClear.js';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { supabase } from '../supabase.js';
 import { peso, dateTime } from '../lib/format.js';
@@ -36,6 +37,7 @@ export default function WalletPayouts() {
   const [rows, setRows] = useState([]);
   const [filter, setFilter] = useState('');
   const [q, setQ] = useState('');
+  useAutoClear(q, setQ);
   const [busy, setBusy] = useState(false);
 
   const loadSummary = useCallback(async () => {

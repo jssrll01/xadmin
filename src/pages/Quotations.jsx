@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import useAutoClear from '../xa/useAutoClear.js';
 import { FileText, Search, Trash2, Edit3, Save, X, PlusCircle } from 'lucide-react';
 import { fetchReceipts, receiptCrud } from '../lib/api.js';
 import { Link } from 'react-router-dom';
@@ -19,6 +20,7 @@ export default function Quotations() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState('');
+  useAutoClear(q, setQ);
   const [editing, setEditing] = useState(null);
   const [draft, setDraft] = useState(emptyDraft);
   const [busy, setBusy] = useState(false);

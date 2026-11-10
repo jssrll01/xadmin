@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import useAutoClear from '../xa/useAutoClear.js';
 import { Plus, Search, Edit3, Trash2, ExternalLink } from 'lucide-react';
 import { xrpc } from '../lib/xrpc.js';
 import { useToast } from '../components/Toast.jsx';
@@ -15,6 +16,7 @@ export default function Supplier() {
   const [loading, setLoading] = useState(true);
   const [loadErr, setLoadErr] = useState('');
   const [q, setQ] = useState('');
+  useAutoClear(q, setQ);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState(BLANK);
   const [errs, setErrs] = useState({});

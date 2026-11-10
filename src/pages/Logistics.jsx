@@ -1,6 +1,7 @@
 import { getAdminPin } from '../lib/pin.js';
 import { useAdminContext } from "../context/AdminContext";
 import React, { useState, useCallback, useEffect } from 'react';
+import useAutoClear from '../xa/useAutoClear.js';
 import Card from '../components/Card.jsx';
 import Modal from '../components/Modal.jsx';
 import Btn from '../components/Btn.jsx';
@@ -35,6 +36,7 @@ export default function Logistics() {
   const [list, setList] = useState({ total: 0, rows: [] });
   const [filter, setFilter] = useState('all');
   const [q, setQ] = useState('');
+  useAutoClear(q, setQ);
   const [dq, setDq] = useState('');
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(true);

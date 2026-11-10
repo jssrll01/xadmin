@@ -1,5 +1,6 @@
 import { getAdminPin } from '../lib/pin.js';
 import React, { useCallback, useEffect, useState } from 'react';
+import useAutoClear from '../xa/useAutoClear.js';
 import { supabase } from '../supabase.js';
 import { dateTime } from '../lib/format.js';
 
@@ -17,6 +18,7 @@ const FIELDS = [['full_name', 'Full name'], ['phone', 'Phone'], ['address', 'Str
 export default function MembersData() {
   const [tab, setTab] = useState('follows');
   const [q, setQ] = useState('');
+  useAutoClear(q, setQ);
   const [rows, setRows] = useState(null);
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);

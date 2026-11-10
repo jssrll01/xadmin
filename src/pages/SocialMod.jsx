@@ -1,5 +1,6 @@
 import { getAdminPin } from '../lib/pin.js';
 import React, { useCallback, useEffect, useState } from 'react';
+import useAutoClear from '../xa/useAutoClear.js';
 import { supabase } from '../supabase.js';
 import { dateTime } from '../lib/format.js';
 import TagEditor from '../components/TagEditor.jsx';
@@ -17,6 +18,7 @@ export default function SocialMod() {
   const [tab, setTab] = useState('posts');
   const [rows, setRows] = useState(null);
   const [q, setQ] = useState('');
+  useAutoClear(q, setQ);
   const [status, setStatus] = useState('active');
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);

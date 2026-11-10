@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useMemo } from 'react';
+import useAutoClear from '../xa/useAutoClear.js';
 import { Trash2, RefreshCw, Search, Eye } from 'lucide-react';
 import Btn from '../components/Btn.jsx';
 import { useToast } from '../components/Toast.jsx';
@@ -18,6 +19,7 @@ export default function AuditLog() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState('');
+  useAutoClear(q, setQ);
   const [act, setAct] = useState('all');
   const [view, setView] = useState(null);
   const [del, setDel] = useState(null);

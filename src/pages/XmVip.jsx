@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import useAutoClear from '../xa/useAutoClear.js';
 import { Crown, Search, Plus, Edit2, Trash2, Ban, RefreshCw } from 'lucide-react';
 import Card from '../components/Card.jsx';
 import Btn from '../components/Btn.jsx';
@@ -26,6 +27,7 @@ export default function XmVip() {
   const [sum, setSum] = useState(null);
   const [rows, setRows] = useState([]);
   const [q, setQ] = useState('');
+  useAutoClear(q, setQ);
   const [loading, setLoading] = useState(true);
   const [grant, setGrant] = useState(null);
   const [edit, setEdit] = useState(null);

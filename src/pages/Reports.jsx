@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import useAutoClear from '../xa/useAutoClear.js';
 import { Search, Filter, X, ChevronDown, ChevronUp, Edit3, Trash2, Save, Mail, Phone, Link2, User, FileWarning } from 'lucide-react';
 import { fetchReports, reportCrud } from '../lib/api.js';
 
@@ -14,8 +15,10 @@ export default function Reports() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState('');
+  useAutoClear(q, setQ);
   const [status, setStatus] = useState('all');
   const [user, setUser] = useState('');
+  useAutoClear(user, setUser);
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
   const [showF, setShowF] = useState(false);

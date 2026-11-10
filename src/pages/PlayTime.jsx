@@ -2,6 +2,7 @@ import { getAdminPin } from '../lib/pin.js';
 import { useAdminContext } from "../context/AdminContext";
 import { adminDb, adminRows } from '../lib/api';
 import React, { useState, useCallback } from 'react';
+import useAutoClear from '../xa/useAutoClear.js';
 import Card from '../components/Card.jsx';
 import Modal from '../components/Modal.jsx';
 import Btn from '../components/Btn.jsx';
@@ -32,6 +33,7 @@ export default function PlayTime() {
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState('');
   const [search, setSearch] = useState('');
+  useAutoClear(search, setSearch);
   const [edit, setEdit] = useState(null);
   const [adj, setAdj] = useState(null);
   const [busy, setBusy] = useState(false);

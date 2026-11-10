@@ -2,6 +2,7 @@ import { getAdminPin } from '../lib/pin.js';
 import { useAdminContext } from "../context/AdminContext";
 import { adminDb, adminRows } from '../lib/api';
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import useAutoClear from '../xa/useAutoClear.js';
 import Card from '../components/Card.jsx';
 import Modal from '../components/Modal.jsx';
 import Btn from '../components/Btn.jsx';
@@ -30,6 +31,7 @@ export default function Stores() {
   const [vform, setVform] = useState(VBLANK);
 
   const [q, setQ] = useState('');
+  useAutoClear(q, setQ);
   const [dq, setDq] = useState('');
   const [filter, setFilter] = useState('all');
   const [sort, setSort] = useState('name_asc');

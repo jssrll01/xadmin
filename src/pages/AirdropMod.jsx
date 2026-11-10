@@ -12,7 +12,7 @@ const card = { padding: 8, borderRadius: 14, background: 'var(--surface)', borde
 const btn = { padding: '7px 12px', borderRadius: 10, border: '1px solid var(--border)', background: 'var(--surface)', cursor: 'pointer', fontWeight: 600, fontSize: 13 };
 const active = { background: 'var(--primary)', color: '#fff', borderColor: 'var(--primary)' };
 const inp = { width: '100%', padding: '10px 12px', border: '1.5px solid var(--border)', borderRadius: 10, background: 'var(--surface)', marginBottom: 10, fontSize: 15 };
-const BLANK = { isNew: true, key: '', label: '', max_n: '', win_count: '', payout: '', sort: '' };
+const BLANK = { isNew: true, key: '', label: '', max_n: '', win_count: '', payout: '', sort: '', draw_minutes: '' };
 
 async function rpc(fn, args) {
   const { data, error } = await supabase.rpc(fn, { code: getAdminPin(), ...args });
@@ -63,7 +63,7 @@ export default function AirdropMod() {
   const delTier = (t) => window.confirm('Delete tier "' + t.label + '"?') && run('admin_airdrop_tier_delete', { p_key: t.key }, 'Tier deleted');
   const openEdit = (t) => {
     setFormErr('');
-    setForm(t ? { isNew: false, key: t.key, label: t.label, max_n: t.max_n, win_count: t.win_count, payout: t.payout, sort: t.sort ?? '' } : BLANK);
+    setForm(t ? { isNew: false, key: t.key, label: t.label, max_n: t.max_n, win_count: t.win_count, payout: t.payout, sort: t.sort ?? '', draw_minutes: t.draw_minutes ?? '' } : BLANK);
   };
   const saveTier = async () => {
     const f = form;
@@ -71,8 +71,10 @@ export default function AirdropMod() {
     if (!String(f.key).trim() || !String(f.label).trim()) return setFormErr('Key and label are required');
     if (!(max_n >= 2) || !(win >= 1) || win >= max_n) return setFormErr('Range must be 2 or more, and winners fewer than the range');
     if (!(pay > 0)) return setFormErr('Payout multiplier must be above 0');
+    const dm = f.draw_minutes === '' ? null : Number(f.draw_minutes);
+    if (dm !== null && !(dm >= 10 && dm <= 1440)) return setFormErr('Draw minutes must be 10 to 1440');
     try {
-      await rpc('admin_airdrop_tier_save', { p_key: String(f.key).trim(), p_label: String(f.label).trim(), p_max_n: max_n, p_win_count: win, p_payout: pay, p_sort: sort });
+      await rpc('admin_airdrop_tier_save', { p_key: String(f.key).trim(), p_label: String(f.label).trim(), p_max_n: max_n, p_win_count: win, p_payout: pay, p_sort: sort, p_draw_minutes: dm });
       setForm(null); say(f.isNew ? 'Tier added' : 'Tier updated'); load();
     } catch (e) { setFormErr(String(e.message || e)); }
   };
@@ -100,7 +102,7 @@ export default function AirdropMod() {
           {rows.length === 0 ? <div style={{ padding: 12 }}>No data yet.</div> : (
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead><tr>
-                {tab === 'tiers' && ['Game', 'Range', 'Winners', 'Pays', 'Bets', 'In', 'Out', 'Margin', 'Status', ''].map((h, i) => <th key={i} style={th}>{h}</th>)}
+                {tab === 'tiers' && ['Game', 'Range', 'Winners', 'Pays', 'Draw', 'Bets', 'In', 'Out', 'Margin', 'Status', ''].map((h, i) => <th key={i} style={th}>{h}</th>)}
                 {tab === 'draws' && <>{headCheck}{['Draw time', 'Game', 'Status', 'Winning', 'Bets', 'In', 'Out', ''].map((h, i) => <th key={i} style={th}>{h}</th>)}</>}
                 {tab === 'bets' && <>{headCheck}{['Time', 'Game', 'Player', 'Pick', 'Bet', 'Result', 'Payout', ''].map((h, i) => <th key={i} style={th}>{h}</th>)}</>}
               </tr></thead>
@@ -108,7 +110,7 @@ export default function AirdropMod() {
                 {rows.map((r) => tab === 'tiers' ? (
                   <tr key={r.key}>
                     <td style={td}>{r.label}</td><td style={td}>1-{r.max_n}</td><td style={td}>{r.win_count}</td>
-                    <td style={td}>{r.payout}x</td><td style={td}>{r.bets}</td><td style={td}>{r.total_in}</td>
+                    <td style={td}>{r.payout}x</td><td style={td}>{r.draw_minutes ? (r.draw_minutes % 60 === 0 ? r.draw_minutes / 60 + 'h' : r.draw_minutes + 'm') : ''}</td><td style={td}>{r.bets}</td><td style={td}>{r.total_in}</td>
                     <td style={td}>{r.total_out}</td><td style={td}>{r.total_in - r.total_out}</td>
                     <td style={td}><button style={{ ...btn, color: r.enabled ? '#16A34A' : '#EF4444' }} onClick={() => toggle(r)}>{r.enabled ? 'ON' : 'OFF'}</button></td>
                     <td style={td}>
@@ -148,6 +150,7 @@ export default function AirdropMod() {
             <input style={inp} placeholder="Winning numbers per draw" inputMode="numeric" value={form.win_count} onChange={setF('win_count')} />
             <input style={inp} placeholder="Payout multiplier (e.g. 8)" inputMode="decimal" value={form.payout} onChange={setF('payout')} />
             <input style={inp} placeholder="Sort order" inputMode="numeric" value={form.sort} onChange={setF('sort')} />
+            <input style={inp} placeholder="Draw every N minutes (10 to 1440, e.g. 180)" inputMode="numeric" value={form.draw_minutes} onChange={setF('draw_minutes')} />
             {formErr && <div style={{ color: '#EF4444', fontSize: 13, marginBottom: 8 }}>{formErr}</div>}
             <div style={{ display: 'flex', gap: 8 }}>
               <button style={{ ...btn, ...active }} onClick={saveTier}>Save</button>
