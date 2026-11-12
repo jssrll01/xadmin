@@ -12,7 +12,7 @@ import { peso, dateTime } from '../lib/format.js';
 import { RefreshCw } from 'lucide-react';
 
 const PAGE = 20;
-const CARRIERS = ['J&T Express', 'LBC', 'Flash Express', 'Ninja Van', '2GO', 'JRS Express', 'Grab Express', 'Lalamove', 'GoGo Xpress'];
+const CARRIERS_FALLBACK = ['J&T Express', 'LBC', 'Flash Express', 'Ninja Van', '2GO', 'JRS Express', 'Grab Express', 'Lalamove', 'GoGo Xpress'];
 const FILTERS = [['all', 'All'], ['awaiting', 'Awaiting tracking'], ['tracked', 'Has tracking'], ['shipped', 'Shipped'], ['delivered', 'Delivered'], ['cancelled', 'Cancelled']];
 const TILES = [['awaiting', 'Awaiting tracking'], ['tracked', 'Has tracking'], ['shipped', 'Shipped'], ['delivered', 'Delivered'], ['cancelled', 'Cancelled']];
 const NEXT = { pending: ['pending', 'paid', 'shipped'], paid: ['paid', 'shipped'], shipped: ['shipped', 'delivered'] };
@@ -20,6 +20,17 @@ const TRACK_RE = /^[A-Za-z0-9._/-]{3,64}$/;
 const lab = { fontSize: 11, fontWeight: 700, color: 'var(--text-dim)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: 0.4 };
 const sub = { fontSize: 12, color: 'var(--text-dim)', marginTop: 3 };
 const orderTotal = (r) => Math.max(0, (Number(r.subtotal) || 0) - (Number(r.discount) || 0)) + (Number(r.shipping_fee) || 0);
+
+// Carrier names from the carriers table when use_db_config is on, else null (keep the built-in list)
+async function loadCarriers(db) {
+  try {
+    const f = await db.from('platform_settings').select('value').eq('key', 'use_db_config').maybeSingle();
+    if (!f.data || f.data.value !== 'true') return null;
+    const c = await db.from('carriers').select('name').eq('active', true).order('sort_order', { ascending: true });
+    const names = (c.data || []).map((x) => x.name).filter(Boolean);
+    return names.length ? names : null;
+  } catch (e) { return null; }
+}
 
 async function rpc(fn, args) {
   const { data, error } = await supabase.rpc(fn, { code: getAdminPin(), ...args });
@@ -31,6 +42,12 @@ const audit = async (...a) => { try { await logAudit(...a); } catch {} };
 export default function Logistics() {
   const { activeSystem } = useAdminContext();
   const supabase = getDb(activeSystem);
+  const [CARRIERS, setCarriers] = useState(CARRIERS_FALLBACK);
+  useEffect(() => {
+    let on = true;
+    loadCarriers(getDb(activeSystem)).then((v) => { if (on && v) setCarriers(v); });
+    return () => { on = false; };
+  }, [activeSystem]);
   const { show } = useToast();
   const [sum, setSum] = useState(null);
   const [list, setList] = useState({ total: 0, rows: [] });
