@@ -6,6 +6,7 @@ import LiveDot from './LiveDot.jsx';
 import { useAdminContext } from '../context/AdminContext';
 import { locate } from '../xa/shellNav.js';
 import { clearAdminPin } from '../lib/pin.js';
+import { endSession } from '../lib/sessionPing.js';
 
 const pretty = (s) => decodeURIComponent(s).replace(/[-_]/g, ' ').replace(/^\w/, (c) => c.toUpperCase());
 
@@ -32,7 +33,8 @@ export default function Topbar() {
     try { localStorage.setItem('xadmin_theme', next); } catch (e) { /* storage blocked */ }
     setTheme(next);
   };
-  const lock = () => {
+  const lock = async () => {
+    await endSession();
     try { sessionStorage.removeItem('xadmin_unlocked'); sessionStorage.removeItem('xadmin_actor'); } catch (e) { /* storage blocked */ }
     clearAdminPin();
     window.location.reload();

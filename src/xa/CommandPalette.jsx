@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { clearAdminPin } from '../lib/pin.js';
+import { endSession } from '../lib/sessionPing.js';
 
 const RK = 'xs_recent';
 const readRecent = () => { try { return JSON.parse(localStorage.getItem(RK)) || []; } catch (e) { return []; } };
@@ -14,7 +15,8 @@ const ACTIONS = [
     window.dispatchEvent(new Event('xs:theme'));
   } },
   { id: 'reload', label: 'Reload the app', run: () => window.location.reload() },
-  { id: 'lock', label: 'Lock admin', run: () => {
+  { id: 'lock', label: 'Lock admin', run: async () => {
+    await endSession();
     try { sessionStorage.removeItem('xadmin_unlocked'); sessionStorage.removeItem('xadmin_actor'); } catch (e) { /* storage blocked */ }
     clearAdminPin();
     window.location.reload();

@@ -61,6 +61,14 @@ import Promos from './pages/Promos.jsx';
 import Settings from './pages/Settings.jsx';
 import AuditLog from './pages/AuditLog.jsx';
 import SecurityCheck from './pages/SecurityCheck.jsx';
+import AdminSessions from './pages/AdminSessions.jsx';
+import LoginAttempts from './pages/LoginAttempts.jsx';
+import AuditSearch from './pages/AuditSearch.jsx';
+import AuditExport from './pages/AuditExport.jsx';
+import BackupManager from './pages/BackupManager.jsx';
+import FaqBulkImport from './pages/FaqBulkImport.jsx';
+import { useSessionPing } from './lib/sessionPing.js';
+import { clearAdminPin as clearPinNow } from './lib/pin.js';
 import Notifications from './pages/Notifications.jsx';
 import Supplier from './pages/Supplier.jsx';
 import Notify from './pages/Notify.jsx';
@@ -111,6 +119,13 @@ export default function App() {
     }, 30000);
     return () => clearInterval(tick);
   }, [unlocked]);
+
+  // Tell the server this tab is unlocked; lock if another admin revoked it
+  useSessionPing(unlocked, () => {
+    try { sessionStorage.removeItem(SESSION_KEY); sessionStorage.removeItem(ACTOR_KEY); } catch (e) { /* storage blocked */ }
+    clearPinNow();
+    setUnlocked(false);
+  });
 
   // Extend session on any user activity (throttled)
   useEffect(() => {
@@ -206,6 +221,12 @@ export default function App() {
           <Route path="/daily"     element={<DailyNotes />} />
           <Route path="/audit"     element={<AuditLog />} />
           <Route path="/security-check" element={<SecurityCheck />} />
+          <Route path="/admin-sessions" element={<AdminSessions />} />
+          <Route path="/login-attempts" element={<LoginAttempts />} />
+          <Route path="/audit-search" element={<AuditSearch />} />
+          <Route path="/audit-export" element={<AuditExport />} />
+          <Route path="/backup" element={<BackupManager />} />
+          <Route path="/faq-import" element={<FaqBulkImport />} />
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/cashback" element={<CashbackCosts />} />
           <Route path="/bulk-products" element={<BulkProducts />} />
