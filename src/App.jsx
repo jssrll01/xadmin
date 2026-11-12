@@ -98,6 +98,7 @@ import QrPortal from './pages/QrPortal.jsx';
 import Logistics from './pages/Logistics.jsx';
 import ContentSettings from './xa/ContentSettings.jsx';
 import AccessApp from './xaccess/App.jsx';
+import { WithdrawalQueue, ReceiptViewer, DuplicateReceipts, WalletFreeze, Liability, FeeIncome, PendingMoney, TopBalances, DormantBalances, LoyaltyReport } from './tw/pages.jsx';
 
 function YlTablePage() {
   const { table } = useParams();
@@ -179,6 +180,16 @@ export default function App() {
         <AuditClear />
         <Routes>
           <Route path="/" element={<HomeSwitch />} />
+          <Route path="/tw/withdrawals" element={<WithdrawalQueue />} />
+          <Route path="/tw/receipts" element={<ReceiptViewer />} />
+          <Route path="/tw/duplicates" element={<DuplicateReceipts />} />
+          <Route path="/tw/freeze" element={<WalletFreeze />} />
+          <Route path="/tw/liability" element={<Liability />} />
+          <Route path="/tw/fees" element={<FeeIncome />} />
+          <Route path="/tw/pending" element={<PendingMoney />} />
+          <Route path="/tw/top-balances" element={<TopBalances />} />
+          <Route path="/tw/dormant" element={<DormantBalances />} />
+          <Route path="/tw/loyalty" element={<LoyaltyReport />} />
           <Route path="/users"     element={<Users />} />
           <Route path="/products"  element={<Products />} />
           <Route path="/orders"    element={<Orders />} />

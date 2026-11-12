@@ -1,3 +1,4 @@
+import { ListChecks as TwA, ReceiptText as TwB, CopyCheck as TwC, Snowflake as TwD, Landmark as TwE, Percent as TwF, Hourglass as TwG, Trophy as TwH, Moon as TwI, Award as TwJ } from 'lucide-react';
 import {
   LayoutDashboard,
   ClipboardList,
@@ -82,6 +83,11 @@ export const XMARKET_GROUPS = [
     ['/xcoin', 'XCOIN', Coins], ['/buy-load', 'Buy Load', Smartphone], ['/topups', 'Top-ups', PlusCircle],
     ['/wallet', 'Wallet', Wallet], ['/payouts', 'Withdrawals & Interest', Banknote],
     ['/wallet-security', 'Wallet Security', ShieldCheck], ['/xcards', 'Xcards', CreditCard]] },
+  { id: 'wallet-tools', label: 'Transactions and wallet', items: [
+    ['/tw/withdrawals', 'Withdrawal Queue', TwA], ['/tw/receipts', 'Receipt Viewer', TwB], ['/tw/duplicates', 'Duplicate Receipts', TwC],
+    ['/tw/freeze', 'Wallet Freeze', TwD], ['/tw/liability', 'Xwallet Liability', TwE], ['/tw/fees', 'Fee Income', TwF],
+    ['/tw/pending', 'Pending Money', TwG], ['/tw/top-balances', 'Top 50 Balances', TwH], ['/tw/dormant', 'Dormant Balances', TwI],
+    ['/tw/loyalty', 'Loyalty Issued vs Spent', TwJ]] },
   { id: 'people', label: 'People', items: [
     ['/users', 'Users', Users], ['/members-data', 'Members Data', UserCog], ['/xm-vip', 'VIP Members', Crown]] },
   { id: 'community', label: 'Community', items: [
