@@ -88,7 +88,7 @@ export const XMARKET_GROUPS = [
   { id: 'tools', label: 'Tools', items: [['/nfc', 'NFC Studio', Radio], ['/qr-portal', 'QR Portal', QrCode]] },
   { id: 'system', label: 'Data and System', items: [
     ['/data', 'Data Manager', Table], ['/db', 'Database', Database], ['/schema', 'Schema', Network], ['/sql', 'SQL editor', Terminal],
-    ['/audit', 'Audit log', ScrollText], ['/content', 'Content', SlidersHorizontal], ['/settings', 'Settings', Cog]] },
+    ['/audit', 'Audit log', ScrollText], ['/security-check', 'Security check', ShieldCheck], ['/content', 'Content', SlidersHorizontal], ['/settings', 'Settings', Cog]] },
 ];
 
 // finds the group and label for a path (longest matching link wins)

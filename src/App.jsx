@@ -60,6 +60,7 @@ import SchemaBrowser from './xa/SchemaBrowser.jsx';
 import Promos from './pages/Promos.jsx';
 import Settings from './pages/Settings.jsx';
 import AuditLog from './pages/AuditLog.jsx';
+import SecurityCheck from './pages/SecurityCheck.jsx';
 import Notifications from './pages/Notifications.jsx';
 import Supplier from './pages/Supplier.jsx';
 import Notify from './pages/Notify.jsx';
@@ -204,6 +205,7 @@ export default function App() {
           <Route path="/xcoin" element={<XCoinAdmin />} />
           <Route path="/daily"     element={<DailyNotes />} />
           <Route path="/audit"     element={<AuditLog />} />
+          <Route path="/security-check" element={<SecurityCheck />} />
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/cashback" element={<CashbackCosts />} />
           <Route path="/bulk-products" element={<BulkProducts />} />
