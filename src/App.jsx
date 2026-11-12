@@ -99,6 +99,7 @@ import Logistics from './pages/Logistics.jsx';
 import ContentSettings from './xa/ContentSettings.jsx';
 import AccessApp from './xaccess/App.jsx';
 import { WithdrawalQueue, ReceiptViewer, DuplicateReceipts, WalletFreeze, Liability, FeeIncome, PendingMoney, TopBalances, DormantBalances, LoyaltyReport } from './tw/pages.jsx';
+import { BuyLoadQueue, TopupQueue, OrdersQueue, QuotationQueue, ReturnQueue, CreatorQueue, LogisticsQueue } from './tw/queues.jsx';
 
 function YlTablePage() {
   const { table } = useParams();
@@ -190,6 +191,13 @@ export default function App() {
           <Route path="/tw/top-balances" element={<TopBalances />} />
           <Route path="/tw/dormant" element={<DormantBalances />} />
           <Route path="/tw/loyalty" element={<LoyaltyReport />} />
+          <Route path="/tw/q/buy-load" element={<BuyLoadQueue />} />
+          <Route path="/tw/q/topups" element={<TopupQueue />} />
+          <Route path="/tw/q/orders" element={<OrdersQueue />} />
+          <Route path="/tw/q/quotations" element={<QuotationQueue />} />
+          <Route path="/tw/q/returns" element={<ReturnQueue />} />
+          <Route path="/tw/q/creators" element={<CreatorQueue />} />
+          <Route path="/tw/q/logistics" element={<LogisticsQueue />} />
           <Route path="/users"     element={<Users />} />
           <Route path="/products"  element={<Products />} />
           <Route path="/orders"    element={<Orders />} />

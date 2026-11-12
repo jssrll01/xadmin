@@ -1,3 +1,4 @@
+import { Smartphone as TqA, PlusCircle as TqB, ShoppingBag as TqC, FileText as TqD, Undo2 as TqE, BadgeCheck as TqF, Truck as TqG } from 'lucide-react';
 import { ListChecks as TwA, ReceiptText as TwB, CopyCheck as TwC, Snowflake as TwD, Landmark as TwE, Percent as TwF, Hourglass as TwG, Trophy as TwH, Moon as TwI, Award as TwJ } from 'lucide-react';
 import {
   LayoutDashboard,
@@ -87,7 +88,10 @@ export const XMARKET_GROUPS = [
     ['/tw/withdrawals', 'Withdrawal Queue', TwA], ['/tw/receipts', 'Receipt Viewer', TwB], ['/tw/duplicates', 'Duplicate Receipts', TwC],
     ['/tw/freeze', 'Wallet Freeze', TwD], ['/tw/liability', 'Xwallet Liability', TwE], ['/tw/fees', 'Fee Income', TwF],
     ['/tw/pending', 'Pending Money', TwG], ['/tw/top-balances', 'Top 50 Balances', TwH], ['/tw/dormant', 'Dormant Balances', TwI],
-    ['/tw/loyalty', 'Loyalty Issued vs Spent', TwJ]] },
+    ['/tw/loyalty', 'Loyalty Issued vs Spent', TwJ],
+    ['/tw/q/buy-load', 'Buy Load Queue', TqA], ['/tw/q/topups', 'Top-up Queue', TqB], ['/tw/q/orders', 'Orders Queue', TqC],
+    ['/tw/q/quotations', 'Quotation Queue', TqD], ['/tw/q/returns', 'Return Queue', TqE], ['/tw/q/creators', 'Creator Queue', TqF],
+    ['/tw/q/logistics', 'Logistics Queue', TqG]] },
   { id: 'people', label: 'People', items: [
     ['/users', 'Users', Users], ['/members-data', 'Members Data', UserCog], ['/xm-vip', 'VIP Members', Crown]] },
   { id: 'community', label: 'Community', items: [
