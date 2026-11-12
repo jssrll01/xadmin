@@ -98,6 +98,7 @@ import QrPortal from './pages/QrPortal.jsx';
 import Logistics from './pages/Logistics.jsx';
 import ContentSettings from './xa/ContentSettings.jsx';
 import AccessApp from './xaccess/App.jsx';
+import { TierEditor, HouseEdge, DailyFlow, CronHealth, SuspiciousBets, HourlyActivity, PointsEconomy } from './pa/pages.jsx';
 import AssetLibrary from './pages/AssetLibrary.jsx';
 import { WithdrawalQueue, ReceiptViewer, DuplicateReceipts, WalletFreeze, Liability, FeeIncome, PendingMoney, TopBalances, DormantBalances, LoyaltyReport } from './tw/pages.jsx';
 import { BuyLoadQueue, TopupQueue, OrdersQueue, QuotationQueue, ReturnQueue, CreatorQueue, LogisticsQueue } from './tw/queues.jsx';
@@ -182,6 +183,13 @@ export default function App() {
         <AuditClear />
         <Routes>
           <Route path="/" element={<HomeSwitch />} />
+          <Route path="/pa/tiers" element={<TierEditor />} />
+          <Route path="/pa/rtp" element={<HouseEdge />} />
+          <Route path="/pa/daily" element={<DailyFlow />} />
+          <Route path="/pa/cron" element={<CronHealth />} />
+          <Route path="/pa/suspicious" element={<SuspiciousBets />} />
+          <Route path="/pa/hours" element={<HourlyActivity />} />
+          <Route path="/pa/economy" element={<PointsEconomy />} />
           <Route path="/assets" element={<AssetLibrary />} />
           <Route path="/tw/withdrawals" element={<WithdrawalQueue />} />
           <Route path="/tw/receipts" element={<ReceiptViewer />} />

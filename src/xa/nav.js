@@ -1,5 +1,12 @@
 // Static page list for the Ctrl+K palette. Table pages are added live by DbHome.
 export const PALETTE_ITEMS = [
+  ['/pa/tiers', 'Tier Draw Minutes', null, 'Play Time and Airdrop'],
+  ['/pa/rtp', 'House Edge and RTP', null, 'Play Time and Airdrop'],
+  ['/pa/daily', 'Payout vs Intake', null, 'Play Time and Airdrop'],
+  ['/pa/cron', 'Draw Cron Health', null, 'Play Time and Airdrop'],
+  ['/pa/suspicious', 'Suspicious Bets', null, 'Play Time and Airdrop'],
+  ['/pa/hours', 'Activity by Hour', null, 'Play Time and Airdrop'],
+  ['/pa/economy', 'Points Economy', null, 'Play Time and Airdrop'],
   ['/assets', 'Asset Library', null, 'Assets'],
   ['/tw/withdrawals', 'Withdrawal Queue', null, 'Transactions and wallet'], ['/tw/receipts', 'Receipt Viewer', null, 'Transactions and wallet'], ['/tw/duplicates', 'Duplicate Receipts', null, 'Transactions and wallet'],
   ['/tw/freeze', 'Wallet Freeze', null, 'Transactions and wallet'], ['/tw/liability', 'Xwallet Liability', null, 'Transactions and wallet'], ['/tw/fees', 'Fee Income', null, 'Transactions and wallet'],
