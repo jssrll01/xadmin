@@ -71,7 +71,7 @@ function BetsPage({ title, sub, render, needUser, needTime }) {
 export function TierEditor() {
   const { show } = useToast();
   const sc = useSchema();
-  const src = useSrc('tiers', sc.rows, (c) => c.includes('draw_minutes'));
+  const src = useSrc('tiers', sc.rows, (c) => c.includes('draw_minutes') && c.includes('key'), /airdrop_tiers/i);
   const [ed, setEd] = useState({});
   const pk = src.cols.includes('id') ? 'id' : src.cols[0];
   const shown = src.cols.filter((c) => c !== 'draw_minutes' && !/(created|updated)_at|description/.test(c)).slice(0, 4);
@@ -178,7 +178,7 @@ export function HourlyActivity() {
 const EX = /exchang|redeem|convert|cash|withdraw/i;
 export function PointsEconomy() {
   const sc = useSchema();
-  const src = useSrc('pts', sc.rows, (c) => c.some((x) => ['points', 'pts', 'delta', 'amount'].includes(x)) && c.some((x) => ['type', 'kind', 'reason'].includes(x)), /(play|^pt|point)/i);
+  const src = useSrc('pts', sc.rows, (c) => c.some((x) => ['points', 'pts', 'delta', 'amount'].includes(x)) && c.some((x) => ['type', 'kind', 'reason'].includes(x)), /(loyalty|play|^pt|point)/i);
   const val = useCol('pval', src.cols, ['points', 'pts', 'delta', 'amount']), typ = useCol('ptype', src.cols, ['type', 'kind', 'reason']), time = useCol('ptime', src.cols, T_CANDS);
   const d = useMemo(() => src.rows.map((r) => ({ v: num(r[val.v]), ty: String(r[typ.v] ?? '—'), t: time.v ? new Date(r[time.v]).getTime() : NaN })), [src.rows, val.v, typ.v, time.v]);
   const earned = d.filter((x) => !EX.test(x.ty) && x.v > 0).reduce((s, x) => s + x.v, 0);
