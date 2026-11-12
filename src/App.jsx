@@ -79,6 +79,11 @@ import Notifications from './pages/Notifications.jsx';
 import Supplier from './pages/Supplier.jsx';
 import Notify from './pages/Notify.jsx';
 import AirdropMod from './pages/AirdropMod.jsx';
+import WalletReconcile from './ops/WalletReconcile.jsx';
+import DailyCloseReport from './ops/DailyCloseReport.jsx';
+import XcoinMonitor from './ops/XcoinMonitor.jsx';
+import UserTimeline from './ops/UserTimeline.jsx';
+import CreatorPayouts from './ops/CreatorPayouts.jsx';
 import DailyNotes from './pages/DailyNotes.jsx';
 import XCoinAdmin from './pages/XCoinAdmin.jsx';
 import BuyLoad from './pages/BuyLoad.jsx';
@@ -224,6 +229,11 @@ export default function App() {
           <Route path="/supplier" element={<Supplier />} />
           <Route path="/notify" element={<Notify />} />
           <Route path="/airdrop-mod" element={<AirdropMod />} />
+          <Route path="/ops/wallet-reconcile" element={<WalletReconcile />} />
+          <Route path="/ops/daily-close" element={<DailyCloseReport />} />
+          <Route path="/ops/xcoin-monitor" element={<XcoinMonitor />} />
+          <Route path="/ops/user-timeline" element={<UserTimeline />} />
+          <Route path="/ops/creator-payouts" element={<CreatorPayouts />} />
           <Route path="/quotations" element={<Quotations />} />
           <Route path="/quotations/new" element={<NewReceipt />} />
           <Route path="/quotations/:id" element={<ReceiptView />} />

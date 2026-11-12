@@ -88,6 +88,10 @@ export const XMARKET_GROUPS = [
     ['/xf-polls', 'Demand Polls', Vote], ['/xf-sponsor', 'Sponsorships', Handshake],
     ['/xf-popups', 'Launch Popups', Rocket], ['/play-time', 'Play Time', Gamepad2],
     ['/airdrop', 'Airdrop 88', Dices], ['/airdrop-mod', 'Airdrop Mod', SlidersHorizontal]] },
+  { id: 'operations', label: 'Operations', items: [
+    ['/ops/wallet-reconcile', 'Wallet Reconcile', ClipboardList], ['/ops/daily-close', 'Daily Close Report', ClipboardList],
+    ['/ops/xcoin-monitor', 'Xcoin Monitor', ClipboardList], ['/ops/user-timeline', 'User Timeline', ClipboardList],
+    ['/ops/creator-payouts', 'Creator Payouts', ClipboardList]] },
   { id: 'tools', label: 'Tools', items: [['/nfc', 'NFC Studio', Radio], ['/qr-portal', 'QR Portal', QrCode],
     ['/faq-import', 'FAQ import', HelpCircle], ['/security-check', 'Security check', ShieldCheck], ['/content', 'Content', SlidersHorizontal]] },
   { id: 'system', label: 'Data and System', items: [

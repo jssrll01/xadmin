@@ -12,4 +12,6 @@ export const PALETTE_ITEMS = [
   ['/reports', 'Reports'], ['/shops', 'Shops'], ['/stores', 'Stores'], ['/banners', 'Banners'], ['/xcards', 'Xcards'],
   ['/xm-vip', 'VIP Members'], ['/xm-chat', 'Global Chat'], ['/notifications', 'Notifications'], ['/audit', 'Audit log'], ['/security-check', 'Security check'],
   ['/settings', 'Settings'], ['/content', 'Content'], ['/xcoin', 'XCOIN'], ['/pricing', 'Pricing'], ['/play-time', 'Play Time'], ['/airdrop', 'Airdrop 88'],
+  ['/ops/wallet-reconcile', 'Wallet Reconcile', null, 'Operations'], ['/ops/daily-close', 'Daily Close Report', null, 'Operations'],
+  ['/ops/xcoin-monitor', 'Xcoin Monitor', null, 'Operations'], ['/ops/user-timeline', 'User Timeline', null, 'Operations'], ['/ops/creator-payouts', 'Creator Payouts', null, 'Operations'],
 ];
