@@ -77,16 +77,16 @@ export function TierEditor() {
   const shown = src.cols.filter((c) => c !== 'draw_minutes' && !/(created|updated)_at|description/.test(c)).slice(0, 4);
   const save = async (r) => {
     const n = Number(ed[r[pk]]);
-    if (!Number.isInteger(n) || n < 1 || n > 1440) return show?.('Enter whole minutes, 1 to 1440.', 'error');
+    if (!Number.isInteger(n) || n < 10 || n > 1440) return show?.('Enter whole minutes, 10 to 1440.', 'error');
     if (!window.confirm('Set draw_minutes to ' + n + ' for ' + shown.map((c) => r[c]).join(' / ') + '?')) return;
-    try { await rpcDb('update', src.t, { payload: { draw_minutes: n }, match_col: pk, match_val: String(r[pk]) }); show?.('Saved', 'success'); setEd((e) => { const x = { ...e }; delete x[r[pk]]; return x; }); src.reload(); }
+    try { await call('admin_airdrop_tier_save', { p_key: r.key, p_label: r.label, p_max_n: r.max_n, p_win_count: r.win_count, p_payout: r.payout, p_sort: r.sort || 0, p_draw_minutes: n }); show?.('Saved', 'success'); setEd((e) => { const x = { ...e }; delete x[r[pk]]; return x; }); src.reload(); }
     catch (e) { show?.(e.message || String(e), 'error'); }
   };
   return (
     <Shell title="Per-tier draw minutes" sub="Edit how many minutes each tier’s draw runs." onRefresh={() => { sc.reload(); src.reload(); }} loading={sc.loading || src.loading} err={sc.err || src.err}>
       {!sc.loading && !sc.err && !src.t && <NoTable what="a tier table with a draw_minutes column" />}
       {src.t && <>
-        <div style={{ ...card, fontSize: 13 }}>This writes <code>draw_minutes</code> directly to <b>{src.t}</b>. It does not run your existing tier-save or draw-time functions, so if changing a tier should also reschedule the next draw, set the draw time on the Airdrop page afterwards.</div>
+        <div style={{ ...card, fontSize: 13 }}>Saves through the guarded tier-save function. Minutes must be 10 to 1440.</div>
         <Tbl cols={[...shown.map((c) => [c, (r) => String(r[c] ?? '—')]), ['Current', (r) => <b>{r.draw_minutes}</b>], ['New minutes', (r) => <input type="number" min="1" max="1440" style={{ ...inp, width: 90 }} value={ed[r[pk]] ?? ''} onChange={(e) => setEd({ ...ed, [r[pk]]: e.target.value })} />], ['', (r) => <button className="neu-btn" disabled={ed[r[pk]] === undefined || ed[r[pk]] === ''} onClick={() => save(r)} style={{ padding: '4px 12px', fontSize: 12 }}>Save</button>]]} rows={src.rows} empty="No tiers." />
       </>}
     </Shell>
