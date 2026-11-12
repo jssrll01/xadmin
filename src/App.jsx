@@ -98,6 +98,7 @@ import QrPortal from './pages/QrPortal.jsx';
 import Logistics from './pages/Logistics.jsx';
 import ContentSettings from './xa/ContentSettings.jsx';
 import AccessApp from './xaccess/App.jsx';
+import AssetLibrary from './pages/AssetLibrary.jsx';
 import { WithdrawalQueue, ReceiptViewer, DuplicateReceipts, WalletFreeze, Liability, FeeIncome, PendingMoney, TopBalances, DormantBalances, LoyaltyReport } from './tw/pages.jsx';
 import { BuyLoadQueue, TopupQueue, OrdersQueue, QuotationQueue, ReturnQueue, CreatorQueue, LogisticsQueue } from './tw/queues.jsx';
 
@@ -181,6 +182,7 @@ export default function App() {
         <AuditClear />
         <Routes>
           <Route path="/" element={<HomeSwitch />} />
+          <Route path="/assets" element={<AssetLibrary />} />
           <Route path="/tw/withdrawals" element={<WithdrawalQueue />} />
           <Route path="/tw/receipts" element={<ReceiptViewer />} />
           <Route path="/tw/duplicates" element={<DuplicateReceipts />} />

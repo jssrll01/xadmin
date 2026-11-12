@@ -1,3 +1,4 @@
+import { Images as AsA } from 'lucide-react';
 import { Smartphone as TqA, PlusCircle as TqB, ShoppingBag as TqC, FileText as TqD, Undo2 as TqE, BadgeCheck as TqF, Truck as TqG } from 'lucide-react';
 import { ListChecks as TwA, ReceiptText as TwB, CopyCheck as TwC, Snowflake as TwD, Landmark as TwE, Percent as TwF, Hourglass as TwG, Trophy as TwH, Moon as TwI, Award as TwJ } from 'lucide-react';
 import {
@@ -92,6 +93,8 @@ export const XMARKET_GROUPS = [
     ['/tw/q/buy-load', 'Buy Load Queue', TqA], ['/tw/q/topups', 'Top-up Queue', TqB], ['/tw/q/orders', 'Orders Queue', TqC],
     ['/tw/q/quotations', 'Quotation Queue', TqD], ['/tw/q/returns', 'Return Queue', TqE], ['/tw/q/creators', 'Creator Queue', TqF],
     ['/tw/q/logistics', 'Logistics Queue', TqG]] },
+  { id: 'assets', label: 'Assets', items: [
+    ['/assets', 'Asset Library', AsA]] },
   { id: 'people', label: 'People', items: [
     ['/users', 'Users', Users], ['/members-data', 'Members Data', UserCog], ['/xm-vip', 'VIP Members', Crown]] },
   { id: 'community', label: 'Community', items: [

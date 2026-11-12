@@ -1,5 +1,6 @@
 // Static page list for the Ctrl+K palette. Table pages are added live by DbHome.
 export const PALETTE_ITEMS = [
+  ['/assets', 'Asset Library', null, 'Assets'],
   ['/tw/withdrawals', 'Withdrawal Queue', null, 'Transactions and wallet'], ['/tw/receipts', 'Receipt Viewer', null, 'Transactions and wallet'], ['/tw/duplicates', 'Duplicate Receipts', null, 'Transactions and wallet'],
   ['/tw/freeze', 'Wallet Freeze', null, 'Transactions and wallet'], ['/tw/liability', 'Xwallet Liability', null, 'Transactions and wallet'], ['/tw/fees', 'Fee Income', null, 'Transactions and wallet'],
   ['/tw/pending', 'Pending Money', null, 'Transactions and wallet'], ['/tw/top-balances', 'Top 50 Balances', null, 'Transactions and wallet'], ['/tw/dormant', 'Dormant Balances', null, 'Transactions and wallet'], ['/tw/loyalty', 'Loyalty Issued vs Spent', null, 'Transactions and wallet'],
