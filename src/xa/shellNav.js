@@ -88,10 +88,11 @@ export const XMARKET_GROUPS = [
     ['/xf-polls', 'Demand Polls', Vote], ['/xf-sponsor', 'Sponsorships', Handshake],
     ['/xf-popups', 'Launch Popups', Rocket], ['/play-time', 'Play Time', Gamepad2],
     ['/airdrop', 'Airdrop 88', Dices], ['/airdrop-mod', 'Airdrop Mod', SlidersHorizontal]] },
-  { id: 'tools', label: 'Tools', items: [['/nfc', 'NFC Studio', Radio], ['/qr-portal', 'QR Portal', QrCode]] },
+  { id: 'tools', label: 'Tools', items: [['/nfc', 'NFC Studio', Radio], ['/qr-portal', 'QR Portal', QrCode],
+    ['/faq-import', 'FAQ import', HelpCircle], ['/security-check', 'Security check', ShieldCheck], ['/content', 'Content', SlidersHorizontal]] },
   { id: 'system', label: 'Data and System', items: [
     ['/data', 'Data Manager', Table], ['/db', 'Database', Database], ['/schema', 'Schema', Network], ['/sql', 'SQL editor', Terminal],
-    ['/audit', 'Audit log', ScrollText], ['/audit-search', 'Audit search', Search], ['/audit-export', 'Audit export', Download], ['/admin-sessions', 'Admin sessions', KeyRound], ['/login-attempts', 'Login attempts', ShieldAlert], ['/backup', 'Backup', Database], ['/faq-import', 'FAQ import', HelpCircle], ['/security-check', 'Security check', ShieldCheck], ['/content', 'Content', SlidersHorizontal], ['/settings', 'Settings', Cog]] },
+    ['/audit', 'Audit log', ScrollText], ['/audit-search', 'Audit search', Search], ['/audit-export', 'Audit export', Download], ['/admin-sessions', 'Admin sessions', KeyRound], ['/login-attempts', 'Login attempts', ShieldAlert], ['/backup', 'Backup', Database], ['/settings', 'Settings', Cog]] },
 ];
 
 // finds the group and label for a path (longest matching link wins)
