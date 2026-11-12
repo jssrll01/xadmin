@@ -54,6 +54,12 @@ import XmChat from './pages/XmChat.jsx';
 import XmVip from './pages/XmVip.jsx';
 import DbHome from './xa/DbHome.jsx';
 import DbTable from './xa/DbTable.jsx';
+import YtImport from './xa/YtImport.jsx';
+import CronViewer from './xa/CronViewer.jsx';
+import SlowQueries from './xa/SlowQueries.jsx';
+import StorageUsage from './xa/StorageUsage.jsx';
+import HealthDashboard from './xa/HealthDashboard.jsx';
+import FraudFlags from './xa/FraudFlags.jsx';
 import DigitalFiles from './xa/DigitalFiles.jsx';
 import SqlEditor from './xa/SqlEditor.jsx';
 import SchemaBrowser from './xa/SchemaBrowser.jsx';
@@ -204,6 +210,12 @@ export default function App() {
         <Route path="/xm-vip" element={<XmVip />} />
           <Route path="/db" element={<DbHome />} />
           <Route path="/db/:table" element={<DbTable />} />
+          <Route path="/yt-import" element={<YtImport />} />
+          <Route path="/cron" element={<CronViewer />} />
+          <Route path="/slow-queries" element={<SlowQueries />} />
+          <Route path="/storage-usage" element={<StorageUsage />} />
+          <Route path="/health" element={<HealthDashboard />} />
+          <Route path="/fraud-flags" element={<FraudFlags />} />
           <Route path="/sql" element={<SqlEditor />} />
           <Route path="/schema" element={<SchemaBrowser />} />
           <Route path="/schema/:table" element={<SchemaBrowser />} />
