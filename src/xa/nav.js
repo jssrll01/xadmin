@@ -5,5 +5,5 @@ export const PALETTE_ITEMS = [
   ['/payouts', 'Withdrawals & Interest'], ['/creators', 'Creators'], ['/returns', 'Returns'], ['/reviews', 'Reviews'],
   ['/reports', 'Reports'], ['/shops', 'Shops'], ['/stores', 'Stores'], ['/banners', 'Banners'], ['/xcards', 'Xcards'],
   ['/xm-vip', 'VIP Members'], ['/xm-chat', 'Global Chat'], ['/notifications', 'Notifications'], ['/audit', 'Audit log'],
-  ['/settings', 'Settings'], ['/xcoin', 'XCOIN'], ['/pricing', 'Pricing'], ['/play-time', 'Play Time'], ['/airdrop', 'Airdrop 88'],
+  ['/settings', 'Settings'], ['/content', 'Content'], ['/xcoin', 'XCOIN'], ['/pricing', 'Pricing'], ['/play-time', 'Play Time'], ['/airdrop', 'Airdrop 88'],
 ];

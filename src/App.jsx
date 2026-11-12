@@ -71,6 +71,7 @@ import Pricing from './pages/Pricing.jsx';
 import NfcStudio from './pages/NfcStudio.jsx';
 import QrPortal from './pages/QrPortal.jsx';
 import Logistics from './pages/Logistics.jsx';
+import ContentSettings from './xa/ContentSettings.jsx';
 import AccessApp from './xaccess/App.jsx';
 
 function YlTablePage() {
@@ -209,6 +210,7 @@ export default function App() {
           <Route path="/nfc" element={<NfcStudio />} />
           <Route path="/qr-portal" element={<QrPortal />} />
           <Route path="/logistics" element={<Logistics />} />
+          <Route path="/content" element={<ContentSettings />} />
           <Route path="/settings"  element={<Settings />} />
           <Route path="/yl-ops" element={<YlGate><YlOps /></YlGate>} />
           <Route path="/yl/:table" element={<YlGate><YlTablePage /></YlGate>} />
