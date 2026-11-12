@@ -84,6 +84,11 @@ import DailyCloseReport from './ops/DailyCloseReport.jsx';
 import XcoinMonitor from './ops/XcoinMonitor.jsx';
 import UserTimeline from './ops/UserTimeline.jsx';
 import CreatorPayouts from './ops/CreatorPayouts.jsx';
+import KillSwitches from './ops/KillSwitches.jsx';
+import RateLimitDashboard from './ops/RateLimitDashboard.jsx';
+import SuspiciousRules from './ops/SuspiciousRules.jsx';
+import FraudScores from './ops/FraudScores.jsx';
+import FunctionExposure from './ops/FunctionExposure.jsx';
 import DailyNotes from './pages/DailyNotes.jsx';
 import XCoinAdmin from './pages/XCoinAdmin.jsx';
 import BuyLoad from './pages/BuyLoad.jsx';
@@ -234,6 +239,11 @@ export default function App() {
           <Route path="/ops/xcoin-monitor" element={<XcoinMonitor />} />
           <Route path="/ops/user-timeline" element={<UserTimeline />} />
           <Route path="/ops/creator-payouts" element={<CreatorPayouts />} />
+          <Route path="/ops/kill-switches" element={<KillSwitches />} />
+          <Route path="/ops/rate-limits" element={<RateLimitDashboard />} />
+          <Route path="/ops/fraud-rules" element={<SuspiciousRules />} />
+          <Route path="/ops/fraud-scores" element={<FraudScores />} />
+          <Route path="/ops/function-exposure" element={<FunctionExposure />} />
           <Route path="/quotations" element={<Quotations />} />
           <Route path="/quotations/new" element={<NewReceipt />} />
           <Route path="/quotations/:id" element={<ReceiptView />} />

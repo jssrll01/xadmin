@@ -63,6 +63,10 @@ import {
   Scale,
   CalendarCheck,
   History,
+  Power,
+  Gauge,
+  Radar,
+  ScanSearch,
 } from 'lucide-react';
 
 export const XMARKET_GROUPS = [
@@ -95,6 +99,12 @@ export const XMARKET_GROUPS = [
     ['/ops/wallet-reconcile', 'Wallet Reconcile', Scale], ['/ops/daily-close', 'Daily Close Report', CalendarCheck],
     ['/ops/xcoin-monitor', 'Xcoin Monitor', Coins], ['/ops/user-timeline', 'User Timeline', History],
     ['/ops/creator-payouts', 'Creator Payouts', Banknote]] },
+  { id: 'securityfraud', label: 'Security and fraud', items: [
+    ['/ops/kill-switches', 'Kill Switches', Power],
+    ['/ops/rate-limits', 'Rate Limit Dashboard', Gauge],
+    ['/ops/fraud-rules', 'Suspicious Pattern Rules', Radar],
+    ['/ops/fraud-scores', 'Fraud Score', ShieldAlert],
+    ['/ops/function-exposure', 'Function Exposure Scanner', ScanSearch]] },
   { id: 'tools', label: 'Tools', items: [['/nfc', 'NFC Studio', Radio], ['/qr-portal', 'QR Portal', QrCode],
     ['/faq-import', 'FAQ import', HelpCircle], ['/security-check', 'Security check', ShieldCheck], ['/content', 'Content', SlidersHorizontal]] },
   { id: 'system', label: 'Data and System', items: [
