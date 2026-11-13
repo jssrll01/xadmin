@@ -17,6 +17,7 @@ export default function LoginAttempts() {
   const [only, setOnly] = useState('failed');
   const [ask, setAsk] = useState(null); // days to keep, 0 = everything
   const [busy, setBusy] = useState(false);
+  const [keep, setKeep] = useState('0');
 
   const load = useCallback(async () => {
     try { setData(await adm('adm_attempts_list', { p_limit: 500 })); setErr(''); } catch (e) { setErr(e.message); }
@@ -36,7 +37,8 @@ export default function LoginAttempts() {
       <PageHeader title="Login attempts" subtitle="PIN unlock attempts, newest first · refreshes every 15s"
         actions={<>
           <Btn onClick={load}><RefreshCw size={14} /> Refresh</Btn>
-          <Btn variant="danger" onClick={() => setAsk(30)} disabled={!data || !data.total}><Trash2 size={14} /> Clear old</Btn>
+          <select className="neu-input" style={{ width: 'auto' }} value={keep} onChange={(e) => setKeep(e.target.value)} aria-label="Which entries to delete"><option value="0">All entries</option><option value="1">Older than 1 day</option><option value="7">Older than 7 days</option><option value="30">Older than 30 days</option></select>
+          <Btn variant="danger" onClick={() => setAsk(Number(keep))} disabled={!data}><Trash2 size={14} /> Delete</Btn>
         </>} />
       {err && <ErrorState message={err} onRetry={load} />}
       {!err && !data && <div className="table-wrap" style={{ padding: 8 }}><SkRows rows={5} cols={4} /></div>}
@@ -74,8 +76,8 @@ export default function LoginAttempts() {
           )}
         </>
       )}
-      <ConfirmDialog open={ask !== null} title="Delete old attempts?"
-        message="Deletes entries older than 30 days. This cannot be undone." confirmText="Delete" danger busy={busy} onConfirm={clear} onCancel={() => setAsk(null)} />
+      <ConfirmDialog open={ask !== null} title="Delete login attempts?"
+        message={ask === 0 ? 'Deletes every login attempt. This cannot be undone.' : 'Deletes entries older than ' + ask + ' day' + (ask === 1 ? '' : 's') + '. This cannot be undone.'} confirmText="Delete" danger busy={busy} onConfirm={clear} onCancel={() => setAsk(null)} />
     </>
   );
 }

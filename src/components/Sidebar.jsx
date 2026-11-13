@@ -56,7 +56,7 @@ export default function Sidebar() {
           </button>
         </div>
         <div className="xs-sys" role="tablist" aria-label="System">
-          {['XMARKET', 'YUELIN', 'ACCESS'].map((s) => (
+          {['XMARKET', 'ACCESS'].map((s) => (
             <button key={s} type="button" role="tab" aria-selected={activeSystem === s} className={activeSystem === s ? 'on' : ''} onClick={() => sw(s)}>{s}</button>
           ))}
         </div>
