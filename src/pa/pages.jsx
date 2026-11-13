@@ -3,6 +3,13 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGri
 import { dateTime } from '../lib/format.js';
 import { useToast } from '../components/Toast.jsx';
 import { card, muted, inp, call, rpcDb, num, useLoad, Shell, Stat, Grid, Tbl } from '../tw/pages.jsx';
+import { xmSupabase } from '../supabase.js';
+import { getAdminPin } from '../lib/pin.js';
+const callCode = async (fn, args) => {
+  const { data, error } = await xmSupabase.rpc(fn, { code: getAdminPin(), ...args });
+  if (error) throw error;
+  return data;
+};
 
 const ls = (k) => { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } };
 const lsSet = (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* blocked */ } };
@@ -79,7 +86,7 @@ export function TierEditor() {
     const n = Number(ed[r[pk]]);
     if (!Number.isInteger(n) || n < 10 || n > 1440) return show?.('Enter whole minutes, 10 to 1440.', 'error');
     if (!window.confirm('Set draw_minutes to ' + n + ' for ' + shown.map((c) => r[c]).join(' / ') + '?')) return;
-    try { await call('admin_airdrop_tier_save', { p_key: r.key, p_label: r.label, p_max_n: r.max_n, p_win_count: r.win_count, p_payout: r.payout, p_sort: r.sort || 0, p_draw_minutes: n }); show?.('Saved', 'success'); setEd((e) => { const x = { ...e }; delete x[r[pk]]; return x; }); src.reload(); }
+    try { await callCode('admin_airdrop_tier_save', { p_key: r.key, p_label: r.label, p_max_n: r.max_n, p_win_count: r.win_count, p_payout: r.payout, p_sort: r.sort || 0, p_draw_minutes: n }); show?.('Saved', 'success'); setEd((e) => { const x = { ...e }; delete x[r[pk]]; return x; }); src.reload(); }
     catch (e) { show?.(e.message || String(e), 'error'); }
   };
   return (
