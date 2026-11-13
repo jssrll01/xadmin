@@ -27,6 +27,7 @@ export default function KillSwitches() {
       {data && sec('Games', 'game', d.games)}
       {data && sec('Shop items', 'shop', d.shop)}
       {data && sec('Payment methods', 'payment', d.payments)}
+      {data && sec('Delivery methods', 'delivery', d.deliveries)}
     </Page>
   );
 }
