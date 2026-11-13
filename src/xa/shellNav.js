@@ -124,7 +124,7 @@ export const XMARKET_GROUPS = [
     ['/ops/fraud-scores', 'Fraud Score', ShieldAlert],
     ['/ops/function-exposure', 'Function Exposure Scanner', ScanSearch]] },
   { id: 'tools', label: 'Tools', items: [['/nfc', 'NFC Studio', Radio], ['/qr-portal', 'QR Portal', QrCode],
-    ['/faq-import', 'FAQ import', HelpCircle], ['/security-check', 'Security check', ShieldCheck], ['/content', 'Content', SlidersHorizontal]] },
+    ['/currencies', 'Currencies', Banknote], ['/faq-import', 'FAQ import', HelpCircle], ['/security-check', 'Security check', ShieldCheck], ['/content', 'Content', SlidersHorizontal]] },
   { id: 'system', label: 'Data and System', items: [
     ['/data', 'Data Manager', Table], ['/db', 'Database', Database], ['/schema', 'Schema', Network], ['/sql', 'SQL editor', Terminal],
     ['/audit', 'Audit log', ScrollText], ['/audit-search', 'Audit search', Search], ['/audit-export', 'Audit export', Download], ['/admin-sessions', 'Admin sessions', KeyRound], ['/login-attempts', 'Login attempts', ShieldAlert], ['/backup', 'Backup', Database], ['/settings', 'Settings', Cog]] },

@@ -73,6 +73,7 @@ import AuditSearch from './pages/AuditSearch.jsx';
 import AuditExport from './pages/AuditExport.jsx';
 import BackupManager from './pages/BackupManager.jsx';
 import FaqBulkImport from './pages/FaqBulkImport.jsx';
+import Currencies from './pages/Currencies.jsx';
 import { useSessionPing } from './lib/sessionPing.js';
 import { clearAdminPin as clearPinNow } from './lib/pin.js';
 import Notifications from './pages/Notifications.jsx';
@@ -288,6 +289,7 @@ export default function App() {
           <Route path="/audit-export" element={<AuditExport />} />
           <Route path="/backup" element={<BackupManager />} />
           <Route path="/faq-import" element={<FaqBulkImport />} />
+          <Route path="/currencies" element={<Currencies />} />
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/cashback" element={<CashbackCosts />} />
           <Route path="/bulk-products" element={<BulkProducts />} />
