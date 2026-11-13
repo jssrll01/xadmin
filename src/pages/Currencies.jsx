@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { RefreshCw, Upload, Trash2 } from 'lucide-react';
+import { RefreshCw, Upload, Trash2, Plus } from 'lucide-react';
 import Btn from '../components/Btn.jsx';
 import { useToast } from '../components/Toast.jsx';
 import PageHeader from '../xa/ui/PageHeader.jsx';
+import Drawer from '../xa/ui/Drawer.jsx';
 import { ConfirmDialog, EmptyState, ErrorState, SkRows } from '../xa/Kit.jsx';
 import { adm } from '../xa/db.js';
 import { parseCurrencies } from '../lib/currencyParse.js';
@@ -15,24 +16,25 @@ export default function Currencies() {
   const { show } = useToast();
   const [rows, setRows] = useState(null);
   const [err, setErr] = useState('');
-  const [f, setF] = useState(EMPTY);
-  const [editing, setEditing] = useState(false);
+  const [form, setForm] = useState(null); // null = closed, otherwise { ...fields, __edit }
+  const [importing, setImporting] = useState(false);
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
   const [del, setDel] = useState(null);
-  const set = (k) => (e) => setF((p) => ({ ...p, [k]: e.target.value }));
+  const set = (k) => (e) => setForm((p) => ({ ...p, [k]: e.target.value }));
 
   const load = useCallback(async () => {
     try { setRows(await adm('adm_currency_list')); setErr(''); } catch (e) { setErr(e.message); }
   }, []);
   useEffect(() => { load(); }, [load]);
 
-  const save = async (row) => {
+  const save = async (row, close) => {
     setBusy(true);
     try {
       await adm('adm_currency_save', { p_cur: row.code, p_name: row.name || '', p_symbol: row.symbol, p_rate: Number(row.rate) || 1, p_active: row.active !== false });
-      show?.(row.code.toUpperCase() + ' saved. Shoppers see it within a minute of their next page load.', 'success');
-      setF(EMPTY); setEditing(false); await load();
+      show?.(row.code.toUpperCase() + ' saved. Shoppers see it on their next page load.', 'success');
+      if (close) setForm(null);
+      await load();
     } catch (e) { show?.(e.message, 'error'); }
     setBusy(false);
   };
@@ -50,16 +52,20 @@ export default function Currencies() {
     try {
       const r = await adm('adm_currency_import', { p_rows: good.map((g) => ({ code: g.code, symbol: g.symbol, rate: g.rate, name: g.name })) });
       show?.((r && r.saved) + ' saved' + (r && r.skipped ? ', ' + r.skipped + ' skipped' : ''), 'success');
-      setText(''); await load();
+      setText(''); setImporting(false); await load();
     } catch (e) { show?.(e.message, 'error'); }
     setBusy(false);
   };
 
-  const ready = f.code.trim() && f.symbol.trim() && Number(f.rate) > 0;
+  const ready = form && form.code.trim() && form.symbol.trim() && Number(form.rate) > 0;
   return (
     <>
       <PageHeader title="Currencies" subtitle="Display only. Orders and wallets always stay in pesos. Rate = how much equals 1 peso."
-        actions={<Btn onClick={load}><RefreshCw size={14} /> Refresh</Btn>} />
+        actions={<>
+          <Btn onClick={load}><RefreshCw size={14} /> Refresh</Btn>
+          <Btn onClick={() => setImporting(true)}><Upload size={14} /> Import</Btn>
+          <Btn variant="primary" onClick={() => setForm({ ...EMPTY, __edit: false })}><Plus size={14} /> Add</Btn>
+        </>} />
       {err && <ErrorState message={err} onRetry={load} />}
       {!err && !rows && <div className="table-wrap" style={{ padding: 8 }}><SkRows rows={6} cols={5} /></div>}
       {rows && !rows.length && <div className="table-wrap"><EmptyState title="No currencies" hint="Run the currency SQL first." /></div>}
@@ -79,8 +85,8 @@ export default function Currencies() {
                   <td data-label="Actions" style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
                     {c.code !== 'PHP' && (
                       <>
-                        <Btn onClick={() => { setF({ code: c.code, symbol: c.symbol, name: c.name || '', rate: String(c.rate), active: c.active }); setEditing(true); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>Edit</Btn>{' '}
-                        <Btn onClick={() => save({ ...c, active: !c.active })} disabled={busy}>{c.active ? 'Hide' : 'Show'}</Btn>{' '}
+                        <Btn onClick={() => setForm({ code: c.code, symbol: c.symbol, name: c.name || '', rate: String(c.rate), active: c.active, __edit: true })}>Edit</Btn>{' '}
+                        <Btn onClick={() => save({ ...c, active: !c.active }, false)} disabled={busy}>{c.active ? 'Hide' : 'Show'}</Btn>{' '}
                         <Btn variant="danger" onClick={() => setDel(c.code)}><Trash2 size={13} /></Btn>
                       </>
                     )}
@@ -92,36 +98,45 @@ export default function Currencies() {
         </div>
       )}
 
-      <div className="table-wrap" style={{ padding: 16, display: 'grid', gap: 12, marginTop: 16 }}>
-        <b>{editing ? 'Edit ' + f.code : 'Add a currency'}</b>
-        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-          <label style={{ flex: '1 1 90px' }}><div className="ui-lbl">Code</div><input className="neu-input" placeholder="CAD" value={f.code} disabled={editing} onChange={set('code')} /></label>
-          <label style={{ flex: '1 1 90px' }}><div className="ui-lbl">Symbol</div><input className="neu-input" placeholder="CA$" value={f.symbol} onChange={set('symbol')} /></label>
-          <label style={{ flex: '2 1 160px' }}><div className="ui-lbl">Name</div><input className="neu-input" placeholder="Canadian Dollar" value={f.name} onChange={set('name')} /></label>
-          <label style={{ flex: '1 1 120px' }}><div className="ui-lbl">Rate per ₱1</div><input className="neu-input" inputMode="decimal" placeholder="0.0215" value={f.rate} onChange={set('rate')} /></label>
-        </div>
-        {Number(f.rate) > 0 && <div style={{ fontSize: 12.5, color: 'var(--text-dim)' }}>Example: ₱100 will show as {f.symbol}{fmt(100 * Number(f.rate))}</div>}
-        <div style={{ display: 'flex', gap: 8 }}>
-          <Btn variant="primary" onClick={() => save(f)} disabled={busy || !ready}>{editing ? 'Save changes' : 'Add currency'}</Btn>
-          {editing && <Btn onClick={() => { setF(EMPTY); setEditing(false); }}>Cancel</Btn>}
-        </div>
-      </div>
-
-      <div className="table-wrap" style={{ padding: 16, display: 'grid', gap: 12, marginTop: 16 }}>
-        <b>Import many</b>
-        <div style={{ fontSize: 12.5, color: 'var(--text-dim)' }}>One per line: CODE, SYMBOL, RATE, Name. The rate is how much of that currency equals 1 peso. Existing codes are updated.</div>
-        <textarea className="neu-input" rows={7} style={{ width: '100%', fontFamily: 'inherit' }} placeholder={SAMPLE} value={text} onChange={(e) => setText(e.target.value)} />
-        {parsed.length > 0 && (
-          <div style={{ display: 'grid', gap: 4, fontSize: 12.5 }}>
-            {parsed.map((p) => (
-              <div key={p.line} style={{ color: p.bad ? '#DC2626' : undefined }}>
-                {p.bad ? 'Line ' + p.line + ': ' + p.bad : p.code + ' · ' + p.symbol + ' · ₱100 = ' + p.symbol + fmt(100 * p.rate)}
-              </div>
-            ))}
+      <Drawer open={!!form} onClose={() => setForm(null)} title={form && form.__edit ? 'Edit ' + form.code : 'Add a currency'}
+        footer={form ? (
+          <>
+            <Btn variant="primary" onClick={() => save(form, true)} loading={busy} disabled={busy || !ready}>{busy ? 'Saving…' : form.__edit ? 'Save changes' : 'Add currency'}</Btn>
+            <Btn onClick={() => setForm(null)} disabled={busy}>Cancel</Btn>
+          </>
+        ) : null}>
+        {form && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div><div className="ui-lbl">Code</div><input className="neu-input" placeholder="CAD" value={form.code} disabled={form.__edit} onChange={set('code')} /></div>
+            <div><div className="ui-lbl">Symbol</div><input className="neu-input" placeholder="CA$" value={form.symbol} onChange={set('symbol')} /></div>
+            <div><div className="ui-lbl">Name</div><input className="neu-input" placeholder="Canadian Dollar" value={form.name} onChange={set('name')} /></div>
+            <div><div className="ui-lbl">Rate per ₱1</div><input className="neu-input" inputMode="decimal" placeholder="0.0215" value={form.rate} onChange={set('rate')} /></div>
+            {Number(form.rate) > 0 && <div style={{ fontSize: 12.5, color: 'var(--text-dim)' }}>Example: ₱100 will show as {form.symbol}{fmt(100 * Number(form.rate))}</div>}
           </div>
         )}
-        <Btn variant="primary" onClick={runImport} disabled={busy || !good.length}><Upload size={14} /> {busy ? 'Importing…' : 'Import ' + good.length}</Btn>
-      </div>
+      </Drawer>
+
+      <Drawer open={importing} onClose={() => setImporting(false)} title="Import currencies"
+        footer={
+          <>
+            <Btn variant="primary" onClick={runImport} loading={busy} disabled={busy || !good.length}><Upload size={14} /> {busy ? 'Importing…' : 'Import ' + good.length}</Btn>
+            <Btn onClick={() => setImporting(false)} disabled={busy}>Cancel</Btn>
+          </>
+        }>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ fontSize: 12.5, color: 'var(--text-dim)' }}>One per line: CODE, SYMBOL, RATE, Name. The rate is how much of that currency equals 1 peso. Existing codes are updated.</div>
+          <textarea className="neu-input" rows={8} style={{ width: '100%', fontFamily: 'inherit' }} placeholder={SAMPLE} value={text} onChange={(e) => setText(e.target.value)} />
+          {parsed.length > 0 && (
+            <div style={{ display: 'grid', gap: 4, fontSize: 12.5 }}>
+              {parsed.map((p) => (
+                <div key={p.line} style={{ color: p.bad ? '#DC2626' : undefined }}>
+                  {p.bad ? 'Line ' + p.line + ': ' + p.bad : p.code + ' · ' + p.symbol + ' · ₱100 = ' + p.symbol + fmt(100 * p.rate)}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </Drawer>
 
       <ConfirmDialog open={!!del} title={'Remove ' + (del || '') + '?'} message="Shoppers who picked it go back to PHP." confirmText="Remove" danger busy={busy} onConfirm={remove} onCancel={() => setDel(null)} />
     </>
