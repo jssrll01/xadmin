@@ -45,6 +45,17 @@ export default function Currencies() {
     setBusy(false); setDel(null);
   };
 
+  const refreshNow = async () => {
+    setBusy(true);
+    try {
+      const r = await adm('adm_currency_refresh');
+      if (r && r.ok) show?.(r.updated + ' updated' + (r.removed ? ', ' + r.removed + ' removed (' + r.removed_codes.join(', ') + ')' : '') + (r.skipped ? ', ' + r.skipped + ' skipped' : ''), 'success');
+      else show?.((r && r.error) || 'Refresh failed', 'error');
+      await load();
+    } catch (e) { show?.(e.message, 'error'); }
+    setBusy(false);
+  };
+
   const parsed = useMemo(() => parseCurrencies(text), [text]);
   const good = parsed.filter((p) => !p.bad);
   const runImport = async () => {
@@ -62,7 +73,7 @@ export default function Currencies() {
     <>
       <PageHeader title="Currencies" subtitle="Display only. Orders and wallets always stay in pesos. Rate = how much equals 1 peso."
         actions={<>
-          <Btn onClick={load}><RefreshCw size={14} /> Refresh</Btn>
+          <><Btn onClick={load}><RefreshCw size={14} /> Reload</Btn> <Btn variant="primary" onClick={refreshNow} disabled={busy}><RefreshCw size={14} /> Refresh rates now</Btn></>
           <Btn onClick={() => setImporting(true)}><Upload size={14} /> Import</Btn>
           <Btn variant="primary" onClick={() => setForm({ ...EMPTY, __edit: false })}><Plus size={14} /> Add</Btn>
         </>} />
@@ -72,7 +83,7 @@ export default function Currencies() {
       {rows && rows.length > 0 && (
         <div className="table-wrap">
           <table className="neu-table stack">
-            <thead><tr><th>Code</th><th>Symbol</th><th>Name</th><th>Rate per ₱1</th><th>₱100 shows as</th><th>Shown</th><th style={{ textAlign: 'right', width: 1 }}>Actions</th></tr></thead>
+            <thead><tr><th>Code</th><th>Symbol</th><th>Name</th><th>Rate per ₱1</th><th>₱100 shows as</th><th>Shown</th><th>Updated</th><th style={{ textAlign: 'right', width: 1 }}>Actions</th></tr></thead>
             <tbody>
               {rows.map((c) => (
                 <tr key={c.code}>
@@ -82,6 +93,7 @@ export default function Currencies() {
                   <td data-label="Rate">{c.rate}</td>
                   <td data-label="₱100">{c.symbol}{fmt(100 * Number(c.rate))}</td>
                   <td data-label="Shown"><span className={'neu-badge ' + (c.active ? 'badge-approved' : 'badge-rejected')}>{c.active ? 'Yes' : 'Hidden'}</span></td>
+                  <td data-label="Updated">{c.code === 'PHP' ? '—' : c.rate_updated_at ? new Date(c.rate_updated_at).toLocaleDateString() : 'Not yet'}</td>
                   <td data-label="Actions" style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
                     {c.code !== 'PHP' && (
                       <>
