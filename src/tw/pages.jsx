@@ -50,7 +50,19 @@ function Shell({ title, sub, onRefresh, loading, err, children }) {
       </div>
       <p style={{ ...muted, margin: '2px 0 14px' }}>{sub}</p>
       {err && <div style={{ ...card, color: '#DC2626', fontSize: 13 }}>Error: {err}</div>}
-      {children}
+      <div style={{ position: 'relative', minHeight: loading ? '55vh' : undefined }}>
+        <div style={{ opacity: loading ? 0.35 : 1, transition: 'opacity .15s' }}>{children}</div>
+        {loading && (
+          <div role="status" aria-live="polite" style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', pointerEvents: 'none' }}>
+            <div style={{ ...card, marginBottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, padding: '16px 22px' }}>
+              <div style={{ width: 150, height: 4, borderRadius: 4, background: 'rgba(0,0,0,.1)', overflow: 'hidden' }}>
+                <div style={{ width: '40%', height: '100%', borderRadius: 4, background: 'var(--primary, #2563eb)', animation: 'xaProg 1.1s ease-in-out infinite' }} />
+              </div>
+              <span style={{ ...muted, fontSize: 12 }}>Loading…</span>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
