@@ -42,10 +42,15 @@ const TblPick = ({ src, none }) => (
 const NoTbl = ({ what }) => <div style={{ ...card, color: '#DC2626', fontSize: 13 }}>No table found for {what}. If the page says a function does not exist, run the SQL first.</div>;
 const nameMap = (rows) => { const m = {}; arr(rows).forEach((p) => { m[p.id] = who(p); }); return m; };
 
+function useStockSrc() {
+  const data = useLoad(async () => arr(await call('adm_stock_overview')));
+  const cols = ['id', 'name', 'stock'];
+  return { t: 'product_stock_summary', cols, ok: [{ t: 'product_stock_summary', cols }], rows: data.rows || [], err: data.err, loading: data.loading, reload: data.reload, setT: () => {} };
+}
 /* 1 Stock alerts */
 export function StockAlerts() {
   const sc = useSchema();
-  const src = useTbl('stock', sc.rows, (c) => STOCK.some((s) => c.includes(s)) && NAME.some((n) => c.includes(n)), /^products$/);
+  const src = useStockSrc();
   const sk = useCol('stockc', src.cols, STOCK), nm = useCol('stockn', src.cols, NAME);
   const [low, setLow] = useState(5);
   const [view, setView] = useState('all');
@@ -64,7 +69,7 @@ export function StockAlerts() {
       {CAPN(src.rows.length)}
       {sk.v && <>
         <Grid><Stat label="Out of stock" value={out.length} /><Stat label="Low stock" value={lowN.length} /><Stat label="Stock not tracked" value={untracked} sub="blank stock value, ignored" /></Grid>
-        <div style={muted}>Reads the product-level stock column only. Stock kept per variant inside another table or JSON field is not counted.</div>
+        <div style={muted}>Stock is the total of each product's variant stock, read live from the database.</div>
         <div style={{ display: 'flex', gap: 8, margin: '8px 0' }}>{[['all', 'All'], ['out', 'Out'], ['low', 'Low']].map(([k, l]) => <button key={k} className="neu-btn" onClick={() => setView(k)} style={{ ...btn, opacity: view === k ? 1 : .6 }}>{l}</button>)}</div>
         <Tbl cols={[['Product', (x) => x.name], ['Stock', (x) => <b style={{ color: x.n <= 0 ? '#DC2626' : '#F59E0B' }}>{x.n}</b>], ['State', (x) => (x.n <= 0 ? 'OUT' : 'LOW')]]} rows={list.slice(0, 300)} empty="Nothing low or out." />
         {list.length > 300 && <div style={muted}>Showing 300 of {list.length}.</div>}
