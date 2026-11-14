@@ -16,10 +16,12 @@ const CAPN = (n) => (n >= 5000 ? <div style={{ ...card, color: '#DC2626', fontSi
 const dayDiff = (t) => (new Date(t).getTime() - Date.now()) / 86400000;
 const safeRx = (s) => { try { return s ? new RegExp(s, 'i') : null; } catch (e) { return null; } };
 
+// Tables the admin_db function accepts for reading. Keep in step with that function.
+const READABLE = new Set(['airdrop_bets', 'creator_gifts', 'user_perks', 'vip_memberships', 'products', 'airdrop_tiers', 'airdrop_settings', 'airdrop_draws', 'playtime_txns', 'playtime_log', 'profiles', 'orders', 'order_items', 'xwallet_topups', 'xwallet_txns', 'promo_codes', 'return_requests', 'bundles', 'xcards', 'report_tickets', 'xquote_receipts', 'reviews', 'shops', 'audit_log', 'settings', 'notifications', 'loyalty_ledger', 'loyalty_vouchers', 'stores', 'store_vouchers', 'playtime_config']);
 function useSchema() { return useLoad(async () => arr(await call('admin_sv_schema'))); }
 function useTbl(key, schema, test, prefer, allowNone) {
   const [name, setName] = useState(() => ls('sv_t_' + key));
-  const ok = useMemo(() => arr(schema).filter((s) => test(s.cols)), [schema]); // eslint-disable-line
+  const ok = useMemo(() => arr(schema).filter((s) => READABLE.has(s.t) && test(s.cols)), [schema]); // eslint-disable-line
   const auto = useMemo(() => ((prefer && ok.find((s) => prefer.test(s.t))) || ok[0] || {}).t || '', [ok]); // eslint-disable-line
   const t = name === '-' && allowNone ? '' : ok.some((s) => s.t === name) ? name : auto;
   const cols = (ok.find((s) => s.t === t) || {}).cols || [];
