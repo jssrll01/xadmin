@@ -1,5 +1,12 @@
 // Static page list for the Ctrl+K palette. Table pages are added live by DbHome.
 export const PALETTE_ITEMS = [
+  ['/ua/ban', 'Ban and Suspend', null, 'Users and accounts'],
+  ['/ua/bulk', 'Bulk Actions', null, 'Users and accounts'],
+  ['/ua/duplicates', 'Duplicate Accounts', null, 'Users and accounts'],
+  ['/ua/referrals', 'Referral Tree', null, 'Users and accounts'],
+  ['/ua/segments', 'User Segments', null, 'Users and accounts'],
+  ['/ua/lastseen', 'Last Seen and Device', null, 'Users and accounts'],
+  ['/ua/watchlist', 'Watchlist', null, 'Users and accounts'],
   ['/pa/tiers', 'Tier Draw Minutes', null, 'Play Time and Airdrop'],
   ['/pa/rtp', 'House Edge and RTP', null, 'Play Time and Airdrop'],
   ['/pa/daily', 'Payout vs Intake', null, 'Play Time and Airdrop'],

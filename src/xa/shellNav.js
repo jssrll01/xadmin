@@ -1,3 +1,4 @@
+import { Ban as UaA, Users as UaB, CopyCheck as UaC, GitFork as UaD, PieChart as UaE, Smartphone as UaF, Eye as UaG } from 'lucide-react';
 import { Timer as PaA, Percent as PaB, TrendingUp as PaC, Clock as PaD, ShieldAlert as PaE, BarChart3 as PaF, Coins as PaG } from 'lucide-react';
 import { Images as AsA } from 'lucide-react';
 import { Smartphone as TqA, PlusCircle as TqB, ShoppingBag as TqC, FileText as TqD, Undo2 as TqE, BadgeCheck as TqF, Truck as TqG } from 'lucide-react';
@@ -100,6 +101,8 @@ export const XMARKET_GROUPS = [
     ['/pa/tiers', 'Tier Draw Minutes', PaA], ['/pa/rtp', 'House Edge and RTP', PaB], ['/pa/daily', 'Payout vs Intake', PaC],
     ['/pa/cron', 'Draw Cron Health', PaD], ['/pa/suspicious', 'Suspicious Bets', PaE], ['/pa/hours', 'Activity by Hour', PaF],
     ['/pa/economy', 'Points Economy', PaG]] },
+  { id: 'ua-tools', label: 'Users and accounts', items: [
+    ['/ua/ban', 'Ban and Suspend', UaA], ['/ua/bulk', 'Bulk Actions', UaB], ['/ua/duplicates', 'Duplicate Accounts', UaC], ['/ua/referrals', 'Referral Tree', UaD], ['/ua/segments', 'User Segments', UaE], ['/ua/lastseen', 'Last Seen and Device', UaF], ['/ua/watchlist', 'Watchlist', UaG]] },
   { id: 'people', label: 'People', items: [
     ['/users', 'Users', Users], ['/members-data', 'Members Data', UserCog], ['/xm-vip', 'VIP Members', Crown]] },
   { id: 'community', label: 'Community', items: [
