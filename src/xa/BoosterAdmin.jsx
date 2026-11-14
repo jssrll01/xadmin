@@ -19,7 +19,7 @@ const isUrl = (t) => /^https:\/\/\S+$/i.test(String(t || ''));
 const lbl = { fontSize: 12, fontWeight: 700, color: 'var(--text-dim)', display: 'block', margin: '10px 0 4px' };
 
 /* ---------------- orders ---------------- */
-function OrderCard({ o, onAct, onHist }) {
+export function OrderCard({ o, onAct, onHist }) {
   const nxt = NEXT[o.status];
   const final = o.status === 'completed' || o.status === 'cancelled';
   return (
@@ -50,7 +50,7 @@ function OrderCard({ o, onAct, onHist }) {
   );
 }
 
-function StatusDialog({ act, onClose, onDone }) {
+export function StatusDialog({ act, onClose, onDone }) {
   const { push } = useXaToast();
   const [note, setNote] = useState('');
   const [by, setBy] = useState(readLabel);
@@ -86,7 +86,7 @@ function StatusDialog({ act, onClose, onDone }) {
   );
 }
 
-function HistoryDialog({ order, onClose }) {
+export function HistoryDialog({ order, onClose }) {
   const [ev, setEv] = useState(null);
   const [err, setErr] = useState('');
   useEffect(() => {
@@ -110,7 +110,7 @@ function HistoryDialog({ order, onClose }) {
   );
 }
 
-function Orders() {
+export function Orders() {
   const [status, setStatus] = useState('');
   const [platform, setPlatform] = useState('');
   const [from, setFrom] = useState('');
@@ -281,7 +281,7 @@ function ServiceForm({ initial, cats, onClose, onSaved }) {
   );
 }
 
-function Services() {
+export function Services() {
   const { push } = useXaToast();
   const [rows, setRows] = useState(null);
   const [err, setErr] = useState('');
