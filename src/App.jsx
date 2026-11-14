@@ -106,6 +106,7 @@ import { TierEditor, HouseEdge, DailyFlow, CronHealth, SuspiciousBets, HourlyAct
 import AssetLibrary from './pages/AssetLibrary.jsx';
 import { WithdrawalQueue, ReceiptViewer, DuplicateReceipts, WalletFreeze, Liability, FeeIncome, PendingMoney, TopBalances, DormantBalances, LoyaltyReport } from './tw/pages.jsx';
 import { BuyLoadQueue, TopupQueue, OrdersQueue, QuotationQueue, ReturnQueue, CreatorQueue, LogisticsQueue } from './tw/queues.jsx';
+import BoosterAdmin from './xa/BoosterAdmin.jsx';
 
 function YlTablePage() {
   const { table } = useParams();
@@ -316,6 +317,7 @@ export default function App() {
           <Route path="/yl-ops" element={<YlGate><YlOps /></YlGate>} />
           <Route path="/yl/:table" element={<YlGate><YlTablePage /></YlGate>} />
           <Route path="/access/:tab" element={<AccessApp />} />
+          <Route path="/booster" element={<BoosterAdmin />} />
           <Route path="*"          element={<Navigate to="/" replace />} />
         </Routes>
       </Layout>
