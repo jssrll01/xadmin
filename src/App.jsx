@@ -101,7 +101,7 @@ import Logistics from './pages/Logistics.jsx';
 import ContentSettings from './xa/ContentSettings.jsx';
 import AccessApp from './xaccess/App.jsx';
 import { StockAlerts, VipMembers, PerkReminders, PerkDashboard, GiftLog } from './sv/pages.jsx';
-import { Restrictions, BulkActions, Duplicates, ReferralTree, Segments, LastSeen, Watchlist } from './ua/pages.jsx';
+import { Restrictions, BulkActions, Duplicates, Segments, LastSeen, Watchlist } from './ua/pages.jsx';
 import { TierEditor, HouseEdge, DailyFlow, CronHealth, SuspiciousBets, HourlyActivity, PointsEconomy } from './pa/pages.jsx';
 import AssetLibrary from './pages/AssetLibrary.jsx';
 import { WithdrawalQueue, ReceiptViewer, DuplicateReceipts, WalletFreeze, Liability, FeeIncome, PendingMoney, TopBalances, DormantBalances, LoyaltyReport } from './tw/pages.jsx';
@@ -196,7 +196,6 @@ export default function App() {
           <Route path="/ua/ban" element={<Restrictions />} />
           <Route path="/ua/bulk" element={<BulkActions />} />
           <Route path="/ua/duplicates" element={<Duplicates />} />
-          <Route path="/ua/referrals" element={<ReferralTree />} />
           <Route path="/ua/segments" element={<Segments />} />
           <Route path="/ua/lastseen" element={<LastSeen />} />
           <Route path="/ua/watchlist" element={<Watchlist />} />

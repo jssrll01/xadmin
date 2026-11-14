@@ -197,62 +197,6 @@ export function Duplicates() {
   );
 }
 
-/* 4 Referral tree */
-const REF_CANDS = ['referred_by', 'referrer_id', 'invited_by', 'referred_by_user', 'referrer', 'referred_by_code', 'referral_by'];
-function TreeNode({ id, depth, path, kids, map }) {
-  const all = (kids[id] || []).filter((x) => !path.includes(x));
-  const [more, setMore] = useState(false);
-  const shown = more ? all : all.slice(0, 25);
-  return (
-    <div style={{ marginLeft: depth ? 16 : 0, borderLeft: depth ? '1px solid rgba(0,0,0,.12)' : 'none', paddingLeft: depth ? 8 : 0 }}>
-      <div style={{ fontSize: 13, padding: '2px 0' }}><b>{nm(map[id] || { id })}</b> <span style={muted}>{all.length ? all.length + ' direct' : ''}</span></div>
-      {depth < 6 && shown.map((c) => <TreeNode key={c} id={c} depth={depth + 1} path={[...path, id]} kids={kids} map={map} />)}
-      {depth < 6 && all.length > 25 && !more && <button className="neu-btn" style={btn} onClick={() => setMore(true)}>+{all.length - 25} more</button>}
-      {depth >= 6 && all.length > 0 && <div style={muted}>…deeper levels hidden</div>}
-    </div>
-  );
-}
-export function ReferralTree() {
-  const us = useUsers();
-  const users = us.rows || [];
-  const [saved, setSaved] = useState(() => ls('ua_ref_col'));
-  const [root, setRoot] = useState(null);
-  const keys = useMemo(() => [...new Set(users.slice(0, 100).flatMap((u) => Object.keys(u.profile || {})))].sort(), [users]);
-  const refCol = keys.includes(saved) ? saved : (REF_CANDS.find((k) => keys.includes(k)) || '');
-  const codeCol = keys.includes('referral_code') ? 'referral_code' : '';
-  const { kids, parent, map } = useMemo(() => {
-    const map = byIdMap(users); const byCode = {}; const kids = {}; const parent = {};
-    if (codeCol) users.forEach((u) => { const c = u.profile[codeCol]; if (c) byCode[String(c).toLowerCase()] = u.id; });
-    if (refCol) users.forEach((u) => { const v = u.profile[refCol]; if (v == null || v === '') return; const s = String(v); const p = map[s] ? s : byCode[s.toLowerCase()]; if (p && p !== u.id) { parent[u.id] = p; (kids[p] = kids[p] || []).push(u.id); } });
-    return { kids, parent, map };
-  }, [users, refCol, codeCol]);
-  const count = (id) => { const seenN = new Set([id]); const st = [id]; let n = 0; while (st.length) { const x = st.pop(); (kids[x] || []).forEach((c) => { if (!seenN.has(c)) { seenN.add(c); n++; st.push(c); } }); } return n; };
-  const top = Object.keys(kids).map((id) => ({ id, direct: kids[id].length, total: count(id) })).sort((a, b) => b.total - a.total).slice(0, 20);
-  const chain = []; if (root) { let c = root.id; const g = new Set(); while (parent[c] && !g.has(c) && chain.length < 10) { g.add(c); c = parent[c]; chain.push(c); } }
-  return (
-    <Shell title="Referral tree viewer" sub="Who referred whom, built from a referral column on the profiles table." onRefresh={us.reload} loading={us.loading} err={us.err}>
-      <Cap n={users.length} />
-      <div style={{ ...card, display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center', fontSize: 13 }}>
-        <span>“Referred by” column:</span>
-        <select style={inp} value={refCol} onChange={(e) => { lsSet('ua_ref_col', e.target.value); setSaved(e.target.value); }}><option value="">choose…</option>{keys.map((k) => <option key={k} value={k}>{k}</option>)}</select>
-        <span style={muted}>{codeCol ? 'Also matches values against referral_code.' : 'No referral_code column, so values must be user ids.'}</span>
-      </div>
-      {!refCol && !us.loading && <div style={{ ...card, color: '#DC2626', fontSize: 13 }}>No referral column was auto-detected on profiles. Pick one above if it exists. If referrals live in a separate table, tell me its name and columns and I will point this page at it.</div>}
-      {refCol && <>
-        <Grid><Stat label="Users with a referrer" value={Object.keys(parent).length} /><Stat label="Referrers" value={Object.keys(kids).length} /></Grid>
-        <div style={{ ...card, display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}><Picker users={users} onPick={setRoot} placeholder="Find a user to view their tree" /></div>
-        {root && <div style={card}>
-          <div style={{ ...muted, marginBottom: 6 }}>Referred by chain: {chain.length ? chain.map((id) => nm(map[id])).join(' ← ') : 'nobody (top of a tree)'}</div>
-          <div style={{ marginBottom: 6 }}>Total downline: <b>{count(root.id)}</b></div>
-          <TreeNode id={root.id} depth={0} path={[]} kids={kids} map={map} />
-        </div>}
-        <h3 style={{ fontSize: 14 }}>Top referrers (by total downline)</h3>
-        <Tbl cols={[['User', (r) => nm(map[r.id])], ['Direct', (r) => r.direct], ['Total downline', (r) => <b>{r.total}</b>], ['', (r) => <button className="neu-btn" style={btn} onClick={() => setRoot(map[r.id])}>View tree</button>]]} rows={top} empty="No referral links found." />
-      </>}
-    </Shell>
-  );
-}
-
 /* 5 Segments */
 const VIP_CANDS = ['is_vip', 'vip', 'vip_until', 'vip_expires_at', 'vip_tier', 'vip_level'];
 const isVip = (v) => { if (v == null || v === false || v === '' || v === 0 || v === 'false') return false; if (typeof v === 'string' && /^\d{4}-\d{2}-\d{2}/.test(v)) return new Date(v) > new Date(); return true; };

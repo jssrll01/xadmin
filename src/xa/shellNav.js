@@ -103,7 +103,7 @@ export const XMARKET_GROUPS = [
     ['/pa/cron', 'Draw Cron Health', PaD], ['/pa/suspicious', 'Suspicious Bets', PaE], ['/pa/hours', 'Activity by Hour', PaF],
     ['/pa/economy', 'Points Economy', PaG]] },
   { id: 'ua-tools', label: 'Users and accounts', items: [
-    ['/ua/ban', 'Ban and Suspend', UaA], ['/ua/bulk', 'Bulk Actions', UaB], ['/ua/duplicates', 'Duplicate Accounts', UaC], ['/ua/referrals', 'Referral Tree', UaD], ['/ua/segments', 'User Segments', UaE], ['/ua/lastseen', 'Last Seen and Device', UaF], ['/ua/watchlist', 'Watchlist', UaG]] },
+    ['/ua/ban', 'Ban and Suspend', UaA], ['/ua/bulk', 'Bulk Actions', UaB], ['/ua/duplicates', 'Duplicate Accounts', UaC], ['/ua/segments', 'User Segments', UaE], ['/ua/lastseen', 'Last Seen and Device', UaF], ['/ua/watchlist', 'Watchlist', UaG]] },
   { id: 'sv-tools', label: 'Shop, VIP and perks', items: [
     ['/sv/stock', 'Stock Alerts', SvA], ['/sv/vip', 'VIP Members', SvB], ['/sv/reminders', 'Perk Reminders', SvC], ['/sv/perks', 'Active Perks', SvD], ['/sv/gifts', 'Gift Purchases', SvE]] },
   { id: 'people', label: 'People', items: [
