@@ -1,0 +1,144 @@
+import { Ban as UaA, Users as UaB, CopyCheck as UaC, GitFork as UaD, PieChart as UaE, Smartphone as UaF, Eye as UaG } from 'lucide-react';
+import { Timer as PaA, Percent as PaB, TrendingUp as PaC, Clock as PaD, ShieldAlert as PaE, BarChart3 as PaF, Coins as PaG } from 'lucide-react';
+import { Images as AsA } from 'lucide-react';
+import { Smartphone as TqA, PlusCircle as TqB, ShoppingBag as TqC, FileText as TqD, Undo2 as TqE, BadgeCheck as TqF, Truck as TqG } from 'lucide-react';
+import { ListChecks as TwA, ReceiptText as TwB, CopyCheck as TwC, Snowflake as TwD, Landmark as TwE, Percent as TwF, Hourglass as TwG, Trophy as TwH, Moon as TwI, Award as TwJ } from 'lucide-react';
+import {
+  LayoutDashboard,
+  ClipboardList,
+  Package,
+  PackagePlus,
+  ShoppingBag,
+  Undo2,
+  FileText,
+  Star,
+  Layers,
+  Tag,
+  HandCoins,
+  Warehouse,
+  Truck,
+  Store,
+  Building2,
+  Eye,
+  Coins,
+  Smartphone,
+  PlusCircle,
+  Wallet,
+  Banknote,
+  ShieldCheck,
+  CreditCard,
+  Users,
+  UserCog,
+  Crown,
+  Sparkles,
+  BadgeCheck,
+  LayoutGrid,
+  Video,
+  Gift,
+  MessagesSquare,
+  Globe,
+  HelpCircle,
+  Flag,
+  Image as ImageIcon,
+  Bell,
+  Megaphone,
+  TrendingDown,
+  Download,
+  Vote,
+  Handshake,
+  Rocket,
+  Gamepad2,
+  Dices,
+  SlidersHorizontal,
+  Radio,
+  QrCode,
+  Table,
+  Database,
+  Network,
+  Terminal,
+  ScrollText,
+  Settings as Cog,
+  Film,
+  Newspaper,
+  GraduationCap,
+  Briefcase,
+  KeyRound,
+  ShieldAlert,
+  Search,
+  Scale,
+  CalendarCheck,
+  History,
+  Power,
+  Gauge,
+  Radar,
+  ScanSearch,
+} from 'lucide-react';
+
+export const XMARKET_GROUPS = [
+  { id: 'overview', label: 'Overview', items: [
+    ['/', 'Dashboard', LayoutDashboard], ['/daily', 'Daily Tasks & Notes', ClipboardList]] },
+  { id: 'commerce', label: 'Commerce', items: [
+    ['/products', 'Products', Package], ['/bulk-products', 'Bulk Product Manager', PackagePlus], ['/orders', 'Orders', ShoppingBag],
+    ['/returns', 'Returns', Undo2], ['/quotations', 'Quotations', FileText], ['/reviews', 'Reviews', Star],
+    ['/bundles', 'Bundles', Layers], ['/pricing', 'Pricing', Tag], ['/cashback', 'Cashback & Costs', HandCoins],
+    ['/supplier', 'Supplier', Warehouse], ['/logistics', 'Logistics', Truck], ['/stores', 'Stores', Store],
+    ['/shops', 'Shops', Building2], ['/product-views', 'Product Views', Eye]] },
+  { id: 'money', label: 'Money', items: [
+    ['/xcoin', 'XCOIN', Coins], ['/buy-load', 'Buy Load', Smartphone], ['/topups', 'Top-ups', PlusCircle],
+    ['/wallet', 'Wallet', Wallet], ['/payouts', 'Withdrawals & Interest', Banknote],
+    ['/wallet-security', 'Wallet Security', ShieldCheck], ['/xcards', 'Xcards', CreditCard]] },
+  { id: 'wallet-tools', label: 'Transactions and wallet', items: [
+    ['/tw/withdrawals', 'Withdrawal Queue', TwA], ['/tw/receipts', 'Receipt Viewer', TwB], ['/tw/duplicates', 'Duplicate Receipts', TwC],
+    ['/tw/freeze', 'Wallet Freeze', TwD], ['/tw/liability', 'Xwallet Liability', TwE], ['/tw/fees', 'Fee Income', TwF],
+    ['/tw/pending', 'Pending Money', TwG], ['/tw/top-balances', 'Top 50 Balances', TwH], ['/tw/dormant', 'Dormant Balances', TwI],
+    ['/tw/loyalty', 'Loyalty Issued vs Spent', TwJ],
+    ['/tw/q/buy-load', 'Buy Load Queue', TqA], ['/tw/q/topups', 'Top-up Queue', TqB], ['/tw/q/orders', 'Orders Queue', TqC],
+    ['/tw/q/quotations', 'Quotation Queue', TqD], ['/tw/q/returns', 'Return Queue', TqE], ['/tw/q/creators', 'Creator Queue', TqF],
+    ['/tw/q/logistics', 'Logistics Queue', TqG]] },
+  { id: 'assets', label: 'Assets', items: [
+    ['/assets', 'Asset Library', AsA]] },
+  { id: 'pa-tools', label: 'Play Time and Airdrop', items: [
+    ['/pa/tiers', 'Tier Draw Minutes', PaA], ['/pa/rtp', 'House Edge and RTP', PaB], ['/pa/daily', 'Payout vs Intake', PaC],
+    ['/pa/cron', 'Draw Cron Health', PaD], ['/pa/suspicious', 'Suspicious Bets', PaE], ['/pa/hours', 'Activity by Hour', PaF],
+    ['/pa/economy', 'Points Economy', PaG]] },
+  { id: 'ua-tools', label: 'Users and accounts', items: [
+    ['/ua/ban', 'Ban and Suspend', UaA], ['/ua/bulk', 'Bulk Actions', UaB], ['/ua/duplicates', 'Duplicate Accounts', UaC], ['/ua/referrals', 'Referral Tree', UaD], ['/ua/segments', 'User Segments', UaE], ['/ua/lastseen', 'Last Seen and Device', UaF], ['/ua/watchlist', 'Watchlist', UaG]] },
+  { id: 'people', label: 'People', items: [
+    ['/users', 'Users', Users], ['/members-data', 'Members Data', UserCog], ['/xm-vip', 'VIP Members', Crown]] },
+  { id: 'community', label: 'Community', items: [
+    ['/creators', 'Creators', Sparkles], ['/creator-mgmt', 'Creator Management', BadgeCheck],
+    ['/social-mod', 'Socials Management', LayoutGrid], ['/video-mod', 'Socials Videos', Video],
+    ['/gifts', 'Creator Gifts', Gift], ['/dm-mod', 'DM Moderation', MessagesSquare], ['/xm-chat', 'Global Chat', Globe],
+    ['/market-qa', 'Market & Q&A', HelpCircle], ['/reports', 'Reports', Flag]] },
+  { id: 'marketing', label: 'Marketing and Games', items: [
+    ['/banners', 'Banner', ImageIcon], ['/articles', 'Articles', Newspaper], ['/scholarships', 'Scholarships', GraduationCap], ['/freelance', 'Freelance', Briefcase], ['/notifications', 'Notifications', Bell], ['/notify', 'Notify', Megaphone],
+    ['/xf-price-drops', 'Price Drops', TrendingDown], ['/xf-digital', 'Digital Products', Download],
+    ['/xf-polls', 'Demand Polls', Vote], ['/xf-sponsor', 'Sponsorships', Handshake],
+    ['/xf-popups', 'Launch Popups', Rocket], ['/play-time', 'Play Time', Gamepad2],
+    ['/airdrop', 'Airdrop 88', Dices], ['/airdrop-mod', 'Airdrop Mod', SlidersHorizontal]] },
+  { id: 'operations', label: 'Operations', items: [
+    ['/ops/wallet-reconcile', 'Wallet Reconcile', Scale], ['/ops/daily-close', 'Daily Close Report', CalendarCheck],
+    ['/ops/xcoin-monitor', 'Xcoin Monitor', Coins], ['/ops/user-timeline', 'User Timeline', History],
+    ['/ops/creator-payouts', 'Creator Payouts', Banknote]] },
+  { id: 'securityfraud', label: 'Security and fraud', items: [
+    ['/ops/kill-switches', 'Kill Switches', Power],
+    ['/ops/rate-limits', 'Rate Limit Dashboard', Gauge],
+    ['/ops/fraud-rules', 'Suspicious Pattern Rules', Radar],
+    ['/ops/fraud-scores', 'Fraud Score', ShieldAlert],
+    ['/ops/function-exposure', 'Function Exposure Scanner', ScanSearch]] },
+  { id: 'tools', label: 'Tools', items: [['/nfc', 'NFC Studio', Radio], ['/qr-portal', 'QR Portal', QrCode],
+    ['/currencies', 'Currencies', Banknote], ['/faq-import', 'FAQ import', HelpCircle], ['/security-check', 'Security check', ShieldCheck], ['/content', 'Content', SlidersHorizontal]] },
+  { id: 'system', label: 'Data and System', items: [
+    ['/data', 'Data Manager', Table], ['/db', 'Database', Database], ['/schema', 'Schema', Network], ['/sql', 'SQL editor', Terminal],
+    ['/audit', 'Audit log', ScrollText], ['/audit-search', 'Audit search', Search], ['/audit-export', 'Audit export', Download], ['/admin-sessions', 'Admin sessions', KeyRound], ['/login-attempts', 'Login attempts', ShieldAlert], ['/backup', 'Backup', Database], ['/settings', 'Settings', Cog]] },
+];
+
+// finds the group and label for a path (longest matching link wins)
+export function locate(pathname) {
+  let best = null;
+  XMARKET_GROUPS.forEach((g) => g.items.forEach(([to, label]) => {
+    const hit = to === '/' ? pathname === '/' : pathname === to || pathname.startsWith(to + '/');
+    if (hit && (!best || to.length > best.to.length)) best = { to, label, group: g.label, groupId: g.id };
+  }));
+  return best;
+}

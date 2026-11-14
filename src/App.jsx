@@ -99,6 +99,7 @@ import QrPortal from './pages/QrPortal.jsx';
 import Logistics from './pages/Logistics.jsx';
 import ContentSettings from './xa/ContentSettings.jsx';
 import AccessApp from './xaccess/App.jsx';
+import { StockAlerts, VipMembers, PerkReminders, PerkDashboard, GiftLog } from './sv/pages.jsx';
 import { Restrictions, BulkActions, Duplicates, ReferralTree, Segments, LastSeen, Watchlist } from './ua/pages.jsx';
 import { TierEditor, HouseEdge, DailyFlow, CronHealth, SuspiciousBets, HourlyActivity, PointsEconomy } from './pa/pages.jsx';
 import AssetLibrary from './pages/AssetLibrary.jsx';
@@ -185,6 +186,11 @@ export default function App() {
         <AuditClear />
         <Routes>
           <Route path="/" element={<HomeSwitch />} />
+          <Route path="/sv/stock" element={<StockAlerts />} />
+          <Route path="/sv/vip" element={<VipMembers />} />
+          <Route path="/sv/reminders" element={<PerkReminders />} />
+          <Route path="/sv/perks" element={<PerkDashboard />} />
+          <Route path="/sv/gifts" element={<GiftLog />} />
           <Route path="/ua/ban" element={<Restrictions />} />
           <Route path="/ua/bulk" element={<BulkActions />} />
           <Route path="/ua/duplicates" element={<Duplicates />} />

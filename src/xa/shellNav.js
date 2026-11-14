@@ -1,3 +1,4 @@
+import { PackageX as SvA, Crown as SvB, BellRing as SvC, BadgeCheck as SvD, Gift as SvE } from 'lucide-react';
 import { Ban as UaA, Users as UaB, CopyCheck as UaC, GitFork as UaD, PieChart as UaE, Smartphone as UaF, Eye as UaG } from 'lucide-react';
 import { Timer as PaA, Percent as PaB, TrendingUp as PaC, Clock as PaD, ShieldAlert as PaE, BarChart3 as PaF, Coins as PaG } from 'lucide-react';
 import { Images as AsA } from 'lucide-react';
@@ -103,6 +104,8 @@ export const XMARKET_GROUPS = [
     ['/pa/economy', 'Points Economy', PaG]] },
   { id: 'ua-tools', label: 'Users and accounts', items: [
     ['/ua/ban', 'Ban and Suspend', UaA], ['/ua/bulk', 'Bulk Actions', UaB], ['/ua/duplicates', 'Duplicate Accounts', UaC], ['/ua/referrals', 'Referral Tree', UaD], ['/ua/segments', 'User Segments', UaE], ['/ua/lastseen', 'Last Seen and Device', UaF], ['/ua/watchlist', 'Watchlist', UaG]] },
+  { id: 'sv-tools', label: 'Shop, VIP and perks', items: [
+    ['/sv/stock', 'Stock Alerts', SvA], ['/sv/vip', 'VIP Members', SvB], ['/sv/reminders', 'Perk Reminders', SvC], ['/sv/perks', 'Active Perks', SvD], ['/sv/gifts', 'Gift Purchases', SvE]] },
   { id: 'people', label: 'People', items: [
     ['/users', 'Users', Users], ['/members-data', 'Members Data', UserCog], ['/xm-vip', 'VIP Members', Crown]] },
   { id: 'community', label: 'Community', items: [
