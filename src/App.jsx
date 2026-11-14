@@ -1,5 +1,6 @@
 import AuditClear from './xa/AuditClear.jsx';
 import ManageData from './xa/ManageData.jsx';
+import AdminCrud from './xa/AdminCrud.jsx';
 import React, { useEffect, useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import PinLock from './components/PinLock.jsx';
@@ -184,6 +185,7 @@ export default function App() {
       <Layout>
         <ManageData />
         <AuditClear />
+        <AdminCrud />
         <Routes>
           <Route path="/" element={<HomeSwitch />} />
           <Route path="/sv/stock" element={<StockAlerts />} />
