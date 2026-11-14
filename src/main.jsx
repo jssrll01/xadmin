@@ -1,3 +1,5 @@
+import './xa/netProgress.js';
+import './xa/customSelect.js';
 import React, { Suspense, useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
