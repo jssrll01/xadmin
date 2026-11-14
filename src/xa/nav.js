@@ -1,5 +1,10 @@
 // Static page list for the Ctrl+K palette. Table pages are added live by DbHome.
 export const PALETTE_ITEMS = [
+  ['/booster/tables', 'Booster Tables', null, 'Booster'],
+  ['/booster', 'Social Booster', null, 'Social Booster'],
+  ['/booster/orders', 'Booster Orders', null, 'Social Booster'],
+  ['/booster/queue', 'Booster Queue', null, 'Social Booster'],
+  ['/booster/services', 'Booster Services', null, 'Social Booster'],
   ['/sv/stock', 'Stock Alerts', null, 'Shop, VIP and perks'],
   ['/sv/vip', 'VIP Members', null, 'Shop, VIP and perks'],
   ['/sv/reminders', 'Perk Reminders', null, 'Shop, VIP and perks'],

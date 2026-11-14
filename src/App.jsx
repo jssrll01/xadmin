@@ -108,6 +108,7 @@ import { WithdrawalQueue, ReceiptViewer, DuplicateReceipts, WalletFreeze, Liabil
 import { BuyLoadQueue, TopupQueue, OrdersQueue, QuotationQueue, ReturnQueue, CreatorQueue, LogisticsQueue } from './tw/queues.jsx';
 import BoosterAdmin from './xa/BoosterAdmin.jsx';
 import { BoosterOrdersPage, BoosterServicesPage, BoosterQueuePage } from './xa/BoosterPages.jsx';
+import BoosterTables from './bt/BoosterTables.jsx';
 
 function YlTablePage() {
   const { table } = useParams();
@@ -322,6 +323,7 @@ export default function App() {
           <Route path="/booster/orders" element={<BoosterOrdersPage />} />
           <Route path="/booster/queue" element={<BoosterQueuePage />} />
           <Route path="/booster/services" element={<BoosterServicesPage />} />
+          <Route path="/booster/tables" element={<BoosterTables />} />
           <Route path="*"          element={<Navigate to="/" replace />} />
         </Routes>
       </Layout>
