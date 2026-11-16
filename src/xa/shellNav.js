@@ -110,8 +110,6 @@ export const XMARKET_GROUPS = [
     ['/sv/stock', 'Stock Alerts', SvA], ['/sv/vip', 'VIP Members', SvB], ['/sv/reminders', 'Perk Reminders', SvC], ['/sv/perks', 'Active Perks', SvD], ['/sv/gifts', 'Gift Purchases', SvE]] },
   { id: 'booster', label: 'Social Booster', items: [
     ['/booster', 'Social Booster', BsA], ['/booster/orders', 'Booster Orders', BsB], ['/booster/queue', 'Booster Queue', BsC], ['/booster/services', 'Booster Services', BsD]] },
-  { id: 'booster-tables', label: 'Booster', items: [
-    ['/booster/tables', 'Booster Tables', BtA]] },
   { id: 'people', label: 'People', items: [
     ['/users', 'Users', Users], ['/members-data', 'Members Data', UserCog], ['/xm-vip', 'VIP Members', Crown]] },
   { id: 'community', label: 'Community', items: [
