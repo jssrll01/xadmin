@@ -1,3 +1,4 @@
+import { FxCourses, FxReferral, FxPoints, FxVotes, FxUpsells, FxTopup, FxLive } from './fx/pages.jsx';
 import AuditClear from './xa/AuditClear.jsx';
 import ManageData from './xa/ManageData.jsx';
 import AdminCrud from './xa/AdminCrud.jsx';
@@ -191,6 +192,13 @@ export default function App() {
         <AdminCrud />
         <Routes>
           <Route path="/" element={<HomeSwitch />} />
+          <Route path="/fx/courses" element={<FxCourses />} />
+          <Route path="/fx/referral" element={<FxReferral />} />
+          <Route path="/fx/points" element={<FxPoints />} />
+          <Route path="/fx/votes" element={<FxVotes />} />
+          <Route path="/fx/upsells" element={<FxUpsells />} />
+          <Route path="/fx/topup" element={<FxTopup />} />
+          <Route path="/fx/live" element={<FxLive />} />
           <Route path="/sv/stock" element={<StockAlerts />} />
           <Route path="/sv/vip" element={<VipMembers />} />
           <Route path="/sv/reminders" element={<PerkReminders />} />
@@ -330,3 +338,5 @@ export default function App() {
     </ErrorBoundary>
   );
 }
+
+// fx-patched
