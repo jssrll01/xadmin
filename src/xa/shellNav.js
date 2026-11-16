@@ -1,5 +1,5 @@
 import { BookOpen as FxA, Trophy as FxB, Hourglass as FxC, Lightbulb as FxD, ShoppingCart as FxE, Percent as FxF, Eye as FxG } from 'lucide-react';
-import { Boxes as BtA } from 'lucide-react';
+import { Boxes as BtA, ToggleRight as FxH } from 'lucide-react';
 import { Rocket as BsA, ShoppingBag as BsB, ListChecks as BsC, SlidersHorizontal as BsD } from 'lucide-react';
 import { PackageX as SvA, Crown as SvB, BellRing as SvC, BadgeCheck as SvD, Gift as SvE } from 'lucide-react';
 import { Ban as UaA, Users as UaB, CopyCheck as UaC, GitFork as UaD, PieChart as UaE, Smartphone as UaF, Eye as UaG } from 'lucide-react';
@@ -112,7 +112,7 @@ export const XMARKET_GROUPS = [
   { id: 'booster', label: 'Social Booster', items: [
     ['/booster', 'Social Booster', BsA], ['/booster/orders', 'Booster Orders', BsB], ['/booster/queue', 'Booster Queue', BsC], ['/booster/services', 'Booster Services', BsD]] },
   { id: 'fx-tools', label: 'Features', items: [
-    ['/fx/courses', 'Courses', FxA], ['/fx/referral', 'Referral Leaders', FxB], ['/fx/points', 'Points Expiry', FxC], ['/fx/votes', 'Feature Voting', FxD], ['/fx/upsells', 'Cart Upsells', FxE], ['/fx/topup', 'Top-up Bonus', FxF], ['/fx/live', 'Live and Milestones', FxG]] },
+    ['/fx/courses', 'Courses', FxA], ['/fx/referral', 'Referral Leaders', FxB], ['/fx/points', 'Points Expiry', FxC], ['/fx/votes', 'Feature Voting', FxD], ['/fx/upsells', 'Cart Upsells', FxE], ['/fx/topup', 'Top-up Bonus', FxF], ['/fx/live', 'Live and Milestones', FxG], ['/fx/controls', 'Feature Controls', FxH]] },
   { id: 'people', label: 'People', items: [
     ['/users', 'Users', Users], ['/members-data', 'Members Data', UserCog], ['/xm-vip', 'VIP Members', Crown]] },
   { id: 'community', label: 'Community', items: [

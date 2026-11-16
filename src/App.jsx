@@ -1,3 +1,4 @@
+import FeatureControls from './pages/FeatureControls.jsx';
 import { FxCourses, FxReferral, FxPoints, FxVotes, FxUpsells, FxTopup, FxLive } from './fx/pages.jsx';
 import AuditClear from './xa/AuditClear.jsx';
 import ManageData from './xa/ManageData.jsx';
@@ -199,6 +200,7 @@ export default function App() {
           <Route path="/fx/upsells" element={<FxUpsells />} />
           <Route path="/fx/topup" element={<FxTopup />} />
           <Route path="/fx/live" element={<FxLive />} />
+          <Route path="/fx/controls" element={<FeatureControls />} />
           <Route path="/sv/stock" element={<StockAlerts />} />
           <Route path="/sv/vip" element={<VipMembers />} />
           <Route path="/sv/reminders" element={<PerkReminders />} />

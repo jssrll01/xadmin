@@ -7,6 +7,7 @@ export const PALETTE_ITEMS = [
   ['/fx/upsells', 'Cart Upsells', null, 'Features'],
   ['/fx/topup', 'Top-up Bonus', null, 'Features'],
   ['/fx/live', 'Live and Milestones', null, 'Features'],
+  ['/fx/controls', 'Feature Controls', null, 'Features'],
   ['/booster', 'Social Booster', null, 'Social Booster'],
   ['/booster/orders', 'Booster Orders', null, 'Social Booster'],
   ['/booster/queue', 'Booster Queue', null, 'Social Booster'],
