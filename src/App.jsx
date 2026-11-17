@@ -1,3 +1,5 @@
+import XnfcLink from './pages/XnfcLink.jsx';
+import XnfcPay from './pages/XnfcPay.jsx';
 import FeatureControls from './pages/FeatureControls.jsx';
 import { FxCourses, FxReferral, FxPoints, FxVotes, FxUpsells, FxTopup, FxLive } from './fx/pages.jsx';
 import AuditClear from './xa/AuditClear.jsx';
@@ -307,6 +309,8 @@ export default function App() {
           <Route path="/quotations/:id" element={<ReceiptView />} />
           <Route path="/reviews"    element={<Reviews />} />
           <Route path="/buy-load" element={<BuyLoad />} />
+          <Route path="/xnfc/link" element={<XnfcLink />} />
+          <Route path="/xnfc/pay" element={<XnfcPay />} />
           <Route path="/xcoin" element={<XCoinAdmin />} />
           <Route path="/daily"     element={<DailyNotes />} />
           <Route path="/audit"     element={<AuditLog />} />

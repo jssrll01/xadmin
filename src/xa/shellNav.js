@@ -128,7 +128,7 @@ export const XMARKET_GROUPS = [
     ['/airdrop', 'Airdrop 88', Dices], ['/airdrop-mod', 'Airdrop Mod', SlidersHorizontal]] },
   { id: 'operations', label: 'Operations', items: [
     ['/ops/wallet-reconcile', 'Wallet Reconcile', Scale], ['/ops/daily-close', 'Daily Close Report', CalendarCheck],
-    ['/ops/xcoin-monitor', 'Xcoin Monitor', Coins], ['/ops/user-timeline', 'User Timeline', History],
+    ['/ops/xcoin-monitor', 'Xcoin Monitor', Coins], ['/xnfc/link', 'xnfc215 · Link cards', Smartphone], ['/xnfc/pay', 'xnfc215 · Tap to pay', Coins], ['/ops/user-timeline', 'User Timeline', History],
     ['/ops/creator-payouts', 'Creator Payouts', Banknote]] },
   { id: 'securityfraud', label: 'Security and fraud', items: [
     ['/ops/kill-switches', 'Kill Switches', Power],
