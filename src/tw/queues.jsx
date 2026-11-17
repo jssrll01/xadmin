@@ -80,7 +80,7 @@ export function TopupQueue() {
   const reload = () => { tu.reload(); pr.reload(); };
   const { busy, run } = useAct(reload);
   const names = useMemo(() => { const m = {}; (pr.rows || []).forEach((p) => { m[p.id] = who(p); }); return m; }, [pr.rows]);
-  const isOpen = (r) => ['pending', 'processing'].includes(String(r.status || 'processing').toLowerCase());
+  const isOpen = (r) => !['approved', 'rejected', 'cancelled', 'canceled', 'completed', 'failed'].includes(String(r.status || 'pending').toLowerCase());
   const [view, setView] = useState('open');
   const open = (tu.rows || []).filter((r) => (view === 'open' ? isOpen(r) : view === 'all' ? true : !isOpen(r)));
   const set = (r, s) => run(r.id, (s === 'approved' ? 'Approve and credit ' + peso(r.amount) : 'Reject this top-up') + '?', async () => {

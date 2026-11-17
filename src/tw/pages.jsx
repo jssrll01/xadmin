@@ -24,7 +24,7 @@ const call = async (fn, args = {}) => {
 const sel = (tbl, order = 'created_at') => rpcDb('select', tbl, { order_col: order, lim: 5000 });
 const num = (v) => { const n = Number(v); return Number.isFinite(n) ? n : 0; };
 const who = (p) => (p.username ? '@' + p.username : p.email || String(p.id || p.user_id || '').slice(0, 8) || '—');
-const OPEN = ['pending', 'processing'];
+const OPEN = ['pending','processing','awaiting_verification'];
 const rcOf = (r) => r.receipt_data || r.receipt || {};
 const srcOf = (r) => { const rc = rcOf(r); return typeof rc === 'string' ? rc : rc.url || rc.dataUrl || ''; };
 const refOf = (r) => { const rc = rcOf(r); const v = r.reference || r.ref_no || r.reference_no || (typeof rc === 'object' ? rc.reference || rc.ref || rc.ref_no || rc.reference_no : '') || ''; return String(v).trim().toLowerCase(); };
