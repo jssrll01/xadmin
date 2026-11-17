@@ -5,6 +5,7 @@ import { useToast } from '../components/Toast.jsx';
 import { fetchSettings, upsertSetting, logAudit } from '../lib/api.js';
 import PageHeader from '../xa/ui/PageHeader.jsx';
 import { SkRows } from '../xa/Kit.jsx';
+import AdminPushCard from '../xa/AdminPushCard.jsx';
 
 const DEFAULT = { enabled: true, percent: 1, min_fee: 0, max_fee: null, apply_to: 'topup' };
 
@@ -82,6 +83,8 @@ export default function Settings() {
           </>
         )}
       </Card>
+
+      <AdminPushCard />
 
       <Card>
         <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 8 }}>Environment</div>

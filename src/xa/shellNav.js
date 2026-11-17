@@ -1,3 +1,4 @@
+import { BellRing as PushNavIcon } from 'lucide-react';
 import { BookOpen as FxA, Trophy as FxB, Hourglass as FxC, Lightbulb as FxD, ShoppingCart as FxE, Percent as FxF, Eye as FxG } from 'lucide-react';
 import { Boxes as BtA, ToggleRight as FxH } from 'lucide-react';
 import { Rocket as BsA, ShoppingBag as BsB, ListChecks as BsC, SlidersHorizontal as BsD } from 'lucide-react';
@@ -121,6 +122,7 @@ export const XMARKET_GROUPS = [
     ['/gifts', 'Creator Gifts', Gift], ['/dm-mod', 'DM Moderation', MessagesSquare], ['/xm-chat', 'Global Chat', Globe],
     ['/market-qa', 'Market & Q&A', HelpCircle], ['/reports', 'Reports', Flag]] },
   { id: 'marketing', label: 'Marketing and Games', items: [
+    ['/push', 'Push Center', PushNavIcon],
     ['/banners', 'Banner', ImageIcon], ['/articles', 'Articles', Newspaper], ['/scholarships', 'Scholarships', GraduationCap], ['/freelance', 'Freelance', Briefcase], ['/notifications', 'Notifications', Bell], ['/notify', 'Notify', Megaphone],
     ['/xf-price-drops', 'Price Drops', TrendingDown], ['/xf-digital', 'Digital Products', Download],
     ['/xf-polls', 'Demand Polls', Vote], ['/xf-sponsor', 'Sponsorships', Handshake],
