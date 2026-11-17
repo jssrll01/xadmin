@@ -11,7 +11,7 @@ const KEY = 'xadmin_nfc_templates';
 const BUILTIN = [
   { name: 'XMARKET storefront', records: [{ type: 'url', url: 'https://xmarket-app.shop' }] },
   { name: 'Landing page', records: [{ type: 'url', url: 'https://xmarket-landing.onrender.com' }] },
-  { name: 'Create account', records: [{ type: 'url', url: 'https://xmarket-app.onrender.com/signup' }] },
+  { name: 'Create account', records: [{ type: 'url', url: 'https://xmarket-app.shop/signup' }] },
 ];
 const lab = { fontSize: 11, fontWeight: 700, color: 'var(--text-dim)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: 0.4 };
 
