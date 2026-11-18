@@ -46,6 +46,11 @@ export default function TelegramBot() {
     setAnn({ text: '', photo: '', url: '' });
   }, 'Announcement queued');
 
+  const clearLog = () => {
+    if (!window.confirm('Delete the whole message history shown here? Messages already in Telegram are not affected.')) return;
+    act('clear', () => rpc('admin_tg_clear'), 'History cleared');
+  };
+
   const state = (l) => (l.note ? 'failed: ' + l.note : l.status_code === null || l.status_code === undefined ? 'sending...' : l.status_code === 200 ? 'sent' : 'failed (' + l.status_code + ') ' + (l.resp || ''));
 
   return (
@@ -101,7 +106,10 @@ export default function TelegramBot() {
             <span style={{ color: l.status_code === 200 ? '#059669' : l.status_code === null || l.status_code === undefined ? '#64748B' : '#DC2626' }}>{state(l)}</span>
           </div>
         ))}
-        <button className="neu-btn" onClick={load} style={{ padding: '6px 14px', marginTop: 8 }}>Refresh</button>
+        <div style={{ display: 'flex', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
+          <button className="neu-btn" onClick={load} style={{ padding: '6px 14px' }}>Refresh</button>
+          <button className="neu-btn" disabled={busy !== '' || !d || (d.log || []).length === 0} onClick={clearLog} style={{ padding: '6px 14px', color: '#DC2626', fontWeight: 700 }}>{busy === 'clear' ? 'Clearing...' : 'Clear history'}</button>
+        </div>
       </div>
     </div>
   );
