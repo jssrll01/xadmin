@@ -19,6 +19,7 @@ export default function TelegramBot() {
   const [token, setToken] = useState('');
   const [chat, setChat] = useState('');
   const [site, setSite] = useState('');
+  const [invite, setInvite] = useState('');
   const [flags, setFlags] = useState({});
   const [busy, setBusy] = useState('');
   const [ann, setAnn] = useState({ text: '', photo: '', url: '' });
@@ -27,7 +28,7 @@ export default function TelegramBot() {
     try {
       const r = await rpc('admin_tg_get');
       setD(r); setErr('');
-      setChat(r.chat_id || ''); setSite(r.site_url || ''); setFlags(r.flags || {});
+      setChat(r.chat_id || ''); setSite(r.site_url || ''); setInvite(r.invite_url || ''); setFlags(r.flags || {});
     } catch (e) { setErr(e.message || String(e)); }
   }, []);
   useEffect(() => { load(); }, [load]);
@@ -38,7 +39,7 @@ export default function TelegramBot() {
     catch (e) { show?.(e.message || String(e), 'error'); }
     setBusy('');
   };
-  const save = () => act('save', async () => { await rpc('admin_tg_save', { p_token: token, p_chat: chat, p_flags: flags, p_site: site }); setToken(''); }, 'Saved');
+  const save = () => act('save', async () => { await rpc('admin_tg_save', { p_token: token, p_chat: chat, p_flags: flags, p_site: site, p_invite: invite }); setToken(''); }, 'Saved');
   const test = () => act('test', () => rpc('admin_tg_test'), 'Test message queued. Check your Telegram group.');
   const send = () => act('send', async () => {
     if (!ann.text.trim()) throw new Error('Write a message first');
@@ -68,6 +69,8 @@ export default function TelegramBot() {
         <input style={inp} value={chat} onChange={(e) => setChat(e.target.value)} placeholder="-1001234567890 or @yourchannel" />
         <label style={lab}>Site address used in buttons</label>
         <input style={inp} value={site} onChange={(e) => setSite(e.target.value)} placeholder="https://xmarket-app.shop" />
+        <label style={lab}>Community link shown in the app (channel invite link)</label>
+        <input style={inp} value={invite} onChange={(e) => setInvite(e.target.value)} placeholder="https://t.me/+AbCdEf... (empty hides the button)" />
       </div>
 
       <div style={card}>
