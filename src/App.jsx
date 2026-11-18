@@ -2,6 +2,7 @@ import XnfcLink from './pages/XnfcLink.jsx';
 import XnfcPay from './pages/XnfcPay.jsx';
 import FeatureControls from './pages/FeatureControls.jsx';
 import TelegramBot from './pages/TelegramBot.jsx';
+import GameCredits from './pages/GameCredits.jsx';
 import { FxCourses, FxReferral, FxPoints, FxVotes, FxUpsells, FxTopup, FxLive } from './fx/pages.jsx';
 import AuditClear from './xa/AuditClear.jsx';
 import ManageData from './xa/ManageData.jsx';
@@ -206,6 +207,7 @@ export default function App() {
           <Route path="/fx/live" element={<FxLive />} />
           <Route path="/fx/controls" element={<FeatureControls />} />
           <Route path="/fx/telegram" element={<TelegramBot />} />
+          <Route path="/fx/game-credits" element={<GameCredits />} />
           <Route path="/sv/stock" element={<StockAlerts />} />
           <Route path="/sv/vip" element={<VipMembers />} />
           <Route path="/sv/reminders" element={<PerkReminders />} />

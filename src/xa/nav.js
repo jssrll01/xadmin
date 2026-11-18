@@ -9,6 +9,7 @@ export const PALETTE_ITEMS = [
   ['/fx/live', 'Live and Milestones', null, 'Features'],
   ['/fx/controls', 'Feature Controls', null, 'Features'],
   ['/fx/telegram', 'Telegram Bot', null, 'Features'],
+  ['/fx/game-credits', 'Game Credits', null, 'Features'],
   ['/booster', 'Social Booster', null, 'Social Booster'],
   ['/booster/orders', 'Booster Orders', null, 'Social Booster'],
   ['/booster/queue', 'Booster Queue', null, 'Social Booster'],
