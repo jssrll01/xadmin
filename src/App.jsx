@@ -32,6 +32,7 @@ import WalletPayouts from './pages/WalletPayouts.jsx';
 import CreatorApps from './pages/CreatorApps.jsx';
 import CreatorMgmt from './pages/CreatorMgmt.jsx';
 import SocialMod from './pages/SocialMod.jsx';
+import Moderation from './pages/Moderation.jsx';
 import VideoMod from './pages/VideoMod.jsx';
 import WalletSecurity from './pages/WalletSecurity.jsx';
 import MarketQA from './pages/MarketQA.jsx';
@@ -253,6 +254,7 @@ export default function App() {
           <Route path="/creators"  element={<CreatorApps />} />
           <Route path="/creator-mgmt" element={<CreatorMgmt />} />
           <Route path="/social-mod" element={<SocialMod />} />
+          <Route path="/moderation" element={<Moderation />} />
           <Route path="/video-mod" element={<VideoMod />} />
           <Route path="/wallet-security" element={<WalletSecurity />} />
           <Route path="/market-qa" element={<MarketQA />} />

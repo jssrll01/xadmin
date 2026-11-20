@@ -119,6 +119,7 @@ export const XMARKET_GROUPS = [
   { id: 'community', label: 'Community', items: [
     ['/creators', 'Creators', Sparkles], ['/creator-mgmt', 'Creator Management', BadgeCheck],
     ['/social-mod', 'Socials Management', LayoutGrid], ['/video-mod', 'Socials Videos', Video],
+    ['/moderation', 'Moderation', LayoutGrid], ['/video-mod', 'Moderation', Video],
     ['/gifts', 'Creator Gifts', Gift], ['/dm-mod', 'DM Moderation', MessagesSquare], ['/xm-chat', 'Global Chat', Globe],
     ['/market-qa', 'Market & Q&A', HelpCircle], ['/reports', 'Reports', Flag]] },
   { id: 'marketing', label: 'Marketing and Games', items: [
