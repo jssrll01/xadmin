@@ -1,6 +1,5 @@
 // Static page list for the Ctrl+K palette. Table pages are added live by DbHome.
 export const PALETTE_ITEMS = [
-  ['/fx/courses', 'Courses', null, 'Features'],
   ['/fx/referral', 'Referral Leaders', null, 'Features'],
   ['/fx/points', 'Points Expiry', null, 'Features'],
   ['/fx/votes', 'Feature Voting', null, 'Features'],

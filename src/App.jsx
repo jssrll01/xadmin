@@ -3,7 +3,7 @@ import XnfcPay from './pages/XnfcPay.jsx';
 import FeatureControls from './pages/FeatureControls.jsx';
 import TelegramBot from './pages/TelegramBot.jsx';
 import GameCredits from './pages/GameCredits.jsx';
-import { FxCourses, FxReferral, FxPoints, FxVotes, FxUpsells, FxTopup, FxLive } from './fx/pages.jsx';
+import { FxReferral, FxPoints, FxVotes, FxUpsells, FxTopup, FxLive } from './fx/pages.jsx';
 import AuditClear from './xa/AuditClear.jsx';
 import ManageData from './xa/ManageData.jsx';
 import AdminCrud from './xa/AdminCrud.jsx';
@@ -55,7 +55,7 @@ import PopupsAdmin from './pages/PopupsAdmin.jsx';
 import LoyaltyAdmin from './xa/LoyaltyAdmin.jsx';
 import Airdrop from './pages/Airdrop.jsx';
 import Banners from './pages/Banners.jsx';
-import { ArticlesAdmin, ScholarshipsAdmin, FreelanceAdmin } from './pages/ContentAdmin.jsx';
+import { ArticlesAdmin } from './pages/ContentAdmin.jsx';
 import Bundles from './pages/Bundles.jsx';
 import Xcards from './pages/Xcards.jsx';
 import XmChat from './pages/XmChat.jsx';
@@ -199,7 +199,6 @@ export default function App() {
         <AdminCrud />
         <Routes>
           <Route path="/" element={<HomeSwitch />} />
-          <Route path="/fx/courses" element={<FxCourses />} />
           <Route path="/fx/referral" element={<FxReferral />} />
           <Route path="/fx/points" element={<FxPoints />} />
           <Route path="/fx/votes" element={<FxVotes />} />
@@ -280,8 +279,6 @@ export default function App() {
           <Route path="/airdrop" element={<Airdrop />} />
           <Route path="/banners" element={<Banners />} />
           <Route path="/articles" element={<ArticlesAdmin />} />
-          <Route path="/scholarships" element={<ScholarshipsAdmin />} />
-          <Route path="/freelance" element={<FreelanceAdmin />} />
           <Route path="/xcards"    element={<Xcards />} />
         <Route path="/xm-chat" element={<XmChat />} />
         <Route path="/xm-vip" element={<XmVip />} />

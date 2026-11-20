@@ -27,18 +27,6 @@ const CFG = {
     name: (r) => r.title, sub: (r) => (r.author || 'No author') + (r.published ? '' : ' · hidden'),
     fields: [['title', 'Title', 'text', true], ['summary', 'Short summary', 'area'], ['cover_url', 'Cover image', 'image'], ['author', 'Author', 'text'], ['body', 'Article text (blank line = new paragraph)', 'big', true], ['published', 'Published', 'bool']],
   },
-  scholarships: {
-    title: 'Scholarships', subtitle: 'Scholarship opportunities', flag: 'active',
-    blank: { active: true },
-    name: (r) => r.title, sub: (r) => (r.provider || 'No provider') + (r.deadline ? ' · deadline ' + r.deadline : '') + (r.active ? '' : ' · hidden'),
-    fields: [['title', 'Title', 'text', true], ['provider', 'Provider', 'text'], ['description', 'Description', 'area'], ['requirements', 'Requirements', 'area'], ['deadline', 'Deadline', 'date'], ['apply_url', 'Apply link', 'url'], ['active', 'Visible to users', 'bool']],
-  },
-  freelance_jobs: {
-    title: 'Freelance work', subtitle: 'Freelance work available at XMARKET', flag: 'active',
-    blank: { active: true },
-    name: (r) => r.title, sub: (r) => (r.pay || 'No pay listed') + (r.deadline ? ' · deadline ' + r.deadline : '') + (r.active ? '' : ' · hidden'),
-    fields: [['title', 'Title', 'text', true], ['description', 'Description', 'area'], ['skills', 'Skills needed', 'area'], ['pay', 'Pay (e.g. ₱500 per task)', 'text'], ['deadline', 'Deadline', 'date'], ['apply_url', 'Apply link', 'url'], ['active', 'Visible to users', 'bool']],
-  },
 };
 
 function ContentAdmin({ tbl }) {
@@ -146,5 +134,3 @@ function ContentAdmin({ tbl }) {
 }
 
 export const ArticlesAdmin = () => <ContentAdmin tbl="articles" />;
-export const ScholarshipsAdmin = () => <ContentAdmin tbl="scholarships" />;
-export const FreelanceAdmin = () => <ContentAdmin tbl="freelance_jobs" />;

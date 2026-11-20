@@ -113,7 +113,7 @@ export const XMARKET_GROUPS = [
   { id: 'booster', label: 'Social Booster', items: [
     ['/booster', 'Social Booster', BsA], ['/booster/orders', 'Booster Orders', BsB], ['/booster/queue', 'Booster Queue', BsC], ['/booster/services', 'Booster Services', BsD]] },
   { id: 'fx-tools', label: 'Features', items: [
-    ['/fx/courses', 'Courses', FxA], ['/fx/referral', 'Referral Leaders', FxB], ['/fx/points', 'Points Expiry', FxC], ['/fx/votes', 'Feature Voting', FxD], ['/fx/upsells', 'Cart Upsells', FxE], ['/fx/topup', 'Top-up Bonus', FxF], ['/fx/live', 'Live and Milestones', FxG], ['/fx/telegram', 'Telegram Bot', FxA], ['/fx/game-credits', 'Game Credits', FxB], ['/fx/controls', 'Feature Controls', FxH]] },
+    ['/fx/referral', 'Referral Leaders', FxB], ['/fx/points', 'Points Expiry', FxC], ['/fx/votes', 'Feature Voting', FxD], ['/fx/upsells', 'Cart Upsells', FxE], ['/fx/topup', 'Top-up Bonus', FxF], ['/fx/live', 'Live and Milestones', FxG], ['/fx/telegram', 'Telegram Bot', FxA], ['/fx/game-credits', 'Game Credits', FxB], ['/fx/controls', 'Feature Controls', FxH]] },
   { id: 'people', label: 'People', items: [
     ['/users', 'Users', Users], ['/members-data', 'Members Data', UserCog], ['/xm-vip', 'VIP Members', Crown]] },
   { id: 'community', label: 'Community', items: [
@@ -124,7 +124,7 @@ export const XMARKET_GROUPS = [
     ['/market-qa', 'Market & Q&A', HelpCircle], ['/reports', 'Reports', Flag]] },
   { id: 'marketing', label: 'Marketing and Games', items: [
     ['/push', 'Push Center', PushNavIcon],
-    ['/banners', 'Banner', ImageIcon], ['/articles', 'Articles', Newspaper], ['/scholarships', 'Scholarships', GraduationCap], ['/freelance', 'Freelance', Briefcase], ['/notifications', 'Notifications', Bell], ['/notify', 'Notify', Megaphone],
+    ['/banners', 'Banner', ImageIcon], ['/articles', 'Articles', Newspaper], ['/notifications', 'Notifications', Bell], ['/notify', 'Notify', Megaphone],
     ['/xf-price-drops', 'Price Drops', TrendingDown], ['/xf-digital', 'Digital Products', Download],
     ['/xf-polls', 'Demand Polls', Vote], ['/xf-sponsor', 'Sponsorships', Handshake],
     ['/xf-popups', 'Launch Popups', Rocket], ['/play-time', 'Play Time', Gamepad2],

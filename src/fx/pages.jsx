@@ -56,62 +56,6 @@ const ErrList = ({ rows }) => (arr(rows).length ? (
   </div>
 ) : null);
 
-/* Courses */
-export function FxCourses() {
-  const { show } = useToast();
-  const { rows, err, loading, reload } = useLoad(async () => arr(await call('admin_fx_course_list')));
-  const [ed, setEd] = useState(null);
-  const [busy, setBusy] = useState(false);
-  const set = (k, v) => setEd({ ...ed, [k]: v });
-  const setL = (i, k, v) => set('lessons', ed.lessons.map((l, j) => (j === i ? { ...l, [k]: v } : l)));
-  const save = async () => {
-    if (!ed.title.trim()) return show?.('Title is required.', 'error');
-    setBusy(true);
-    try {
-      await call('admin_fx_course_save', { p_course: { id: ed.id || null, title: ed.title, description: ed.description, cover_url: ed.cover_url, active: ed.active, sort: Number(ed.sort) || 0 }, p_lessons: ed.lessons });
-      show?.('Saved', 'success'); setEd(null); reload();
-    } catch (e) { show?.(e.message || String(e), 'error'); }
-    setBusy(false);
-  };
-  const del = async (c) => {
-    if (!window.confirm('Delete "' + c.title + '" and all its lessons?')) return;
-    try { await call('admin_fx_course_delete', { p_id: c.id }); show?.('Deleted', 'success'); reload(); } catch (e) { show?.(e.message || String(e), 'error'); }
-  };
-  return (
-    <Shell title="Courses" sub="Courses shown on the Digital Hub Courses page." onRefresh={reload} loading={loading} err={err}>
-      <button className="neu-btn" style={{ ...sm, fontWeight: 700, marginBottom: 10 }} onClick={() => setEd({ title: '', description: '', cover_url: '', active: true, sort: 0, lessons: [] })}>+ New course</button>
-      <Tbl cols={[['Title', (c) => c.title], ['Lessons', (c) => c.lessons.length], ['Order', (c) => c.sort], ['Shown', (c) => (c.active ? 'yes' : 'hidden')],
-        ['', (c) => <span><button className="neu-btn" style={sm} onClick={() => setEd({ ...c, description: c.description || '', cover_url: c.cover_url || '', lessons: c.lessons.map((l) => ({ title: l.title || '', content: l.content || '', video_url: l.video_url || '' })) })}>Edit</button>{' '}<button className="neu-btn" style={{ ...sm, color: '#DC2626' }} onClick={() => del(c)}>Delete</button></span>]]} rows={rows || []} empty="No courses yet." />
-      <Modal open={!!ed} onClose={() => setEd(null)} title={ed && ed.id ? 'Edit course' : 'New course'} wide>
-        {ed && <>
-          <div style={{ maxHeight: '62vh', overflowY: 'auto' }}>
-            <label style={lab}><b>Title</b><input style={{ ...inp, width: '100%' }} value={ed.title} onChange={(e) => set('title', e.target.value)} /></label>
-            <label style={lab}><b>Description</b><textarea style={{ ...inp, width: '100%', minHeight: 60 }} value={ed.description} onChange={(e) => set('description', e.target.value)} /></label>
-            <label style={lab}><b>Cover image link</b> (https, optional)<input style={{ ...inp, width: '100%' }} value={ed.cover_url} onChange={(e) => set('cover_url', e.target.value)} /></label>
-            <label style={lab}><b>Order</b> (lower shows first)<input style={{ ...inp, width: 100 }} value={ed.sort} onChange={(e) => set('sort', e.target.value)} /></label>
-            <label style={lab}><input type="checkbox" checked={ed.active} onChange={(e) => set('active', e.target.checked)} /> Visible to users</label>
-            <b style={{ fontSize: 13 }}>Lessons</b>
-            {ed.lessons.map((l, i) => (
-              <div key={i} style={{ ...card, padding: 10, marginTop: 8 }}>
-                <input style={{ ...inp, width: '100%', marginBottom: 6 }} placeholder={'Lesson ' + (i + 1) + ' title'} value={l.title} onChange={(e) => setL(i, 'title', e.target.value)} />
-                <textarea style={{ ...inp, width: '100%', minHeight: 50, marginBottom: 6 }} placeholder="Notes (optional)" value={l.content} onChange={(e) => setL(i, 'content', e.target.value)} />
-                <input style={{ ...inp, width: '100%', marginBottom: 6 }} placeholder="Video or file link, https (optional)" value={l.video_url} onChange={(e) => setL(i, 'video_url', e.target.value)} />
-                <button className="neu-btn" style={sm} disabled={i === 0} onClick={() => { const a = [...ed.lessons]; [a[i - 1], a[i]] = [a[i], a[i - 1]]; set('lessons', a); }}>Up</button>{' '}
-                <button className="neu-btn" style={sm} disabled={i === ed.lessons.length - 1} onClick={() => { const a = [...ed.lessons]; [a[i + 1], a[i]] = [a[i], a[i + 1]]; set('lessons', a); }}>Down</button>{' '}
-                <button className="neu-btn" style={{ ...sm, color: '#DC2626' }} onClick={() => set('lessons', ed.lessons.filter((_, j) => j !== i))}>Remove</button>
-              </div>
-            ))}
-            <button className="neu-btn" style={{ ...sm, marginTop: 8 }} onClick={() => set('lessons', [...ed.lessons, { title: '', content: '', video_url: '' }])}>+ Add lesson</button>
-          </div>
-          <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
-            <button className="neu-btn neu-btn-success" style={{ padding: '8px 16px', fontWeight: 700 }} disabled={busy} onClick={save}>{busy ? 'Saving…' : 'Save course'}</button>
-            <button className="neu-btn" style={{ padding: '8px 16px' }} onClick={() => setEd(null)}>Cancel</button>
-          </div>
-        </>}
-      </Modal>
-    </Shell>
-  );
-}
 
 /* Referral leaders */
 export function FxReferral() {
