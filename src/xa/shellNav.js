@@ -113,7 +113,7 @@ export const XMARKET_GROUPS = [
   { id: 'booster', label: 'Social Booster', items: [
     ['/booster', 'Social Booster', BsA], ['/booster/orders', 'Booster Orders', BsB], ['/booster/queue', 'Booster Queue', BsC], ['/booster/services', 'Booster Services', BsD]] },
   { id: 'fx-tools', label: 'Features', items: [
-    ['/fx/referral', 'Referral Leaders', FxB], ['/fx/points', 'Points Expiry', FxC], ['/fx/votes', 'Feature Voting', FxD], ['/fx/upsells', 'Cart Upsells', FxE], ['/fx/topup', 'Top-up Bonus', FxF], ['/fx/live', 'Live and Milestones', FxG], ['/fx/telegram', 'Telegram Bot', FxA], ['/fx/game-credits', 'Game Credits', FxB], ['/fx/controls', 'Feature Controls', FxH]] },
+    ['/fx/referral', 'Referral Leaders', FxB], ['/fx/points', 'Points Expiry', FxC], ['/fx/upsells', 'Cart Upsells', FxE], ['/fx/topup', 'Top-up Bonus', FxF], ['/fx/live', 'Live and Milestones', FxG], ['/fx/telegram', 'Telegram Bot', FxA], ['/fx/game-credits', 'Game Credits', FxB], ['/fx/controls', 'Feature Controls', FxH]] },
   { id: 'people', label: 'People', items: [
     ['/users', 'Users', Users], ['/members-data', 'Members Data', UserCog], ['/xm-vip', 'VIP Members', Crown]] },
   { id: 'community', label: 'Community', items: [

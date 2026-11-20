@@ -2,7 +2,6 @@
 export const PALETTE_ITEMS = [
   ['/fx/referral', 'Referral Leaders', null, 'Features'],
   ['/fx/points', 'Points Expiry', null, 'Features'],
-  ['/fx/votes', 'Feature Voting', null, 'Features'],
   ['/fx/upsells', 'Cart Upsells', null, 'Features'],
   ['/fx/topup', 'Top-up Bonus', null, 'Features'],
   ['/fx/live', 'Live and Milestones', null, 'Features'],

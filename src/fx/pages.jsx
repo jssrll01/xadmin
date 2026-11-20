@@ -107,20 +107,6 @@ export function FxPoints() {
 }
 
 /* Feature voting */
-export function FxVotes() {
-  const { show } = useToast();
-  const { rows, err, loading, reload } = useLoad(async () => arr(await call('admin_fx_req_list')));
-  const act = async (fn, r, q) => {
-    if (!window.confirm(q)) return;
-    try { await call(fn, { p_id: r.id }); show?.('Done', 'success'); reload(); } catch (e) { show?.(e.message || String(e), 'error'); }
-  };
-  return (
-    <Shell title="Feature voting" sub="Options posted by creators (one per creator per week). Each stays open for 7 days." onRefresh={reload} loading={loading} err={err}>
-      <Tbl cols={[['Option', (r) => r.title], ['By', (r) => (r.creator ? '@' + r.creator : '—')], ['Votes', (r) => <b>{r.votes}</b>], ['Posted', (r) => dateTime(r.created_at)], ['State', (r) => (r.is_open ? 'open until ' + dateTime(r.closes_at) : 'closed')],
-        ['', (r) => <span>{r.is_open && <button className="neu-btn" style={sm} onClick={() => act('admin_fx_req_close', r, 'Close voting now and show the result?')}>Close now</button>}{' '}<button className="neu-btn" style={{ ...sm, color: '#DC2626' }} onClick={() => act('admin_fx_req_delete', r, 'Delete this option and its votes?')}>Delete</button></span>]]} rows={rows || []} empty="No options yet." />
-    </Shell>
-  );
-}
 
 /* Upsells */
 function ProductPick({ label, list, value, onPick }) {
