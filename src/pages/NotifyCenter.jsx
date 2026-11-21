@@ -31,7 +31,7 @@ export default function NotifyCenter() {
   const [busy, setBusy] = useState(false);
   const [data, setData] = useState({ scheduled: [], log: [] });
   const [cfg, setCfg] = useState(null);
-  const [cf, setCf] = useState({ key: '', from: '', name: 'XMARKET' });
+  const [cf, setCf] = useState({ url: '', secret: '', from: '', name: 'XMARKET' });
   const [testTo, setTestTo] = useState('');
   const [results, setResults] = useState([]);
   const [err, setErr] = useState('');
@@ -39,7 +39,7 @@ export default function NotifyCenter() {
 
   const loadList = useCallback(async () => { try { setData(await rpc('admin_nx_list')); setErr(''); } catch (e) { setErr(e.message || String(e)); } }, []);
   const loadCfg = useCallback(async () => {
-    try { const c = await rpc('admin_nx_email_cfg'); setCfg(c); setCf((x) => ({ ...x, from: x.from || c.from_email || '', name: c.from_name || x.name })); } catch (e) { setErr(e.message || String(e)); }
+    try { const c = await rpc('admin_nx_email_cfg'); setCfg(c); setCf((x) => ({ ...x, url: x.url || c.url || '', from: x.from || c.from_email || '', name: c.from_name || x.name })); } catch (e) { setErr(e.message || String(e)); }
   }, []);
   const loadResults = useCallback(async () => { try { setResults(await rpc('admin_nx_email_results')); } catch (e) { /* ignore */ } }, []);
   useEffect(() => {
@@ -94,7 +94,7 @@ export default function NotifyCenter() {
   };
   const saveCfg = async () => {
     setBusy(true);
-    try { await rpc('admin_nx_email_save', { p_key: cf.key || null, p_from: cf.from, p_name: cf.name }); setCf((x) => ({ ...x, key: '' })); show?.('Email settings saved', 'success'); await loadCfg(); }
+    try { await rpc('admin_nx_gmail_save', { p_url: cf.url, p_secret: cf.secret || null, p_from: cf.from, p_name: cf.name }); setCf((x) => ({ ...x, secret: '' })); show?.('Email settings saved', 'success'); await loadCfg(); }
     catch (e) { show?.(e.message || String(e), 'error'); }
     setBusy(false);
   };
@@ -203,14 +203,16 @@ export default function NotifyCenter() {
       {tab === 'email' && (
         <>
           <div style={card}>
-            <b>Email provider (Resend)</b>
+            <b>Email provider (your Gmail)</b>
             <div style={{ ...muted, margin: '6px 0 8px' }}>
-              {cfg && cfg.configured ? 'Connected. Key ' + cfg.key_hint + ', sending from ' + cfg.from_email + '.' : 'Not set up yet. Create a Resend account, verify your domain, then add the API key here.'}
+              {cfg && cfg.configured ? 'Connected. Sending from ' + cfg.from_email + '.' : 'Not set up yet. Create the Google Apps Script, then paste its Web app URL and your secret here.'}
             </div>
-            <label style={lbl}>API key {cfg && cfg.key_hint ? '(leave blank to keep the saved one)' : ''}</label>
-            <input type="password" autoComplete="off" className="neu-input" style={{ ...inp, width: '100%' }} value={cf.key} onChange={(e) => setCf({ ...cf, key: e.target.value })} placeholder="re_..." />
-            <label style={lbl}>Sender email (must be on your verified domain)</label>
-            <input className="neu-input" style={{ ...inp, width: '100%' }} value={cf.from} onChange={(e) => setCf({ ...cf, from: e.target.value })} placeholder="no-reply@xmarket-app.shop" />
+            <label style={lbl}>Web app URL</label>
+            <input className="neu-input" style={{ ...inp, width: '100%' }} value={cf.url} onChange={(e) => setCf({ ...cf, url: e.target.value })} placeholder="https://script.google.com/macros/s/.../exec" />
+            <label style={lbl}>Secret {cfg && cfg.key_hint ? '(leave blank to keep the saved one)' : ''}</label>
+            <input type="password" autoComplete="off" className="neu-input" style={{ ...inp, width: '100%' }} value={cf.secret} onChange={(e) => setCf({ ...cf, secret: e.target.value })} placeholder="The same secret you put in the script" />
+            <label style={lbl}>Your Gmail address (for reference)</label>
+            <input className="neu-input" style={{ ...inp, width: '100%' }} value={cf.from} onChange={(e) => setCf({ ...cf, from: e.target.value })} placeholder="you@gmail.com" />
             <label style={lbl}>Sender name</label>
             <input className="neu-input" style={{ ...inp, width: '100%' }} value={cf.name} onChange={(e) => setCf({ ...cf, name: e.target.value })} />
             <button className="neu-btn neu-btn-success" disabled={busy} onClick={saveCfg} style={{ marginTop: 12, padding: '9px 20px', fontWeight: 800 }}>Save</button>
@@ -228,10 +230,10 @@ export default function NotifyCenter() {
             {results.map((r, i) => (
               <div key={i} style={{ borderTop: '1px solid var(--border)', padding: '8px 0', fontSize: 13 }}>
                 <b style={{ color: r.status_code >= 200 && r.status_code < 300 ? '#059669' : r.status_code ? '#DC2626' : '#64748B' }}>{r.status_code ? 'HTTP ' + r.status_code : 'Pending'}</b> · {r.kind} · {r.n} email(s) · <span style={muted}>{dateTime(r.created_at)}</span>
-                {r.status_code >= 300 && <div style={{ color: '#DC2626', wordBreak: 'break-word' }}>{r.detail}</div>}
+                {r.detail && <div style={{ color: r.status_code >= 300 ? '#DC2626' : '#64748B', wordBreak: 'break-word' }}>{r.detail}</div>}
               </div>
             ))}
-            <div style={{ ...muted, marginTop: 8 }}>Results are kept for a few hours. Resend's free plan allows 100 emails per day.</div>
+            <div style={{ ...muted, marginTop: 8 }}>Results are kept for a few hours. A free Gmail account can send about 100 emails per day.</div>
           </div>
         </>
       )}
