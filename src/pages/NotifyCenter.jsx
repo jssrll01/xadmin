@@ -241,6 +241,7 @@ export default function NotifyCenter() {
       {tab === 'log' && (
         <>
           <button className="neu-btn" onClick={loadList} style={{ padding: '7px 14px', marginBottom: 10 }}>Refresh</button>
+          {data.log.length > 0 && <button type="button" className="neu-btn" style={{ padding: '7px 14px', marginBottom: 10, marginLeft: 8, color: '#DC2626' }} onClick={async () => { if (window.prompt('Delete ALL send history? Type DELETE to confirm.') !== 'DELETE') return; try { await rpc('admin_nx_clear', { p_what: 'log' }); show?.('Cleared', 'success'); loadList(); } catch (e) { show?.(e.message || String(e), 'error'); } }}>Clear all</button>}
           {data.log.length === 0 && <div style={{ ...card, opacity: 0.7 }}>Nothing sent yet.</div>}
           {data.log.map((r) => (
             <div key={r.id} style={card}>
