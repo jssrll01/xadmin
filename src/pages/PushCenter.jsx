@@ -109,7 +109,7 @@ export default function PushCenter() {
       </Card>
 
       <Card style={{ marginBottom: 14 }}>
-        <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 8 }}>Sent pushes</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}><div style={{ fontSize: 15, fontWeight: 800, flex: 1 }}>Sent pushes</div><button type="button" className="neu-btn" style={{ padding: '5px 12px', fontSize: 12, color: '#DC2626' }} onClick={async () => { if (window.prompt('Delete ALL sent push history? Users keep the notifications they already received. Type DELETE to confirm.') !== 'DELETE') return; try { await xrpc('adm_push_clear', { p_what: 'campaigns' }); setHist(await xrpc('adm_push_history')); setErr(''); } catch (e) { setErr(e.message || String(e)); } }}>Clear all</button></div>
         {err && <div className="ui-err" role="alert">{err}</div>}
         {!hist && !err && <div style={dim}>Loading…</div>}
         {hist && !rows.length && <div style={dim}>Nothing sent yet.</div>}
@@ -133,7 +133,7 @@ export default function PushCenter() {
       </Card>
 
       <Card>
-        <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 8 }}>Recent admin alerts</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}><div style={{ fontSize: 15, fontWeight: 800, flex: 1 }}>Recent admin alerts</div><button type="button" className="neu-btn" style={{ padding: '5px 12px', fontSize: 12, color: '#DC2626' }} onClick={async () => { if (window.prompt('Delete ALL admin alert history? Type DELETE to confirm.') !== 'DELETE') return; try { await xrpc('adm_push_clear', { p_what: 'alerts' }); setHist(await xrpc('adm_push_history')); setErr(''); } catch (e) { setErr(e.message || String(e)); } }}>Clear all</button></div>
         {hist && !alerts.length && <div style={dim}>No admin alerts yet.</div>}
         {alerts.map((a, i) => (
           <div key={i} style={{ padding: '6px 0', borderTop: i ? '1px solid rgba(0,0,0,.06)' : 'none', fontSize: 13 }}>

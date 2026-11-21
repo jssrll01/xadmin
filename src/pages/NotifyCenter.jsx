@@ -225,7 +225,7 @@ export default function NotifyCenter() {
             </div>
           </div>
           <div style={card}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}><b>Recent delivery results</b><button className="neu-btn" onClick={loadResults} style={{ marginLeft: 'auto', padding: '5px 12px' }}>Refresh</button></div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}><b>Recent delivery results</b><button type="button" className="neu-btn" style={{ padding: '5px 12px', fontSize: 12, color: '#DC2626' }} onClick={async () => { if (window.prompt('Delete ALL email delivery results? Type DELETE to confirm.') !== 'DELETE') return; try { await rpc('admin_nx_clear', { p_what: 'email' }); show?.('Cleared', 'success'); loadResults(); } catch (e) { show?.(e.message || String(e), 'error'); } }}>Clear all</button><button className="neu-btn" onClick={loadResults} style={{ marginLeft: 'auto', padding: '5px 12px' }}>Refresh</button></div>
             {results.length === 0 && <div style={{ ...muted, marginTop: 6 }}>No emails sent yet.</div>}
             {results.map((r, i) => (
               <div key={i} style={{ borderTop: '1px solid var(--border)', padding: '8px 0', fontSize: 13 }}>
