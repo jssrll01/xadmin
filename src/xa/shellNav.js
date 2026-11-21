@@ -124,6 +124,7 @@ export const XMARKET_GROUPS = [
     ['/market-qa', 'Market & Q&A', HelpCircle], ['/reports', 'Reports', Flag]] },
   { id: 'marketing', label: 'Marketing and Games', items: [
     ['/push', 'Push Center', PushNavIcon],
+    ['/notify-center', 'Notification Center', PushNavIcon],
     ['/banners', 'Banner', ImageIcon], ['/articles', 'Articles', Newspaper], ['/notifications', 'Notifications', Bell], ['/notify', 'Notify', Megaphone],
     ['/xf-price-drops', 'Price Drops', TrendingDown], ['/xf-digital', 'Digital Products', Download],
     ['/xf-polls', 'Demand Polls', Vote], ['/xf-sponsor', 'Sponsorships', Handshake],

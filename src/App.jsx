@@ -75,6 +75,7 @@ import Promos from './pages/Promos.jsx';
 import Settings from './pages/Settings.jsx';
 import AuditLog from './pages/AuditLog.jsx';
 import PushCenter from './pages/PushCenter.jsx';
+import NotifyCenter from './pages/NotifyCenter.jsx';
 import SecurityCheck from './pages/SecurityCheck.jsx';
 import AdminSessions from './pages/AdminSessions.jsx';
 import LoginAttempts from './pages/LoginAttempts.jsx';
@@ -318,6 +319,7 @@ export default function App() {
           <Route path="/daily"     element={<DailyNotes />} />
           <Route path="/audit"     element={<AuditLog />} />
           <Route path="/push" element={<PushCenter />} />
+          <Route path="/notify-center" element={<NotifyCenter />} />
           <Route path="/security-check" element={<SecurityCheck />} />
           <Route path="/admin-sessions" element={<AdminSessions />} />
           <Route path="/login-attempts" element={<LoginAttempts />} />
